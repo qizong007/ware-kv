@@ -6,7 +6,7 @@ import (
 )
 
 type String struct {
-	Val string
+	Val        string
 	CreateTime int64
 	UpdateTime int64
 	DeleteTime int64

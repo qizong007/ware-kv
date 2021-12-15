@@ -20,8 +20,8 @@ func MakeResponse(c *gin.Context, resp *WareResponse) {
 	}
 
 	respMap := gin.H{
-		"code":      resp.Code,
-		"msg":       msg,
+		"code": resp.Code,
+		"msg":  msg,
 	}
 	if resp.Val != nil {
 		respMap["data"] = resp.Val

@@ -5,4 +5,3 @@ import "ware-kv/storage"
 var (
 	WTable *storage.WareTable
 )
-

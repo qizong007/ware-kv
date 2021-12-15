@@ -1,7 +1,7 @@
 package storage
 
 type Key struct {
-	Val  string
+	Val string
 }
 
 func (k *Key) Hashcode() int {
@@ -19,6 +19,6 @@ func (k *Key) Hashcode() int {
 
 func MakeKey(key string) *Key {
 	return &Key{
-		Val:  key,
+		Val: key,
 	}
 }
