@@ -16,8 +16,6 @@
 
 集成了**常用的中间件与常见问题解决方案**于一身的kv数据库
 
-多map表 → 缓解锁问题（表扩充，rehash）
-
 ## 想法来源
 - ES的风格
 - 七零八落的各种中间件
@@ -28,10 +26,8 @@
 
 - 支持多种数据类型
     - string
-    - number
-        - 计数器
-        - 计时器
-    - list/deque
+    - counter(计数器)
+    - list
     - sort-list
     - object
     - set
