@@ -3,12 +3,15 @@ package initializer
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/gookit/color"
+	"ware-kv/global"
+	"ware-kv/storage"
 )
 
 func Boot() *gin.Engine {
 	engine := gin.Default()
 	Register(engine)
 	showFrame()
+	global.WTable = storage.NewWareTable()
 	return engine
 }
 
