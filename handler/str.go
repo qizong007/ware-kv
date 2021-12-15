@@ -59,13 +59,13 @@ func SetStr(c *gin.Context) {
 }
 
 func DeleteStr(c *gin.Context) {
-	_, val := findKeyAndValue(c)
+	key, val := findKeyAndValue(c)
 	if !isValEffective(c, val) {
 		return
 	}
+	global.WTable.Delete(key)
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
-		Val:  val.GetValue(),
 	})
 }
 
