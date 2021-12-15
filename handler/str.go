@@ -10,22 +10,8 @@ import (
 )
 
 func GetStr(c *gin.Context) {
-	paramKey := c.Param("key")
-	if paramKey == "" {
-		log.Println("key is null")
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.ParamError,
-			Msg:  "Key should not be null!",
-		})
-		return
-	}
-	key := storage.MakeKey(paramKey)
-	val := global.WTable.Get(key)
-	if val == nil || !val.IsAlive() {
-		log.Println("key is not existed")
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.KeyNotExisted,
-		})
+	_, val := findKeyAndValue(c)
+	if !isValEffective(c, val) {
 		return
 	}
 	util.MakeResponse(c, &util.WareResponse{
@@ -50,10 +36,10 @@ func SetStr(c *gin.Context) {
 	var val interface{}
 	var ok bool
 	if paramKey, ok = optionMap["k"]; !ok {
-		log.Println("val is null")
+		log.Println("key is null")
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.ParamError,
-			Msg:  "Val should not be null!",
+			Msg:  "Key should not be null!",
 		})
 		return
 	}
@@ -73,18 +59,24 @@ func SetStr(c *gin.Context) {
 }
 
 func DeleteStr(c *gin.Context) {
-	key, val := findKeyAndValue(c)
-	if !val.IsAlive() {
-		log.Println("key is dead")
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.KeyNotExisted,
-			Msg:  "Key has been deleted...",
-		})
+	_, val := findKeyAndValue(c)
+	if !isValEffective(c, val) {
 		return
 	}
-	global.WTable.Delete(key)
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
+		Val:  val.GetValue(),
+	})
+}
+
+func GetStrLen(c *gin.Context) {
+	_, val := findKeyAndValue(c)
+	if !isValEffective(c, val) {
+		return
+	}
+	util.MakeResponse(c, &util.WareResponse{
+		Code: util.Success,
+		Val:  ds.Value2String(val).GetLen(),
 	})
 }
 
@@ -100,4 +92,23 @@ func findKeyAndValue(c *gin.Context) (*storage.Key, storage.Value) {
 	key := storage.MakeKey(paramKey)
 	val := global.WTable.Get(key)
 	return key, val
+}
+
+func isValEffective(c *gin.Context, val storage.Value) bool {
+	if val == nil {
+		log.Println("key is not existed")
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.KeyNotExisted,
+		})
+		return false
+	}
+	if !val.IsAlive() {
+		log.Println("key is dead")
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.KeyHasDeleted,
+			Msg:  "Key has been deleted...",
+		})
+		return false
+	}
+	return true
 }

@@ -24,7 +24,7 @@ func MakeResponse(c *gin.Context, resp *WareResponse) {
 		"msg":  msg,
 	}
 	if resp.Val != nil {
-		respMap["data"] = resp.Val
+		respMap["result"] = resp.Val
 	}
 	timeCost := TimeCost(c)
 	if timeCost != "" {

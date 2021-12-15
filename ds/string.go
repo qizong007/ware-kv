@@ -3,6 +3,7 @@ package ds
 import (
 	"fmt"
 	"time"
+	"ware-kv/storage"
 )
 
 type String struct {
@@ -21,11 +22,7 @@ func (s *String) SetValue(val interface{}) {
 }
 
 func (s *String) DeleteValue() {
-	fmt.Println(s.DeleteTime)
-	fmt.Println(s)
 	s.DeleteTime = time.Now().Unix()
-	fmt.Println(s.DeleteTime)
-	fmt.Println(s)
 }
 
 func (s *String) IsAlive() bool {
@@ -45,6 +42,10 @@ func MakeString(val string) *String {
 	}
 }
 
+func Value2String(val storage.Value) *String {
+	return val.(*String)
+}
+
 func (s *String) GetLen() int {
 	return len(s.Val)
 }
@@ -53,7 +54,7 @@ func (s *String) Append(str string) {
 	s.Val = s.Val + str
 }
 
-// GetRange 取范围（左闭右开）
+// GetRange TODO 取范围（左闭右开）
 // start为左， == -1 参数无效
 //  end  == -1 参数无效
 func (s *String) GetRange(start int, end int) (string, error) {
@@ -76,6 +77,5 @@ func (s *String) GetRange(start int, end int) (string, error) {
 }
 
 // TODO
-//   append
 // 	 expire
 // 	 set if not exist
