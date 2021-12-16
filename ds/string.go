@@ -7,10 +7,8 @@ import (
 )
 
 type String struct {
-	Val        string
-	CreateTime int64
-	UpdateTime int64
-	DeleteTime int64
+	Base
+	Val string
 }
 
 func (s *String) GetValue() interface{} {
@@ -21,24 +19,16 @@ func (s *String) SetValue(val interface{}) {
 	s.Val = val.(string)
 }
 
-func (s *String) DeleteValue() {
-	s.DeleteTime = time.Now().Unix()
-}
-
-func (s *String) IsAlive() bool {
-	if s.DeleteTime == 0 {
-		return true
-	}
-	return false
-}
-
 func MakeString(val string) *String {
 	t := time.Now().Unix()
 	return &String{
-		Val:        val,
-		CreateTime: t,
-		UpdateTime: t,
-		DeleteTime: 0,
+		Base: Base{
+			CreateTime: t,
+			UpdateTime: t,
+			DeleteTime: 0,
+			ExpireTime: nil,
+		},
+		Val: val,
 	}
 }
 
