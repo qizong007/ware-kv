@@ -7,6 +7,7 @@ type Base struct {
 	UpdateTime int64
 	DeleteTime int64
 	ExpireTime *int64
+	Version    int64
 }
 
 func (b *Base) DeleteValue() {

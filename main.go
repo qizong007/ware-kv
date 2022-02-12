@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"ware-kv/initializer"
+	"ware-kv/warekv"
 )
 
 const (
@@ -10,6 +10,6 @@ const (
 )
 
 func main() {
-	r := initializer.Boot()
+	r := warekv.Boot()
 	r.Run(fmt.Sprintf(":%s", Port))
 }

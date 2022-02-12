@@ -1,17 +1,16 @@
-package initializer
+package warekv
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/gookit/color"
-	"ware-kv/global"
-	"ware-kv/storage"
+	storage2 "ware-kv/warekv/storage"
 )
 
 func Boot() *gin.Engine {
 	engine := gin.Default()
 	Register(engine)
 	showFrame()
-	global.WTable = storage.NewWareTable()
+	WTable = storage2.NewWareTable()
 	return engine
 }
 

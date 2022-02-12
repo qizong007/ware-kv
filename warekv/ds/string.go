@@ -3,7 +3,7 @@ package ds
 import (
 	"fmt"
 	"time"
-	"ware-kv/storage"
+	storage2 "ware-kv/warekv/storage"
 )
 
 type String struct {
@@ -32,7 +32,7 @@ func MakeString(val string) *String {
 	}
 }
 
-func Value2String(val storage.Value) *String {
+func Value2String(val storage2.Value) *String {
 	return val.(*String)
 }
 
