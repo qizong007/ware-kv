@@ -1,6 +1,8 @@
 package ds
 
-import "time"
+import (
+	"time"
+)
 
 type Base struct {
 	CreateTime int64

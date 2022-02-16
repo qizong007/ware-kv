@@ -1,7 +1,7 @@
 package manager
 
 import (
-	storage2 "ware-kv/warekv/storage"
+	"ware-kv/warekv/storage"
 )
 
 // SubscribeCenter 订阅中心
@@ -20,6 +20,6 @@ type CallbackPlan struct {
 }
 
 // Subscribe 订阅
-func (s *SubscribeCenter) Subscribe(k *storage2.Key, plan *CallbackPlan) {
+func (s *SubscribeCenter) Subscribe(k *storage.Key, plan *CallbackPlan) {
 
 }

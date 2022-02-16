@@ -7,21 +7,13 @@ import (
 )
 
 func TestKeyHashcode(t *testing.T) {
-	a := "Aa"
-	key := &Key{}
-	key.Val = a
+	key := MakeKey("Aa")
 	fmt.Println(key.Hashcode())
-	b := "BB"
-	key = &Key{}
-	key.Val = b
+	key.SetKey("BB")
 	fmt.Println(key.Hashcode())
-	c := "hello"
-	key = &Key{}
-	key.Val = c
+	key.SetKey("hello")
 	fmt.Println(key.Hashcode())
-	d := "祺总007"
-	key = &Key{}
-	key.Val = d
+	key.SetKey("祺总007")
 	tm := time.Now()
 	key.Hashcode()
 	fmt.Println(time.Since(tm))

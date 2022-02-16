@@ -4,9 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"ware-kv/warekv"
-	ds2 "ware-kv/warekv/ds"
-	storage2 "ware-kv/warekv/storage"
-	util2 "ware-kv/warekv/util"
+	"ware-kv/warekv/ds"
+	"ware-kv/warekv/storage"
+	"ware-kv/warekv/util"
 )
 
 func GetStr(c *gin.Context) {
@@ -14,8 +14,8 @@ func GetStr(c *gin.Context) {
 	if !isValEffective(c, val) {
 		return
 	}
-	util2.MakeResponse(c, &util2.WareResponse{
-		Code: util2.Success,
+	util.MakeResponse(c, &util.WareResponse{
+		Code: util.Success,
 		Val:  val.GetValue(),
 	})
 }
@@ -25,8 +25,8 @@ func SetStr(c *gin.Context) {
 	err := c.BindJSON(&optionMap)
 	if err != nil {
 		log.Println("BindJSON fail")
-		util2.MakeResponse(c, &util2.WareResponse{
-			Code: util2.ParamError,
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ParamError,
 			Msg:  "Param bind json fail!",
 		})
 		return
@@ -37,24 +37,24 @@ func SetStr(c *gin.Context) {
 	var ok bool
 	if paramKey, ok = optionMap["k"]; !ok {
 		log.Println("key is null")
-		util2.MakeResponse(c, &util2.WareResponse{
-			Code: util2.ParamError,
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ParamError,
 			Msg:  "Key should not be null!",
 		})
 		return
 	}
-	key := storage2.MakeKey(paramKey.(string))
+	key := storage.MakeKey(paramKey.(string))
 	if val, ok = optionMap["v"]; !ok {
 		log.Println("val is null")
-		util2.MakeResponse(c, &util2.WareResponse{
-			Code: util2.ParamError,
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ParamError,
 			Msg:  "Val should not be null!",
 		})
 		return
 	}
-	warekv.WTable.Set(key, ds2.MakeString(val.(string)))
-	util2.MakeResponse(c, &util2.WareResponse{
-		Code: util2.Success,
+	warekv.WTable.Set(key, ds.MakeString(val.(string)))
+	util.MakeResponse(c, &util.WareResponse{
+		Code: util.Success,
 	})
 }
 
@@ -64,8 +64,8 @@ func DeleteStr(c *gin.Context) {
 		return
 	}
 	warekv.WTable.Delete(key)
-	util2.MakeResponse(c, &util2.WareResponse{
-		Code: util2.Success,
+	util.MakeResponse(c, &util.WareResponse{
+		Code: util.Success,
 	})
 }
 
@@ -74,38 +74,38 @@ func GetStrLen(c *gin.Context) {
 	if !isValEffective(c, val) {
 		return
 	}
-	util2.MakeResponse(c, &util2.WareResponse{
-		Code: util2.Success,
-		Val:  ds2.Value2String(val).GetLen(),
+	util.MakeResponse(c, &util.WareResponse{
+		Code: util.Success,
+		Val:  ds.Value2String(val).GetLen(),
 	})
 }
 
-func findKeyAndValue(c *gin.Context) (*storage2.Key, storage2.Value) {
+func findKeyAndValue(c *gin.Context) (*storage.Key, storage.Value) {
 	paramKey := c.Param("key")
 	if paramKey == "" {
 		log.Println("key is null")
-		util2.MakeResponse(c, &util2.WareResponse{
-			Code: util2.ParamError,
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ParamError,
 			Msg:  "Key should not be null!",
 		})
 	}
-	key := storage2.MakeKey(paramKey)
+	key := storage.MakeKey(paramKey)
 	val := warekv.WTable.Get(key)
 	return key, val
 }
 
-func isValEffective(c *gin.Context, val storage2.Value) bool {
+func isValEffective(c *gin.Context, val storage.Value) bool {
 	if val == nil {
 		log.Println("key is not existed")
-		util2.MakeResponse(c, &util2.WareResponse{
-			Code: util2.KeyNotExisted,
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.KeyNotExisted,
 		})
 		return false
 	}
 	if !val.IsAlive() {
 		log.Println("key is dead")
-		util2.MakeResponse(c, &util2.WareResponse{
-			Code: util2.KeyHasDeleted,
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.KeyHasDeleted,
 			Msg:  "Key has been deleted...",
 		})
 		return false

@@ -6,16 +6,16 @@ const (
 
 // WareTable 总表
 type WareTable struct {
-	TableList []*TableUnit
+	TableList []*Shard
 	TableNum  int // 永远保持2的倍数，方便哈希计算
 }
 
 func NewWareTable() *WareTable {
 	wt := &WareTable{}
-	wt.TableList = make([]*TableUnit, DefaultTableNum)
+	wt.TableList = make([]*Shard, DefaultTableNum)
 	wt.TableNum = DefaultTableNum
 	for i := range wt.TableList {
-		wt.TableList[i] = newTableUnit()
+		wt.TableList[i] = newShard()
 	}
 	return wt
 }
