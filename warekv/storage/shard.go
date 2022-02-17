@@ -10,6 +10,13 @@ const (
 	defaultTickInterval  = 100 * time.Millisecond
 )
 
+type writeEvent int
+
+const (
+	SetEvent = iota
+	DeleteEvent
+)
+
 // Shard 表分片
 type Shard struct {
 	table      map[string]Value
@@ -20,6 +27,7 @@ type Shard struct {
 
 // 写请求
 type writeReq struct {
+	event writeEvent
 	key   *Key
 	value Value
 }
@@ -43,6 +51,7 @@ func (s *Shard) Get(key *Key) Value {
 func (s *Shard) Set(key *Key, val Value) {
 	// 写入写事件队列
 	s.writeQueue <- &writeReq{
+		event: SetEvent,
 		key:   key,
 		value: val,
 	}
@@ -58,7 +67,12 @@ func (s *Shard) scheduledBatchCommit() {
 			// 批量写入
 			s.rw.Lock()
 			for entry := range s.writeQueue {
-				s.table[entry.key.GetKey()] = entry.value
+				switch entry.event {
+				case SetEvent:
+					s.table[entry.key.GetKey()] = entry.value
+				case DeleteEvent:
+					s.table[entry.key.GetKey()].DeleteValue()
+				}
 				if len(s.writeQueue) == 0 {
 					break
 				}
@@ -68,9 +82,11 @@ func (s *Shard) scheduledBatchCommit() {
 	}
 }
 
-// todo GC
 func (s *Shard) Delete(key *Key) {
 	s.rw.Lock()
 	defer s.rw.Unlock()
-	s.table[key.GetKey()].DeleteValue()
+	s.writeQueue <- &writeReq{
+		event: DeleteEvent,
+		key:   key,
+	}
 }

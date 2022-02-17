@@ -22,3 +22,7 @@ func (b *Base) IsAlive() bool {
 	}
 	return false
 }
+
+func (b *Base) Size() int {
+	return 5 * 8 // 字段数 * 大小
+}

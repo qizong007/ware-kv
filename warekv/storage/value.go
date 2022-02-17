@@ -6,4 +6,5 @@ type Value interface {
 	GetValue() interface{}
 	DeleteValue()
 	IsAlive() bool
+	Size() int
 }
