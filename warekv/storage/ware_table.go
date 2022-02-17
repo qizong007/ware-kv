@@ -4,20 +4,27 @@ const (
 	DefaultTableNum = 16
 )
 
+var (
+	wTable *WareTable
+)
+
+func init() {
+	wTable = &WareTable{}
+	wTable.TableList = make([]*Shard, DefaultTableNum)
+	wTable.TableNum = DefaultTableNum
+	for i := range wTable.TableList {
+		wTable.TableList[i] = newShard()
+	}
+}
+
 // WareTable 总表
 type WareTable struct {
 	TableList []*Shard
 	TableNum  int // 永远保持2的倍数，方便哈希计算
 }
 
-func NewWareTable() *WareTable {
-	wt := &WareTable{}
-	wt.TableList = make([]*Shard, DefaultTableNum)
-	wt.TableNum = DefaultTableNum
-	for i := range wt.TableList {
-		wt.TableList[i] = newShard()
-	}
-	return wt
+func GetWareTable() *WareTable {
+	return wTable
 }
 
 func (w *WareTable) wHash(key *Key) int {

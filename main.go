@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gookit/color"
-	"ware-kv/warekv"
 	"ware-kv/warekv/handler"
-	"ware-kv/warekv/storage"
 )
 
 const (
@@ -17,7 +15,6 @@ func boot() *gin.Engine {
 	engine := gin.Default()
 	handler.Register(engine)
 	showFrame()
-	warekv.WTable = storage.NewWareTable()
 	return engine
 }
 

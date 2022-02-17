@@ -3,7 +3,6 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"log"
-	"ware-kv/warekv"
 	"ware-kv/warekv/ds"
 	"ware-kv/warekv/storage"
 	"ware-kv/warekv/util"
@@ -52,7 +51,7 @@ func SetStr(c *gin.Context) {
 		})
 		return
 	}
-	warekv.WTable.Set(key, ds.MakeString(val.(string)))
+	storage.GetWareTable().Set(key, ds.MakeString(val.(string)))
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 	})
@@ -63,7 +62,7 @@ func DeleteStr(c *gin.Context) {
 	if !isValEffective(c, val) {
 		return
 	}
-	warekv.WTable.Delete(key)
+	storage.GetWareTable().Delete(key)
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 	})
@@ -90,7 +89,7 @@ func findKeyAndValue(c *gin.Context) (*storage.Key, storage.Value) {
 		})
 	}
 	key := storage.MakeKey(paramKey)
-	val := warekv.WTable.Get(key)
+	val := storage.GetWareTable().Get(key)
 	return key, val
 }
 
