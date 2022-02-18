@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	defaultWriteQueueCap = 256 // 默认写请求缓存容量
-	defaultTickInterval  = 100 * time.Millisecond
+	defaultWriteQueueCap     = 256 // 默认写请求缓存容量
+	defaultWriteTickInterval = 100 * time.Millisecond
 )
 
 type writeEvent int
@@ -22,7 +22,9 @@ type Shard struct {
 	table      map[string]Value
 	rw         sync.RWMutex
 	writeQueue chan *writeReq // 写请求缓存队列
-	ticker     *time.Ticker   // 写队列的定时器
+	wqTicker   *time.Ticker   // 写队列的定时器
+	gcTasks    chan string    // gc task 任务队列（存key）
+	gcTicker   *time.Ticker   // gc task 的定时器
 }
 
 // 写请求
@@ -36,7 +38,9 @@ func newShard() *Shard {
 	shard := &Shard{
 		table:      make(map[string]Value),
 		writeQueue: make(chan *writeReq, defaultWriteQueueCap),
-		ticker:     time.NewTicker(defaultTickInterval),
+		gcTasks:    make(chan string, defaultGCTaskCap),
+		wqTicker:   time.NewTicker(defaultWriteTickInterval),
+		gcTicker:   time.NewTicker(defaultGCTickInterval),
 	}
 	go shard.scheduledBatchCommit()
 	return shard
@@ -49,7 +53,6 @@ func (s *Shard) Get(key *Key) Value {
 }
 
 func (s *Shard) Set(key *Key, val Value) {
-	// 写入写事件队列
 	s.writeQueue <- &writeReq{
 		event: SetEvent,
 		key:   key,
@@ -57,36 +60,48 @@ func (s *Shard) Set(key *Key, val Value) {
 	}
 }
 
+func (s *Shard) Delete(key *Key) {
+	s.writeQueue <- &writeReq{
+		event: DeleteEvent,
+		key:   key,
+	}
+}
+
 func (s *Shard) scheduledBatchCommit() {
 	for {
 		select {
-		case <-s.ticker.C:
+		case <-s.wqTicker.C: // 批量写入
 			if len(s.writeQueue) == 0 {
 				continue
 			}
 			// 批量写入
 			s.rw.Lock()
 			for entry := range s.writeQueue {
+				key := entry.key.GetKey()
 				switch entry.event {
 				case SetEvent:
-					s.table[entry.key.GetKey()] = entry.value
+					s.table[key] = entry.value
 				case DeleteEvent:
-					s.table[entry.key.GetKey()].DeleteValue()
+					s.table[key].DeleteValue()
+					s.gcTasks <- key
 				}
 				if len(s.writeQueue) == 0 {
 					break
 				}
 			}
 			s.rw.Unlock()
+		case <-s.gcTicker.C: // 批量清扫
+			if len(s.gcTasks) == 0 {
+				continue
+			}
+			s.rw.Lock()
+			for key := range s.gcTasks {
+				delete(s.table, key)
+				if len(s.gcTasks) == 0 {
+					break
+				}
+			}
+			s.rw.Unlock()
 		}
-	}
-}
-
-func (s *Shard) Delete(key *Key) {
-	s.rw.Lock()
-	defer s.rw.Unlock()
-	s.writeQueue <- &writeReq{
-		event: DeleteEvent,
-		key:   key,
 	}
 }
