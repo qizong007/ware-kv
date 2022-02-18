@@ -23,8 +23,7 @@ type Shard struct {
 	rw         sync.RWMutex
 	writeQueue chan *writeReq // 写请求缓存队列
 	wqTicker   *time.Ticker   // 写队列的定时器
-	gcTasks    chan string    // gc task 任务队列（存key）
-	gcTicker   *time.Ticker   // gc task 的定时器
+	gc         *WareGC
 }
 
 // 写请求
@@ -38,9 +37,8 @@ func newShard() *Shard {
 	shard := &Shard{
 		table:      make(map[string]Value),
 		writeQueue: make(chan *writeReq, defaultWriteQueueCap),
-		gcTasks:    make(chan string, defaultGCTaskCap),
 		wqTicker:   time.NewTicker(defaultWriteTickInterval),
-		gcTicker:   time.NewTicker(defaultGCTickInterval),
+		gc:         NewWareGC(),
 	}
 	go shard.scheduledBatchCommit()
 	return shard
@@ -74,7 +72,6 @@ func (s *Shard) scheduledBatchCommit() {
 			if len(s.writeQueue) == 0 {
 				continue
 			}
-			// 批量写入
 			s.rw.Lock()
 			for entry := range s.writeQueue {
 				key := entry.key.GetKey()
@@ -83,21 +80,21 @@ func (s *Shard) scheduledBatchCommit() {
 					s.table[key] = entry.value
 				case DeleteEvent:
 					s.table[key].DeleteValue()
-					s.gcTasks <- key
+					s.gc.Commit(key)
 				}
 				if len(s.writeQueue) == 0 {
 					break
 				}
 			}
 			s.rw.Unlock()
-		case <-s.gcTicker.C: // 批量清扫
-			if len(s.gcTasks) == 0 {
+		case <-s.gc.gcTicker.C: // 批量清扫
+			if len(s.gc.gcTasks) == 0 {
 				continue
 			}
 			s.rw.Lock()
-			for key := range s.gcTasks {
+			for key := range s.gc.gcTasks {
 				delete(s.table, key)
-				if len(s.gcTasks) == 0 {
+				if len(s.gc.gcTasks) == 0 {
 					break
 				}
 			}
