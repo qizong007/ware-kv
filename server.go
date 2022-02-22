@@ -5,14 +5,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gookit/color"
 	"ware-kv/warekv/handler"
+	"ware-kv/warekv/manager"
 	"ware-kv/warekv/storage"
 )
 
 var Server *WareKV
 
 type WareKV struct {
-	wTable *storage.WareTable
-	router *gin.Engine
+	wTable          *storage.WareTable
+	router          *gin.Engine
+	subscribeCenter *manager.SubscribeCenter
 	//options（布隆开关、日志开关）
 	//stats
 	//machine info
@@ -25,8 +27,9 @@ type WareKV struct {
 
 func Boot(port string) {
 	Server = &WareKV{
-		wTable: storage.GetWareTable(),
-		router: gin.Default(),
+		wTable:          storage.GetWareTable(),
+		router:          gin.Default(),
+		subscribeCenter: manager.GetSubscribeCenter(),
 	}
 	handler.Register(Server.router)
 	showFrame()

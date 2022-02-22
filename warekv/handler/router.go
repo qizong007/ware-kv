@@ -14,6 +14,8 @@ func Register(r *gin.Engine) {
 	r.PUT("/str", SetStr)
 	r.DELETE("/str/:key", DeleteStr)
 	r.GET("/str/:key/len", GetStrLen)
+	// subscribe
+	r.POST("/subscribe", SubscribeKey)
 	// test
 	r.GET("/ping", Ping)
 }

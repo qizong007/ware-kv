@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"ware-kv/warekv/ds"
+	"ware-kv/warekv/manager"
 	"ware-kv/warekv/storage"
 	"ware-kv/warekv/util"
 )
@@ -51,7 +52,11 @@ func SetStr(c *gin.Context) {
 		})
 		return
 	}
-	storage.GetWareTable().Set(key, ds.MakeString(val.(string)))
+
+	newVal := ds.MakeString(val.(string))
+	storage.GetWareTable().Set(key, newVal)
+	go manager.GetSubscribeCenter().Notify(key.GetKey(), newVal, manager.CallbackSetEvent)
+
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 	})
@@ -63,6 +68,8 @@ func DeleteStr(c *gin.Context) {
 		return
 	}
 	storage.GetWareTable().Delete(key)
+	//go manager.GetSubscribeCenter().Notify(key.GetKey(), nil, manager.CallbackSetEvent)
+
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 	})
@@ -77,37 +84,4 @@ func GetStrLen(c *gin.Context) {
 		Code: util.Success,
 		Val:  ds.Value2String(val).GetLen(),
 	})
-}
-
-func findKeyAndValue(c *gin.Context) (*storage.Key, storage.Value) {
-	paramKey := c.Param("key")
-	if paramKey == "" {
-		log.Println("key is null")
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.ParamError,
-			Msg:  "Key should not be null!",
-		})
-	}
-	key := storage.MakeKey(paramKey)
-	val := storage.GetWareTable().Get(key)
-	return key, val
-}
-
-func isValEffective(c *gin.Context, val storage.Value) bool {
-	if val == nil {
-		log.Println("key is not existed")
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.KeyNotExisted,
-		})
-		return false
-	}
-	if !val.IsAlive() {
-		log.Println("key is dead")
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.KeyHasDeleted,
-			Msg:  "Key has been deleted...",
-		})
-		return false
-	}
-	return true
 }
