@@ -1,7 +1,6 @@
 package ds
 
 import (
-	"time"
 	"ware-kv/warekv/storage"
 )
 
@@ -19,14 +18,8 @@ func (s *String) SetValue(val interface{}) {
 }
 
 func MakeString(val string) *String {
-	t := time.Now().Unix()
 	return &String{
-		Base: Base{
-			CreateTime: t,
-			UpdateTime: t,
-			DeleteTime: 0,
-			ExpireTime: nil,
-		},
+		Base: *NewBase(),
 		str: val,
 	}
 }

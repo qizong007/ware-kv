@@ -8,12 +8,17 @@ const (
 )
 
 type slNode struct {
-	score   int64
+	score   float64
 	val     interface{}
 	forward []*slNode // forward[i] 表示在第 i 层，当前节点的下一个节点
 }
 
-func newSLNode(score int64, value interface{}, level int) *slNode {
+type SlElement struct {
+	Score float64     `json:"score"`
+	Val   interface{} `json:"val"`
+}
+
+func newSLNode(score float64, value interface{}, level int) *slNode {
 	return &slNode{
 		score:   score,
 		val:     value,
@@ -52,19 +57,22 @@ func (n *slNode) Next() *slNode {
 	return nil
 }
 
-func (sl *SkipList) GetList() []interface{} {
-	list := make([]interface{}, sl.len)
+func (sl *SkipList) GetList() []SlElement {
+	list := make([]SlElement, sl.len)
 	x := sl.Front()
 	i := 0
 	for x != nil {
-		list[i] = x
+		list[i] = SlElement{
+			Score: x.score,
+			Val:   x.val,
+		}
 		x = x.Next()
 		i++
 	}
 	return list
 }
 
-func (sl *SkipList) Search(score int64) (*slNode, bool) {
+func (sl *SkipList) Search(score float64) (*slNode, bool) {
 	x := sl.header
 	for i := sl.level - 1; i >= 0; i-- {
 		for x.forward[i] != nil && x.forward[i].score < score {
@@ -78,7 +86,7 @@ func (sl *SkipList) Search(score int64) (*slNode, bool) {
 	return nil, false
 }
 
-func (sl *SkipList) Insert(score int64, value interface{}) *slNode {
+func (sl *SkipList) Insert(score float64, value interface{}) *slNode {
 	update := make([]*slNode, maxLevel)
 	x := sl.header
 	for i := sl.level - 1; i >= 0; i-- {
@@ -109,7 +117,7 @@ func (sl *SkipList) Insert(score int64, value interface{}) *slNode {
 	return newNode
 }
 
-func (sl *SkipList) Delete(score int64) *slNode {
+func (sl *SkipList) Delete(score float64) *slNode {
 	update := make([]*slNode, maxLevel)
 	x := sl.header
 	for i := sl.level - 1; i >= 0; i-- {
@@ -132,4 +140,8 @@ func (sl *SkipList) Delete(score int64) *slNode {
 	}
 
 	return nil
+}
+
+func (sl *SkipList) Len() int {
+	return sl.len
 }

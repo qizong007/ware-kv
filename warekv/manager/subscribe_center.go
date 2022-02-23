@@ -162,7 +162,6 @@ func (p *CallbackPlan) distribute() {
 	case http.MethodPost, http.MethodPut, http.MethodDelete:
 		p.notifyWithBody()
 	}
-
 }
 
 func (p *CallbackPlan) generateRequest() (*http.Request, error) {
@@ -183,6 +182,7 @@ func (p *CallbackPlan) generateGetPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
+	// fixme: 解析newVal
 	return fmt.Sprintf("%s?newVal=%s", p.callbackPath, paramStr), nil
 }
 

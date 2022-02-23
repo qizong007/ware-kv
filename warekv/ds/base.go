@@ -12,6 +12,16 @@ type Base struct {
 	Version    int64
 }
 
+func NewBase() *Base {
+	t := time.Now().Unix()
+	return &Base{
+		CreateTime: t,
+		UpdateTime: t,
+		DeleteTime: 0,
+		ExpireTime: nil,
+	}
+}
+
 func (b *Base) DeleteValue() {
 	b.DeleteTime = time.Now().Unix()
 }
