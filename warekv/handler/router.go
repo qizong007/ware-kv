@@ -8,6 +8,9 @@ import (
 func Register(r *gin.Engine) {
 	// 添加计时器
 	r.Use(util.TimeKeeping())
+	// 获取系统信息
+	r.GET("/", Info)
+	r.GET("/info", Info)
 	// string
 	r.GET("/str/:key", GetStr)
 	r.POST("/str", SetStr)
