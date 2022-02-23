@@ -42,6 +42,7 @@ func init() {
 		retryQueue:  make(chan *CallbackPlan, defaultCallbackRetryQueueLen),
 		retryTicker: time.NewTicker(defaultCallbackRetryTickInterval),
 	}
+	go center.scheduledRetry()
 }
 
 // SubscribeCenter 订阅中心
@@ -161,6 +162,7 @@ func (p *CallbackPlan) distribute() {
 	case http.MethodPost, http.MethodPut, http.MethodDelete:
 		p.notifyWithBody()
 	}
+
 }
 
 func (p *CallbackPlan) generateRequest() (*http.Request, error) {
@@ -187,27 +189,23 @@ func (p *CallbackPlan) generateGetPath() (string, error) {
 func (p *CallbackPlan) notifyInGet() {
 	getPath, err := p.generateGetPath()
 	if err != nil {
-		log.Fatalln("generateGetPath(), json解析错误", err)
+		log.Println("generateGetPath(), json解析错误", err)
 		return
 	}
 	resp, err := http.Get(getPath)
 	if err != nil {
 		p.dealWithCallbackErr()
-		log.Fatalln("http.Get(getPath), GET回调错误", err)
+		log.Println("http.Get(getPath), GET回调错误", err)
 		return
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode == http.StatusOK {
-		p.status = callbackSuccess
-		return
-	}
-	p.status = callbackFail
+	p.retryOrAbort(resp)
 }
 
 func (p *CallbackPlan) notifyWithBody() {
 	req, err := p.generateRequest()
 	if err != nil {
-		log.Fatalln("p.generateRequest(), 生成 req 错误", err)
+		log.Println("p.generateRequest(), 生成 req 错误", err)
 		return
 	}
 	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
@@ -215,15 +213,19 @@ func (p *CallbackPlan) notifyWithBody() {
 	resp, err := client.Do(req)
 	if err != nil {
 		p.dealWithCallbackErr()
-		log.Fatalln("client.Do(req) 回调错误", err)
+		log.Println("client.Do(req) 回调错误", err)
 		return
 	}
 	defer resp.Body.Close()
+	p.retryOrAbort(resp)
+}
+
+func (p *CallbackPlan) retryOrAbort(resp *http.Response) {
 	if resp.StatusCode == http.StatusOK {
 		p.status = callbackSuccess
-		return
+	} else {
+		p.dealWithCallbackErr()
 	}
-	p.status = callbackFail
 }
 
 func (p *CallbackPlan) dealWithCallbackErr() {

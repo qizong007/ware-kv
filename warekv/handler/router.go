@@ -18,4 +18,5 @@ func Register(r *gin.Engine) {
 	r.POST("/subscribe", SubscribeKey)
 	// test
 	r.GET("/ping", Ping)
+	r.GET("/err", Err500)
 }

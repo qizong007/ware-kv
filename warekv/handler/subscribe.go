@@ -62,7 +62,7 @@ func SubscribeKey(c *gin.Context) {
 		option.ExpectEvent = events
 	}
 	if paramRetryTimes, ok = optionMap["retry_times"]; ok {
-		option.RetryTimes = paramRetryTimes.(int)
+		option.RetryTimes = int(paramRetryTimes.(float64))
 	}
 
 	manager.GetSubscribeCenter().Subscribe(option)
