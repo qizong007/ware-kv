@@ -4,14 +4,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"ware-kv/warekv/ds"
-	"ware-kv/warekv/manager"
 	"ware-kv/warekv/storage"
 	"ware-kv/warekv/util"
 )
 
+type SetStrParam struct {
+	Key string `json:"k"`
+	Val string `json:"v"`
+}
+
 func SetStr(c *gin.Context) {
-	optionMap := make(map[string]interface{})
-	err := c.BindJSON(&optionMap)
+	param := SetStrParam{}
+	err := c.ShouldBindJSON(&param)
 	if err != nil {
 		log.Println("BindJSON fail")
 		util.MakeResponse(c, &util.WareResponse{
@@ -21,30 +25,10 @@ func SetStr(c *gin.Context) {
 		return
 	}
 
-	var paramKey interface{}
-	var val interface{}
-	var ok bool
-	if paramKey, ok = optionMap["k"]; !ok {
-		log.Println("key is null")
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.ParamError,
-			Msg:  "Key should not be null!",
-		})
-		return
-	}
-	key := storage.MakeKey(paramKey.(string))
-	if val, ok = optionMap["v"]; !ok {
-		log.Println("v is null")
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.ParamError,
-			Msg:  "v should not be null!",
-		})
-		return
-	}
+	key := storage.MakeKey(param.Key)
+	newVal := ds.MakeString(param.Val)
 
-	newVal := ds.MakeString(val.(string))
-	storage.GetWareTable().Set(key, newVal)
-	go manager.GetSubscribeCenter().Notify(key.GetKey(), newVal, manager.CallbackSetEvent)
+	set(key, newVal)
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,

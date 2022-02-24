@@ -14,7 +14,7 @@ func Register(r *gin.Engine) {
 	// 获取系统信息
 	r.GET("/", Info)
 	r.GET("/info", Info)
-	// common
+	// common kv
 	r.GET("/:key", Get)
 	r.DELETE("/:key", Delete)
 	// string
@@ -24,7 +24,13 @@ func Register(r *gin.Engine) {
 	// zlist
 	r.POST("/zlist", SetZList)
 	r.PUT("/zlist", SetZList)
+	r.PUT("/zlist/:key/add", AddZList)
 	r.GET("/zlist/:key/len", GetZListLen)
+	r.GET("/zlist/:key/pos/:pos", GetZListByPos)
+	r.GET("/zlist/:key/start/:left", GetZListStartAt)
+	r.GET("/zlist/:key/end/:right", GetZListEndAt)
+	r.GET("/zlist/:key/between/:left/:right", GetZListBetween)
+	r.DELETE("/zlist/:key", RemoveZListByScore)
 	// subscribe
 	r.POST("/subscribe", SubscribeKey)
 	// test

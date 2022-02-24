@@ -32,6 +32,11 @@ func Delete(c *gin.Context) {
 	})
 }
 
+func set(key *storage.Key, newVal storage.Value) {
+	storage.GetWareTable().Set(key, newVal)
+	go manager.GetSubscribeCenter().Notify(key.GetKey(), newVal.GetValue(), manager.CallbackSetEvent)
+}
+
 func findKeyAndValue(c *gin.Context) (*storage.Key, storage.Value) {
 	paramKey := c.Param("key")
 	if paramKey == "" {

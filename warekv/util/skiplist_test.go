@@ -3,7 +3,9 @@ package util
 import (
 	"fmt"
 	"math"
+	"math/rand"
 	"testing"
+	"time"
 )
 
 func TestSkipList(t *testing.T) {
@@ -32,4 +34,18 @@ func TestSkipList(t *testing.T) {
 		fmt.Println("not found", -100)
 	}
 	fmt.Println(sl.GetList())
+}
+
+func TestSkipList_Insert(t *testing.T) {
+	num := 100000
+	scores := make([]float64, num)
+	for i := 0; i < num; i++ {
+		scores[i] = rand.Float64()
+	}
+	sl := NewSkipList()
+	s := time.Now()
+	for i := 0; i < num; i++ {
+		sl.Insert(scores[i], i)
+	}
+	fmt.Println(time.Since(s))
 }

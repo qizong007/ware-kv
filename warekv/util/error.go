@@ -1,15 +1,19 @@
 package util
 
 const (
-	Success       = 0
-	ParamError    = 10000
-	KeyNotExisted = 20000
-	KeyHasDeleted = 20001
+	Success            = 0
+	ParamError         = 10000
+	KeyNotExisted      = 20000
+	KeyHasDeleted      = 20001
+	TypeTransformError = 70001
+	ScopeError         = 80001
 )
 
 var ErrCode2Msg = map[int]string{
-	Success:       "success",
-	ParamError:    "something wrong with param...",
-	KeyNotExisted: "key is not existed!",
-	KeyHasDeleted: "key has been deleted!",
+	Success:            "success",
+	ParamError:         "something wrong with param...",
+	KeyNotExisted:      "key is not existed!",
+	KeyHasDeleted:      "key has been deleted!",
+	TypeTransformError: "something wrong with type transform...",
+	ScopeError:         "scope is not in a right way!",
 }

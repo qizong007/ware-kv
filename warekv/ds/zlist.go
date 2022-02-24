@@ -40,6 +40,11 @@ func Value2ZList(val storage.Value) *ZList {
 	return val.(*ZList)
 }
 
+// ZListView 深拷贝
+func ZListView(origin *ZList) *ZList {
+	return MakeZList(origin.skipList.GetList())
+}
+
 // GetListBetween 左闭右开
 func (zl *ZList) GetListBetween(left int, right int) ([]util.SlElement, error) {
 	zlLen := zl.GetLen()
@@ -71,7 +76,15 @@ func (zl *ZList) GetListEndAt(right int) ([]util.SlElement, error) {
 		return nil, fmt.Errorf("array out of bounds")
 	}
 	list := zl.skipList.GetList()
-	return list[:right], nil
+	return list[:right+1], nil
+}
+
+func (zl *ZList) GetElementAt(pos int) (*util.SlElement, error) {
+	if pos < 0 || pos >= zl.GetLen() {
+		return nil, fmt.Errorf("pos out of bounds")
+	}
+	list := zl.skipList.GetList()
+	return &list[pos], nil
 }
 
 func (zl *ZList) GetListInScore(min float64, max float64) ([]util.SlElement, error) {
