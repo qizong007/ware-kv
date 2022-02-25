@@ -20,7 +20,7 @@ func (s *String) SetValue(val interface{}) {
 func MakeString(val string) *String {
 	return &String{
 		Base: *NewBase(),
-		str: val,
+		str:  val,
 	}
 }
 

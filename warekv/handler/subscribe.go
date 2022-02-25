@@ -8,9 +8,16 @@ import (
 	"ware-kv/warekv/util"
 )
 
+type SubscribeKeyParam struct {
+	Key        string    `json:"key"`
+	Path       string    `json:"path"`
+	Events     *[]string `json:"expect_events" binding:"-"`
+	RetryTimes *int      `json:"retry_times" binding:"-"`
+}
+
 func SubscribeKey(c *gin.Context) {
-	optionMap := make(map[string]interface{})
-	err := c.BindJSON(&optionMap)
+	param := SubscribeKeyParam{}
+	err := c.ShouldBindJSON(&param)
 	if err != nil {
 		log.Println("BindJSON fail")
 		util.MakeResponse(c, &util.WareResponse{
@@ -20,36 +27,14 @@ func SubscribeKey(c *gin.Context) {
 		return
 	}
 
-	var paramKey interface{}
-	var paramPath interface{}
-	var paramEvents interface{}
-	var paramRetryTimes interface{}
-	var ok bool
-	if paramKey, ok = optionMap["key"]; !ok {
-		log.Println("key is null")
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.ParamError,
-			Msg:  "Key should not be null!",
-		})
-		return
-	}
-	if paramPath, ok = optionMap["path"]; !ok {
-		log.Println("path is null")
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.ParamError,
-			Msg:  "Path should not be null!",
-		})
-		return
-	}
-
 	option := &manager.SubscribeOption{
-		Key:          paramKey.(string),
-		CallbackPath: paramPath.(string),
+		Key:          param.Key,
+		CallbackPath: param.Path,
 		ExpectEvent:  nil,
 		RetryTimes:   0,
 	}
-	if paramEvents, ok = optionMap["expect_events"]; ok {
-		list := paramEvents.([]string)
+	if param.Events != nil {
+		list := *param.Events
 		events := make([]int, 0)
 		for i := range list {
 			if strings.ToLower(list[i]) == "set" {
@@ -61,8 +46,8 @@ func SubscribeKey(c *gin.Context) {
 		}
 		option.ExpectEvent = events
 	}
-	if paramRetryTimes, ok = optionMap["retry_times"]; ok {
-		option.RetryTimes = int(paramRetryTimes.(float64))
+	if param.RetryTimes != nil {
+		option.RetryTimes = *param.RetryTimes
 	}
 
 	manager.GetSubscribeCenter().Subscribe(option)

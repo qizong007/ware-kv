@@ -19,6 +19,6 @@ func NewWareGC() *WareGC {
 	}
 }
 
-func (gc *WareGC) Commit(entry string)  {
+func (gc *WareGC) Commit(entry string) {
 	gc.gcTasks <- entry
 }
