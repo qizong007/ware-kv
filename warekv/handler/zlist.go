@@ -91,6 +91,7 @@ func GetZListByPos(c *gin.Context) {
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.ScopeError,
 		})
+		return
 	}
 
 	util.MakeResponse(c, &util.WareResponse{
@@ -257,11 +258,11 @@ func AddZList(c *gin.Context) {
 		return
 	}
 
-	zList := ds.ZListView(ds.Value2ZList(val))
+	zList := ds.Value2ZList(val)
 
 	if param.Element != nil {
 		zList.Add([]util.SlElement{*param.Element})
-		set(key, zList)
+		subscribe(key, zList)
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.Success,
 		})
@@ -269,7 +270,7 @@ func AddZList(c *gin.Context) {
 	}
 
 	zList.Add(*param.Elements)
-	set(key, zList)
+	subscribe(key, zList)
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
@@ -311,11 +312,11 @@ func RemoveZListByScore(c *gin.Context) {
 		return
 	}
 
-	zList := ds.ZListView(ds.Value2ZList(val))
+	zList := ds.Value2ZList(val)
 
 	if param.Score != nil {
 		zList.Remove(*param.Score)
-		set(key, zList)
+		subscribe(key, zList)
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.Success,
 		})
@@ -323,10 +324,8 @@ func RemoveZListByScore(c *gin.Context) {
 	}
 
 	if param.Scores != nil {
-		for _, s := range *param.Scores {
-			zList.Remove(s)
-		}
-		set(key, zList)
+		zList.RemoveScores(*param.Scores)
+		subscribe(key, zList)
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.Success,
 		})
@@ -339,13 +338,10 @@ func RemoveZListByScore(c *gin.Context) {
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.ScopeError,
 		})
-	} else {
-		set(key, zList)
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.Success,
-		})
+		return
 	}
 
+	subscribe(key, zList)
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 	})

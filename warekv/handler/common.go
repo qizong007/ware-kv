@@ -34,6 +34,10 @@ func Delete(c *gin.Context) {
 
 func set(key *storage.Key, newVal storage.Value) {
 	storage.GetWareTable().Set(key, newVal)
+	subscribe(key, newVal)
+}
+
+func subscribe(key *storage.Key, newVal storage.Value) {
 	go manager.GetSubscribeCenter().Notify(key.GetKey(), newVal.GetValue(), manager.CallbackSetEvent)
 }
 

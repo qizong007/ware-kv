@@ -2,6 +2,7 @@ package ds
 
 import (
 	"fmt"
+	"sync"
 	"ware-kv/warekv/storage"
 	"ware-kv/warekv/util"
 )
@@ -10,6 +11,7 @@ import (
 type ZList struct {
 	Base
 	skipList *util.SkipList
+	rw       sync.RWMutex
 }
 
 type ZElement struct {
@@ -18,10 +20,15 @@ type ZElement struct {
 }
 
 func (zl *ZList) GetValue() interface{} {
-	return zl.skipList.GetList()
+	zl.rw.RLock()
+	defer zl.rw.RUnlock()
+	val := zl.skipList.GetList()
+	return val
 }
 
 func (zl *ZList) SetValue(val interface{}) {
+	zl.rw.Lock()
+	defer zl.rw.Unlock()
 	zl.skipList = val.(*util.SkipList)
 }
 
@@ -42,11 +49,16 @@ func Value2ZList(val storage.Value) *ZList {
 
 // ZListView 深拷贝
 func ZListView(origin *ZList) *ZList {
-	return MakeZList(origin.skipList.GetList())
+	origin.rw.RLock()
+	defer origin.rw.RUnlock()
+	orig := origin.skipList.GetList()
+	return MakeZList(orig)
 }
 
 // GetListBetween 左闭右开
 func (zl *ZList) GetListBetween(left int, right int) ([]util.SlElement, error) {
+	zl.rw.RLock()
+	defer zl.rw.RUnlock()
 	zlLen := zl.GetLen()
 	if left < 0 || left >= zlLen || right < 0 {
 		return nil, fmt.Errorf("array out of bounds")
@@ -62,6 +74,8 @@ func (zl *ZList) GetListBetween(left int, right int) ([]util.SlElement, error) {
 }
 
 func (zl *ZList) GetListStartWith(left int) ([]util.SlElement, error) {
+	zl.rw.RLock()
+	defer zl.rw.RUnlock()
 	zlLen := zl.GetLen()
 	if left < 0 || left >= zlLen {
 		return nil, fmt.Errorf("array out of bounds")
@@ -71,6 +85,8 @@ func (zl *ZList) GetListStartWith(left int) ([]util.SlElement, error) {
 }
 
 func (zl *ZList) GetListEndAt(right int) ([]util.SlElement, error) {
+	zl.rw.RLock()
+	defer zl.rw.RUnlock()
 	zlLen := zl.GetLen()
 	if right < 0 || right >= zlLen {
 		return nil, fmt.Errorf("array out of bounds")
@@ -80,6 +96,8 @@ func (zl *ZList) GetListEndAt(right int) ([]util.SlElement, error) {
 }
 
 func (zl *ZList) GetElementAt(pos int) (*util.SlElement, error) {
+	zl.rw.RLock()
+	defer zl.rw.RUnlock()
 	if pos < 0 || pos >= zl.GetLen() {
 		return nil, fmt.Errorf("pos out of bounds")
 	}
@@ -88,6 +106,8 @@ func (zl *ZList) GetElementAt(pos int) (*util.SlElement, error) {
 }
 
 func (zl *ZList) GetListInScore(min float64, max float64) ([]util.SlElement, error) {
+	zl.rw.RLock()
+	defer zl.rw.RUnlock()
 	if min > max {
 		return nil, fmt.Errorf("min should not be larger than max")
 	}
@@ -105,13 +125,25 @@ func (zl *ZList) GetListInScore(min float64, max float64) ([]util.SlElement, err
 }
 
 func (zl *ZList) Add(list []util.SlElement) {
+	zl.rw.Lock()
+	defer zl.rw.Unlock()
 	for i := range list {
 		zl.skipList.Insert(list[i].Score, list[i].Val)
 	}
 }
 
 func (zl *ZList) Remove(score float64) {
+	zl.rw.Lock()
+	defer zl.rw.Unlock()
 	zl.skipList.Delete(score)
+}
+
+func (zl *ZList) RemoveScores(scores []float64) {
+	zl.rw.Lock()
+	defer zl.rw.Unlock()
+	for i := range scores {
+		zl.skipList.Delete(scores[i])
+	}
 }
 
 func (zl *ZList) RemoveInScore(min float64, max float64) error {
@@ -119,6 +151,8 @@ func (zl *ZList) RemoveInScore(min float64, max float64) error {
 	if err != nil {
 		return err
 	}
+	zl.rw.Lock()
+	defer zl.rw.Unlock()
 	for i := range list {
 		zl.skipList.Delete(list[i].Score)
 	}
@@ -126,5 +160,7 @@ func (zl *ZList) RemoveInScore(min float64, max float64) error {
 }
 
 func (zl *ZList) GetLen() int {
+	zl.rw.RLock()
+	defer zl.rw.RUnlock()
 	return zl.skipList.Len()
 }

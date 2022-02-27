@@ -36,3 +36,7 @@ func (b *Base) IsAlive() bool {
 func (b *Base) Size() int {
 	return 5 * 8 // 字段数 * 大小
 }
+
+func (b *Base) WithExpireTime(t int64) {
+	b.ExpireTime = &t
+}
