@@ -32,7 +32,10 @@ func Delete(c *gin.Context) {
 	})
 }
 
-func set(key *storage.Key, newVal storage.Value) {
+func set(key *storage.Key, newVal storage.Value, expireTime int64) {
+	if expireTime != 0 {
+		newVal.WithExpireTime(expireTime)
+	}
 	storage.GetWareTable().Set(key, newVal)
 	subscribe(key, newVal)
 }
@@ -67,7 +70,13 @@ func isValEffective(c *gin.Context, val storage.Value) bool {
 		log.Println("key is dead")
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.KeyHasDeleted,
-			Msg:  "Key has been deleted...",
+		})
+		return false
+	}
+	if val.IsExpired() {
+		log.Println("key has been expired")
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.KeyHasExpired,
 		})
 		return false
 	}

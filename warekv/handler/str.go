@@ -9,8 +9,9 @@ import (
 )
 
 type SetStrParam struct {
-	Key string `json:"k"`
-	Val string `json:"v"`
+	Key        string `json:"k"`
+	Val        string `json:"v"`
+	ExpireTime int64  `json:"expire_time" binding:"-"`
 }
 
 func SetStr(c *gin.Context) {
@@ -28,7 +29,7 @@ func SetStr(c *gin.Context) {
 	key := storage.MakeKey(param.Key)
 	newVal := ds.MakeString(param.Val)
 
-	set(key, newVal)
+	set(key, newVal, param.ExpireTime)
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,

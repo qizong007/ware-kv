@@ -6,6 +6,7 @@ type Value interface {
 	GetValue() interface{}
 	DeleteValue()
 	IsAlive() bool
+	IsExpired() bool
 	Size() int
 	WithExpireTime(t int64)
 }

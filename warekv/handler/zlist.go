@@ -9,8 +9,9 @@ import (
 )
 
 type SetZListParam struct {
-	Key string           `json:"k"`
-	Val []util.SlElement `json:"v"`
+	Key        string           `json:"k"`
+	Val        []util.SlElement `json:"v"`
+	ExpireTime int64            `json:"expire_time" binding:"-"`
 }
 
 type AddZListParam struct {
@@ -40,7 +41,8 @@ func SetZList(c *gin.Context) {
 	key := storage.MakeKey(param.Key)
 
 	newVal := ds.MakeZList(param.Val)
-	set(key, newVal)
+
+	set(key, newVal, param.ExpireTime)
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,

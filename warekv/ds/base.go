@@ -33,10 +33,18 @@ func (b *Base) IsAlive() bool {
 	return false
 }
 
+func (b *Base) IsExpired() bool {
+	if *b.ExpireTime <= time.Now().Unix() {
+		return true
+	}
+	return false
+}
+
 func (b *Base) Size() int {
 	return 5 * 8 // 字段数 * 大小
 }
 
-func (b *Base) WithExpireTime(t int64) {
+func (b *Base) WithExpireTime(delta int64) {
+	t := delta + time.Now().Unix()
 	b.ExpireTime = &t
 }
