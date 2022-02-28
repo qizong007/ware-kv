@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"time"
 	"ware-kv/warekv/manager"
 	"ware-kv/warekv/storage"
 	"ware-kv/warekv/util"
@@ -25,7 +26,7 @@ func Delete(c *gin.Context) {
 		return
 	}
 	storage.GetWareTable().Delete(key)
-	go manager.GetSubscribeCenter().Notify(key.GetKey(), nil, manager.CallbackDeleteEvent)
+	deleteNotify(key)
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
@@ -35,13 +36,21 @@ func Delete(c *gin.Context) {
 func set(key *storage.Key, newVal storage.Value, expireTime int64) {
 	if expireTime != 0 {
 		newVal.WithExpireTime(expireTime)
+		time.AfterFunc(time.Duration(expireTime) * time.Second, func() {
+			storage.GetWareTable().Delete(key)
+			deleteNotify(key)
+		})
 	}
 	storage.GetWareTable().Set(key, newVal)
-	subscribe(key, newVal)
+	setNotify(key, newVal)
 }
 
-func subscribe(key *storage.Key, newVal storage.Value) {
+func setNotify(key *storage.Key, newVal storage.Value) {
 	go manager.GetSubscribeCenter().Notify(key.GetKey(), newVal.GetValue(), manager.CallbackSetEvent)
+}
+
+func deleteNotify(key *storage.Key) {
+	go manager.GetSubscribeCenter().Notify(key.GetKey(), nil, manager.CallbackDeleteEvent)
 }
 
 func findKeyAndValue(c *gin.Context) (*storage.Key, storage.Value) {

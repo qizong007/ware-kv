@@ -264,7 +264,7 @@ func AddZList(c *gin.Context) {
 
 	if param.Element != nil {
 		zList.Add([]util.SlElement{*param.Element})
-		subscribe(key, zList)
+		setNotify(key, zList)
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.Success,
 		})
@@ -272,7 +272,7 @@ func AddZList(c *gin.Context) {
 	}
 
 	zList.Add(*param.Elements)
-	subscribe(key, zList)
+	setNotify(key, zList)
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
@@ -318,7 +318,7 @@ func RemoveZListByScore(c *gin.Context) {
 
 	if param.Score != nil {
 		zList.Remove(*param.Score)
-		subscribe(key, zList)
+		setNotify(key, zList)
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.Success,
 		})
@@ -327,7 +327,7 @@ func RemoveZListByScore(c *gin.Context) {
 
 	if param.Scores != nil {
 		zList.RemoveScores(*param.Scores)
-		subscribe(key, zList)
+		setNotify(key, zList)
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.Success,
 		})
@@ -343,7 +343,7 @@ func RemoveZListByScore(c *gin.Context) {
 		return
 	}
 
-	subscribe(key, zList)
+	setNotify(key, zList)
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 	})
