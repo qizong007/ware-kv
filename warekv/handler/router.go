@@ -25,6 +25,14 @@ func Register(r *gin.Engine) {
 	r.PUT("/str", SetStr)
 	r.GET("/str/:key/len", GetStrLen)
 
+	// counter
+	r.POST("/counter", SetCounter)
+	r.PUT("/counter", SetCounter)
+	r.POST("/counter/:key/incr", IncrCounter)
+	r.POST("/counter/:key/incrby/:delta", IncrByCounter)
+	r.POST("/counter/:key/decr", DecrCounter)
+	r.POST("/counter/:key/decrby/:delta", DecrByCounter)
+
 	// object
 	r.POST("/object", SetObject)
 	r.PUT("/object", SetObject)
