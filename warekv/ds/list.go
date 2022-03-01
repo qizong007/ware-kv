@@ -10,7 +10,7 @@ import (
 type List struct {
 	Base
 	list *[]interface{}
-	rw       sync.RWMutex
+	rw   sync.RWMutex
 }
 
 func (l *List) GetValue() interface{} {

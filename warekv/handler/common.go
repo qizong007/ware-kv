@@ -44,7 +44,7 @@ func Delete(c *gin.Context) {
 func set(key *storage.Key, newVal storage.Value, expireTime int64) {
 	if expireTime != 0 {
 		newVal.WithExpireTime(expireTime)
-		time.AfterFunc(time.Duration(expireTime) * time.Second, func() {
+		time.AfterFunc(time.Duration(expireTime)*time.Second, func() {
 			del(key)
 		})
 	}
@@ -76,7 +76,7 @@ func paramNull(c *gin.Context, param string) {
 	})
 }
 
-func findKeyAndValue(c *gin.Context) (*storage.Key, storage.Value,error) {
+func findKeyAndValue(c *gin.Context) (*storage.Key, storage.Value, error) {
 	return findKeyAndValByParam(c, "key")
 }
 

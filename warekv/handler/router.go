@@ -25,6 +25,12 @@ func Register(r *gin.Engine) {
 	r.PUT("/str", SetStr)
 	r.GET("/str/:key/len", GetStrLen)
 
+	// object
+	r.POST("/object", SetObject)
+	r.PUT("/object", SetObject)
+	r.GET("/object/:key/:field", GetObjectFieldByKey)
+	r.POST("/object/:key/:field", SetObjectFieldByKey)
+
 	// list
 	r.POST("/list", SetList)
 	r.PUT("/list", SetList)
