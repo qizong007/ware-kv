@@ -29,12 +29,6 @@ func (l *List) listView() []interface{} {
 	return list
 }
 
-func (l *List) SetValue(val interface{}) {
-	l.rw.Lock()
-	defer l.rw.Unlock()
-	l.list = val.(*[]interface{})
-}
-
 func MakeList(list []interface{}) *List {
 	return &List{
 		Base: *NewBase(),

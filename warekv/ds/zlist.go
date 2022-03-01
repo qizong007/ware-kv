@@ -26,12 +26,6 @@ func (zl *ZList) GetValue() interface{} {
 	return val
 }
 
-func (zl *ZList) SetValue(val interface{}) {
-	zl.rw.Lock()
-	defer zl.rw.Unlock()
-	zl.skipList = val.(*util.SkipList)
-}
-
 func MakeZList(list []util.SlElement) *ZList {
 	sl := util.NewSkipList()
 	for i := range list {

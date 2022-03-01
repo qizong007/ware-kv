@@ -25,12 +25,6 @@ func (s *Set) setView() []interface{} {
 	return list
 }
 
-func (s *Set) SetValue(val interface{}) {
-	s.rw.Lock()
-	defer s.rw.Unlock()
-	s.set = val.(*util.Set)
-}
-
 func MakeSet(list []interface{}) *Set {
 	return &Set{
 		Base: *NewBase(),

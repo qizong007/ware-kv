@@ -14,10 +14,6 @@ func (c *Counter) GetValue() interface{} {
 	return atomic.LoadInt64(&c.num)
 }
 
-func (c *Counter) SetValue(val interface{}) {
-	atomic.StoreInt64(&c.num, val.(int64))
-}
-
 func MakeCounter(val int64) *Counter {
 	return &Counter{
 		Base: *NewBase(),

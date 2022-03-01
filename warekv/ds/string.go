@@ -13,10 +13,6 @@ func (s *String) GetValue() interface{} {
 	return s.str
 }
 
-func (s *String) SetValue(val interface{}) {
-	s.str = val.(string)
-}
-
 func MakeString(val string) *String {
 	return &String{
 		Base: *NewBase(),

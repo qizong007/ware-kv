@@ -17,12 +17,6 @@ func (o *Object) GetValue() interface{} {
 	return o.object
 }
 
-func (o *Object) SetValue(val interface{}) {
-	o.rw.Lock()
-	defer o.rw.Unlock()
-	o.object = val.(map[string]interface{})
-}
-
 func MakeObject(object map[string]interface{}) *Object {
 	return &Object{
 		Base:   *NewBase(),
