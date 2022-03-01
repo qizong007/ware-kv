@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"time"
@@ -10,7 +11,11 @@ import (
 )
 
 func Get(c *gin.Context) {
-	_, val := findKeyAndValue(c)
+	_, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
 	if !isKVEffective(c, val) {
 		return
 	}
@@ -21,7 +26,11 @@ func Get(c *gin.Context) {
 }
 
 func Delete(c *gin.Context) {
-	key, val := findKeyAndValue(c)
+	key, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
 	if !isKVEffective(c, val) {
 		return
 	}
@@ -56,18 +65,30 @@ func deleteNotify(key *storage.Key) {
 	go manager.GetSubscribeCenter().Notify(key.GetKey(), nil, manager.CallbackDeleteEvent)
 }
 
-func findKeyAndValue(c *gin.Context) (*storage.Key, storage.Value) {
-	paramKey := c.Param("key")
+func keyNull(c *gin.Context) {
+	paramNull(c, "Key")
+}
+
+func paramNull(c *gin.Context, param string) {
+	util.MakeResponse(c, &util.WareResponse{
+		Code: util.ParamError,
+		Msg:  param + " should not be null!",
+	})
+}
+
+func findKeyAndValue(c *gin.Context) (*storage.Key, storage.Value,error) {
+	return findKeyAndValByParam(c, "key")
+}
+
+func findKeyAndValByParam(c *gin.Context, param string) (*storage.Key, storage.Value, error) {
+	paramKey := c.Param(param)
 	if paramKey == "" {
-		log.Println("key is null")
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.ParamError,
-			Msg:  "Key should not be null!",
-		})
+		log.Println(param, "is null")
+		return nil, nil, fmt.Errorf("%s", util.ErrCode2Msg[util.ParamError])
 	}
 	key := storage.MakeKey(paramKey)
 	val := storage.GetWareTable().Get(key)
-	return key, val
+	return key, val, nil
 }
 
 func isKVEffective(c *gin.Context, val storage.Value) bool {

@@ -28,7 +28,7 @@ func Register(r *gin.Engine) {
 	// list
 	r.POST("/list", SetList)
 	r.PUT("/list", SetList)
-	r.PUT("/list/:key/add", AddList)
+	r.POST("/list/:key/add", AddList)
 	r.GET("/list/:key/len", GetListLen)
 	r.GET("/list/:key/pos/:pos", GetListByPos)
 	r.GET("/list/:key/start/:left", GetListStartAt)
@@ -39,13 +39,24 @@ func Register(r *gin.Engine) {
 	// zlist
 	r.POST("/zlist", SetZList)
 	r.PUT("/zlist", SetZList)
-	r.PUT("/zlist/:key/add", AddZList)
+	r.POST("/zlist/:key/add", AddZList)
 	r.GET("/zlist/:key/len", GetZListLen)
 	r.GET("/zlist/:key/pos/:pos", GetZListByPos)
 	r.GET("/zlist/:key/start/:left", GetZListStartAt)
 	r.GET("/zlist/:key/end/:right", GetZListEndAt)
 	r.GET("/zlist/:key/between/:left/:right", GetZListBetween)
 	r.DELETE("/zlist/:key", RemoveZListByScore)
+
+	// set
+	r.POST("/set", SetSet)
+	r.PUT("/set", SetSet)
+	r.POST("/set/:key/add", AddSet)
+	r.GET("/set/:key/size", GetSetSize)
+	r.DELETE("/set/:key", RemoveSet)
+	r.GET("/set/:key/contains", ContainsSet)
+	r.GET("/set/inter/:set1/:set2", InterSet)
+	r.GET("/set/union/:set1/:set2", UnionSet)
+	r.GET("/set/diff/:set1/:set2", DiffSet)
 
 	// subscribe
 	r.POST("/subscribe", SubscribeKey)

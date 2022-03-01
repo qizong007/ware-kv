@@ -37,7 +37,11 @@ func SetStr(c *gin.Context) {
 }
 
 func GetStrLen(c *gin.Context) {
-	_, val := findKeyAndValue(c)
+	_, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
 	if !isKVEffective(c, val) {
 		return
 	}

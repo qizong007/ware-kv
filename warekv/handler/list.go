@@ -47,7 +47,11 @@ func SetList(c *gin.Context) {
 }
 
 func GetListLen(c *gin.Context) {
-	_, val := findKeyAndValue(c)
+	_, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
 	if !isKVEffective(c, val) {
 		return
 	}
@@ -69,7 +73,11 @@ func GetListByPos(c *gin.Context) {
 		return
 	}
 
-	_, val := findKeyAndValue(c)
+	_, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
 	if !isKVEffective(c, val) {
 		return
 	}
@@ -112,7 +120,11 @@ func GetListBetween(c *gin.Context) {
 		return
 	}
 
-	_, val := findKeyAndValue(c)
+	_, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
 	if !isKVEffective(c, val) {
 		return
 	}
@@ -161,7 +173,11 @@ func GetListStartAt(c *gin.Context) {
 		return
 	}
 
-	_, val := findKeyAndValue(c)
+	_, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
 	if !isKVEffective(c, val) {
 		return
 	}
@@ -202,7 +218,11 @@ func GetListEndAt(c *gin.Context) {
 		return
 	}
 
-	_, val := findKeyAndValue(c)
+	_, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
 	if !isKVEffective(c, val) {
 		return
 	}
@@ -252,7 +272,11 @@ func AddList(c *gin.Context) {
 		return
 	}
 
-	key, val := findKeyAndValue(c)
+	key, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
 	if !isKVEffective(c, val) {
 		return
 	}
@@ -297,7 +321,11 @@ func RemoveListElement(c *gin.Context) {
 		return
 	}
 
-	key, val := findKeyAndValue(c)
+	key, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
 	if !isKVEffective(c, val) {
 		return
 	}
