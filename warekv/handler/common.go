@@ -11,7 +11,7 @@ import (
 
 func Get(c *gin.Context) {
 	_, val := findKeyAndValue(c)
-	if !isValEffective(c, val) {
+	if !isKVEffective(c, val) {
 		return
 	}
 	util.MakeResponse(c, &util.WareResponse{
@@ -22,11 +22,10 @@ func Get(c *gin.Context) {
 
 func Delete(c *gin.Context) {
 	key, val := findKeyAndValue(c)
-	if !isValEffective(c, val) {
+	if !isKVEffective(c, val) {
 		return
 	}
-	storage.GetWareTable().Delete(key)
-	deleteNotify(key)
+	del(key)
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
@@ -37,12 +36,16 @@ func set(key *storage.Key, newVal storage.Value, expireTime int64) {
 	if expireTime != 0 {
 		newVal.WithExpireTime(expireTime)
 		time.AfterFunc(time.Duration(expireTime) * time.Second, func() {
-			storage.GetWareTable().Delete(key)
-			deleteNotify(key)
+			del(key)
 		})
 	}
 	storage.GetWareTable().Set(key, newVal)
 	setNotify(key, newVal)
+}
+
+func del(key *storage.Key) {
+	storage.GetWareTable().Delete(key)
+	deleteNotify(key)
 }
 
 func setNotify(key *storage.Key, newVal storage.Value) {
@@ -67,7 +70,7 @@ func findKeyAndValue(c *gin.Context) (*storage.Key, storage.Value) {
 	return key, val
 }
 
-func isValEffective(c *gin.Context, val storage.Value) bool {
+func isKVEffective(c *gin.Context, val storage.Value) bool {
 	if val == nil {
 		log.Println("key is not existed")
 		util.MakeResponse(c, &util.WareResponse{

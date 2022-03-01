@@ -51,7 +51,7 @@ func SetZList(c *gin.Context) {
 
 func GetZListLen(c *gin.Context) {
 	_, val := findKeyAndValue(c)
-	if !isValEffective(c, val) {
+	if !isKVEffective(c, val) {
 		return
 	}
 	util.MakeResponse(c, &util.WareResponse{
@@ -73,7 +73,7 @@ func GetZListByPos(c *gin.Context) {
 	}
 
 	_, val := findKeyAndValue(c)
-	if !isValEffective(c, val) {
+	if !isKVEffective(c, val) {
 		return
 	}
 
@@ -116,7 +116,7 @@ func GetZListBetween(c *gin.Context) {
 	}
 
 	_, val := findKeyAndValue(c)
-	if !isValEffective(c, val) {
+	if !isKVEffective(c, val) {
 		return
 	}
 
@@ -165,7 +165,7 @@ func GetZListStartAt(c *gin.Context) {
 	}
 
 	_, val := findKeyAndValue(c)
-	if !isValEffective(c, val) {
+	if !isKVEffective(c, val) {
 		return
 	}
 
@@ -206,7 +206,7 @@ func GetZListEndAt(c *gin.Context) {
 	}
 
 	_, val := findKeyAndValue(c)
-	if !isValEffective(c, val) {
+	if !isKVEffective(c, val) {
 		return
 	}
 
@@ -256,7 +256,7 @@ func AddZList(c *gin.Context) {
 	}
 
 	key, val := findKeyAndValue(c)
-	if !isValEffective(c, val) {
+	if !isKVEffective(c, val) {
 		return
 	}
 
@@ -310,7 +310,7 @@ func RemoveZListByScore(c *gin.Context) {
 	}
 
 	key, val := findKeyAndValue(c)
-	if !isValEffective(c, val) {
+	if !isKVEffective(c, val) {
 		return
 	}
 

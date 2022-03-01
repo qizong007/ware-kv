@@ -38,7 +38,7 @@ func SetStr(c *gin.Context) {
 
 func GetStrLen(c *gin.Context) {
 	_, val := findKeyAndValue(c)
-	if !isValEffective(c, val) {
+	if !isKVEffective(c, val) {
 		return
 	}
 	util.MakeResponse(c, &util.WareResponse{
