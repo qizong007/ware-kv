@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"sync"
 	"ware-kv/warekv/storage"
-	"ware-kv/warekv/util"
 )
 
 type List struct {
@@ -125,16 +124,11 @@ func (l *List) RemoveAt(idx int) {
 	}
 }
 
-var typeCheckList = []string{"string", "float64", "bool"}
-
 func (l *List) RemoveVal(val interface{}) {
-	if !util.IsStrInList(reflect.TypeOf(val).String(), typeCheckList) {
-		return
-	}
 	l.rw.Lock()
 	defer l.rw.Unlock()
 	for i, v := range *l.list {
-		if v == val {
+		if reflect.DeepEqual(v, val) {
 			*l.list = append((*l.list)[:i], (*l.list)[i+1:]...)
 		}
 	}
