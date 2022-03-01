@@ -11,16 +11,31 @@ import (
 func Register(r *gin.Engine) {
 	// 添加计时器
 	r.Use(util.TimeKeeping())
+
 	// 获取系统信息
 	r.GET("/", Info)
 	r.GET("/info", Info)
+
 	// common kv
 	r.GET("/:key", Get)
 	r.DELETE("/:key", Delete)
+
 	// string
 	r.POST("/str", SetStr)
 	r.PUT("/str", SetStr)
 	r.GET("/str/:key/len", GetStrLen)
+
+	// list
+	r.POST("/list", SetList)
+	r.PUT("/list", SetList)
+	r.PUT("/list/:key/add", AddList)
+	r.GET("/list/:key/len", GetListLen)
+	r.GET("/list/:key/pos/:pos", GetListByPos)
+	r.GET("/list/:key/start/:left", GetListStartAt)
+	r.GET("/list/:key/end/:right", GetListEndAt)
+	r.GET("/list/:key/between/:left/:right", GetListBetween)
+	r.DELETE("/list/:key", RemoveListElement)
+
 	// zlist
 	r.POST("/zlist", SetZList)
 	r.PUT("/zlist", SetZList)
@@ -31,8 +46,10 @@ func Register(r *gin.Engine) {
 	r.GET("/zlist/:key/end/:right", GetZListEndAt)
 	r.GET("/zlist/:key/between/:left/:right", GetZListBetween)
 	r.DELETE("/zlist/:key", RemoveZListByScore)
+
 	// subscribe
 	r.POST("/subscribe", SubscribeKey)
+
 	// test
 	r.GET("/ping", Ping)
 	r.GET("/err", Err500)

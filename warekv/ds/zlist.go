@@ -132,7 +132,7 @@ func (zl *ZList) Add(list []util.SlElement) {
 	}
 }
 
-func (zl *ZList) Remove(score float64) {
+func (zl *ZList) RemoveScore(score float64) {
 	zl.rw.Lock()
 	defer zl.rw.Unlock()
 	zl.skipList.Delete(score)

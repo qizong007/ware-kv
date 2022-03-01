@@ -31,7 +31,3 @@ func Value2String(val storage.Value) *String {
 func (s *String) GetLen() int {
 	return len(s.str)
 }
-
-func (s *String) Size() int {
-	return s.Base.Size() + len(s.str)
-}

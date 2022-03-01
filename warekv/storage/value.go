@@ -7,6 +7,5 @@ type Value interface {
 	DeleteValue()
 	IsAlive() bool
 	IsExpired() bool
-	Size() int
 	WithExpireTime(t int64)
 }

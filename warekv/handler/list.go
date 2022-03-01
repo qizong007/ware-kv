@@ -8,26 +8,24 @@ import (
 	"ware-kv/warekv/util"
 )
 
-type SetZListParam struct {
-	Key        string           `json:"k"`
-	Val        []util.SlElement `json:"v"`
-	ExpireTime int64            `json:"expire_time" binding:"-"`
+type SetListParam struct {
+	Key        string        `json:"k"`
+	Val        []interface{} `json:"v"`
+	ExpireTime int64         `json:"expire_time" binding:"-"`
 }
 
-type AddZListParam struct {
-	Element  *util.SlElement   `json:"e"`
-	Elements *[]util.SlElement `json:"elements"`
+type AddListParam struct {
+	Element  interface{}   `json:"e"`
+	Elements []interface{} `json:"elements"`
 }
 
-type RemoveZListByScoreParam struct {
-	Scores *[]float64
-	Score  *float64
-	Min    *float64
-	Max    *float64
+type RemoveListElementParam struct {
+	Val interface{}
+	Pos *int
 }
 
-func SetZList(c *gin.Context) {
-	param := SetZListParam{}
+func SetList(c *gin.Context) {
+	param := SetListParam{}
 	err := c.ShouldBindJSON(&param)
 	if err != nil {
 		log.Println("BindJSON fail")
@@ -39,7 +37,7 @@ func SetZList(c *gin.Context) {
 	}
 
 	key := storage.MakeKey(param.Key)
-	newVal := ds.MakeZList(param.Val)
+	newVal := ds.MakeList(param.Val)
 
 	set(key, newVal, param.ExpireTime)
 
@@ -48,18 +46,18 @@ func SetZList(c *gin.Context) {
 	})
 }
 
-func GetZListLen(c *gin.Context) {
+func GetListLen(c *gin.Context) {
 	_, val := findKeyAndValue(c)
 	if !isKVEffective(c, val) {
 		return
 	}
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
-		Val:  ds.Value2ZList(val).GetLen(),
+		Val:  ds.Value2List(val).GetLen(),
 	})
 }
 
-func GetZListByPos(c *gin.Context) {
+func GetListByPos(c *gin.Context) {
 	posStr := c.Param("pos")
 
 	if posStr == "" {
@@ -76,7 +74,7 @@ func GetZListByPos(c *gin.Context) {
 		return
 	}
 
-	zList := ds.Value2ZList(val)
+	list := ds.Value2List(val)
 
 	pos, err := util.Str2Int(posStr)
 	if err != nil {
@@ -86,7 +84,7 @@ func GetZListByPos(c *gin.Context) {
 		})
 		return
 	}
-	res, err := zList.GetElementAt(pos)
+	res, err := list.GetElementAt(pos)
 	if err != nil {
 		log.Println("GetElementAt fail", err)
 		util.MakeResponse(c, &util.WareResponse{
@@ -101,12 +99,12 @@ func GetZListByPos(c *gin.Context) {
 	})
 }
 
-func GetZListBetween(c *gin.Context) {
+func GetListBetween(c *gin.Context) {
 	leftStr := c.Param("left")
 	rightStr := c.Param("right")
 
 	if leftStr == "" && rightStr == "" || leftStr != "" && rightStr == "" || leftStr == "" && rightStr != "" {
-		log.Println("GetZListBetween left or right is <nil>!")
+		log.Println("GetListBetween left or right is <nil>!")
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.ParamError,
 			Msg:  "left or right is <nil>!",
@@ -119,7 +117,7 @@ func GetZListBetween(c *gin.Context) {
 		return
 	}
 
-	zList := ds.Value2ZList(val)
+	list := ds.Value2List(val)
 
 	left, err := util.Str2Int(leftStr)
 	if err != nil {
@@ -137,7 +135,7 @@ func GetZListBetween(c *gin.Context) {
 		})
 		return
 	}
-	res, err := zList.GetListBetween(left, right)
+	res, err := list.GetListBetween(left, right)
 	if err != nil {
 		log.Println("GetListBetween fail", err)
 		util.MakeResponse(c, &util.WareResponse{
@@ -151,11 +149,11 @@ func GetZListBetween(c *gin.Context) {
 	})
 }
 
-func GetZListStartAt(c *gin.Context) {
+func GetListStartAt(c *gin.Context) {
 	leftStr := c.Param("left")
 
 	if leftStr == "" {
-		log.Println("GetZListStartAt left is <nil>!")
+		log.Println("GetListStartAt left is <nil>!")
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.ParamError,
 			Msg:  "left is <nil>!",
@@ -168,7 +166,7 @@ func GetZListStartAt(c *gin.Context) {
 		return
 	}
 
-	zList := ds.Value2ZList(val)
+	list := ds.Value2List(val)
 
 	left, err := util.Str2Int(leftStr)
 	if err != nil {
@@ -178,9 +176,9 @@ func GetZListStartAt(c *gin.Context) {
 		})
 		return
 	}
-	res, err := zList.GetListStartWith(left)
+	res, err := list.GetListStartWith(left)
 	if err != nil {
-		log.Println("GetZListStartAt fail", err)
+		log.Println("GetListStartAt fail", err)
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.ScopeError,
 		})
@@ -192,11 +190,11 @@ func GetZListStartAt(c *gin.Context) {
 	})
 }
 
-func GetZListEndAt(c *gin.Context) {
+func GetListEndAt(c *gin.Context) {
 	rightStr := c.Param("right")
 
 	if rightStr == "" {
-		log.Println("GetZListEndAt right is <nil>!")
+		log.Println("GetListEndAt right is <nil>!")
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.ParamError,
 			Msg:  "right is <nil>!",
@@ -209,7 +207,7 @@ func GetZListEndAt(c *gin.Context) {
 		return
 	}
 
-	zList := ds.Value2ZList(val)
+	list := ds.Value2List(val)
 
 	right, err := util.Str2Int(rightStr)
 	if err != nil {
@@ -219,9 +217,9 @@ func GetZListEndAt(c *gin.Context) {
 		})
 		return
 	}
-	res, err := zList.GetListEndAt(right)
+	res, err := list.GetListEndAt(right)
 	if err != nil {
-		log.Println("GetZListEndAt fail", err)
+		log.Println("GetListEndAt fail", err)
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.ScopeError,
 		})
@@ -233,8 +231,8 @@ func GetZListEndAt(c *gin.Context) {
 	})
 }
 
-func AddZList(c *gin.Context) {
-	param := AddZListParam{}
+func AddList(c *gin.Context) {
+	param := AddListParam{}
 	err := c.BindJSON(&param)
 	if err != nil {
 		log.Println("BindJSON fail")
@@ -246,7 +244,7 @@ func AddZList(c *gin.Context) {
 	}
 
 	if param.Element == nil && param.Elements == nil {
-		log.Println("AddZListParam all <nil>!")
+		log.Println("AddListParam all <nil>!")
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.ParamError,
 			Msg:  "Param all <nil>!",
@@ -259,27 +257,27 @@ func AddZList(c *gin.Context) {
 		return
 	}
 
-	zList := ds.Value2ZList(val)
+	list := ds.Value2List(val)
 
 	if param.Element != nil {
-		zList.Add([]util.SlElement{*param.Element})
-		setNotify(key, zList)
+		list.Append([]interface{}{param.Element})
+		setNotify(key, list)
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.Success,
 		})
 		return
 	}
 
-	zList.Add(*param.Elements)
-	setNotify(key, zList)
+	list.Append(param.Elements)
+	setNotify(key, list)
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 	})
 }
 
-func RemoveZListByScore(c *gin.Context) {
-	param := RemoveZListByScoreParam{}
+func RemoveListElement(c *gin.Context) {
+	param := RemoveListElementParam{}
 	err := c.BindJSON(&param)
 	if err != nil {
 		log.Println("BindJSON fail")
@@ -290,20 +288,11 @@ func RemoveZListByScore(c *gin.Context) {
 		return
 	}
 
-	if param.Score == nil && param.Scores == nil && param.Min == nil && param.Max == nil {
-		log.Println("RemoveZListByScoreParam all <nil>!")
+	if param.Pos == nil && param.Val == nil {
+		log.Println("RemoveListElement all <nil>!")
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.ParamError,
 			Msg:  "Param all <nil>!",
-		})
-		return
-	}
-
-	if param.Min != nil && param.Max == nil || param.Min == nil && param.Max != nil {
-		log.Println("RemoveZListByScoreParam should have min and max at same time!")
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.ParamError,
-			Msg:  "Check your min and max!",
 		})
 		return
 	}
@@ -313,36 +302,20 @@ func RemoveZListByScore(c *gin.Context) {
 		return
 	}
 
-	zList := ds.Value2ZList(val)
+	list := ds.Value2List(val)
 
-	if param.Score != nil {
-		zList.RemoveScore(*param.Score)
-		setNotify(key, zList)
+	if param.Val != nil {
+		list.RemoveVal(param.Val)
+		setNotify(key, list)
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.Success,
 		})
 		return
 	}
 
-	if param.Scores != nil {
-		zList.RemoveScores(*param.Scores)
-		setNotify(key, zList)
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.Success,
-		})
-		return
-	}
-
-	// param.Min != nil && param.Max != nil
-	if err = zList.RemoveInScore(*param.Min, *param.Max); err != nil {
-		log.Println("RemoveInScore Fail", err)
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.ScopeError,
-		})
-		return
-	}
-
-	setNotify(key, zList)
+	// param.Pos != nil
+	list.RemoveAt(*param.Pos)
+	setNotify(key, list)
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 	})
