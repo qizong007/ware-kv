@@ -15,6 +15,13 @@ func NewBitmap() *Bitmap {
 	return &Bitmap{}
 }
 
+// NewBitmapWithCap cap 单位为 bit
+func NewBitmapWithCap(cap uint64) *Bitmap {
+	return &Bitmap{
+		val: make([]uint64, 0, (cap>>6)+1),
+	}
+}
+
 func getSegAndOffsetByNum(num int) (seg int, offset uint) {
 	seg = num >> 6                  // num/64
 	offset = uint(num - (seg << 6)) // num%64
