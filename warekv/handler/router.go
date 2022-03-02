@@ -72,6 +72,14 @@ func Register(r *gin.Engine) {
 	r.GET("/set/union/:set1/:set2", UnionSet)
 	r.GET("/set/diff/:set1/:set2", DiffSet)
 
+	// bitmap
+	r.POST("/bitmap/:key/:num", SetBitmap)
+	r.PUT("/bitmap/:key/:num", SetBitmap)
+	r.GET("/bitmap/:key/len", GetBitmapLen)
+	r.GET("/bitmap/:key/between/:left/:right", GetBitCount)
+	r.GET("/bitmap/:key/:num", GetBitmapBit)
+	r.DELETE("/bitmap/:key/:num", ClearBitmap)
+
 	// subscribe
 	r.POST("/subscribe", SubscribeKey)
 

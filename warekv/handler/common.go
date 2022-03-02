@@ -91,6 +91,13 @@ func findKeyAndValByParam(c *gin.Context, param string) (*storage.Key, storage.V
 	return key, val, nil
 }
 
+func isValNil(val storage.Value) bool {
+	if val == nil {
+		return true
+	}
+	return false
+}
+
 func isKVEffective(c *gin.Context, val storage.Value) bool {
 	if val == nil {
 		log.Println("key is not existed")
