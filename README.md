@@ -1,4 +1,6 @@
-# ware-kv
+# ware-kv 
+
+[![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)   
 
 It's a kv in-memory database, based on **HTTP RESTful** type.
 
