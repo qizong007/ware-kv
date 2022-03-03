@@ -1,57 +1,71 @@
-# 基于HTTP RESTful风格的kv内存数据库——ware-kv
+# ware-kv
 
-## 做这个的理由
+It's a kv in-memory database, based on HTTP RESTful type.
 
-- 市面上还没有RESTful风格的kv内存数据库
-- 对标redis（最主流的开源kv内存数据库），但有它没有的东西：
-    - 通过统一的HTTP RESTful接口，不需要配套相关SDK
-    - 提供真正的消息队列能力，而不只是模拟
-    - 集成布隆过滤器抵挡缓存异常情况
-    - 提供真正的分布式锁能力，而不只是模拟
-    - 配套web端的平台工具，包含操作使用和性能监控
-    - 提供双写一致性保证（MySQL）
-- 顺便完成毕业设计😊
+## Why *ware-kv*?
 
-## 核心
+- Take [*Redis*](https://github.com/redis/redis), which is the main stream open-source kv in-memory database, for standard. But *ware-kv* got something different:
+  - Just unified HTTP RESTful interfaces, no SDK is required, out of the box!
+  - Contains some lightweight middleware:
+    - Message Queue
+    - Bloom Filter
+    - Distributed lock
+  - Support web-based platform tools, including:
+    - Operation usage
+    - Performance monitoring
+  - Provide double-write consistency plan for MySQL.
 
-集成了**常用的中间件与常见问题解决方案**于一身的kv数据库
+- Maybe there's no database like 'this'?
+- By the way, complete the graduation project! :)
 
-## 想法来源
-- ES的风格
-- 七零八落的各种中间件
+## How *ware-kv*?
 
-## 基本
+### Basic *Wares*
 
-（单体）
+- string
+- list
+- sort-list
+- object
+- set
+- bitmap
 
-- 支持多种数据类型
-    - string
-    - counter(计数器)
-    - list
-    - sort-list
-    - object
-    - set
-    - bitmap
-- 支持持久化，保证crash-safe（崩溃恢复能力）
-    - 逻辑日志 - 检查点
-    - 物理日志 - 快照
-- 提供轻量级消息队列能力（生产者-消费者模型）
-- 提供发布/订阅机制（设立注册中心，以做回调）
-- 集成布隆过滤器（bitmap）
-- 提供与MySQL配套的双写一致性保证（解决缓存一致性问题）
-- 允许设定kv有效期（时间到了做惰性删除）
-- 支持缓存淘汰策略，开放定制化接口
-- 配套使用平台（web）
-    - 编辑器（http）
-    - 点击控件（ui）
-    - 性能监控工具（可视化）-使用情况
-- 提供分布式锁能力
+### Special *Wares*
 
-## 可选
+- counter
 
-时间允许情况下，加入分布式：
+- bloom filter
+- ~~message queue~~ (not yet...)
+- ~~lock~~ (not yet...)
+- ~~cache~~ (not yet...)
 
-- 集群
-- 哨兵
-- 数据分片
-- 主从复制
+### Others
+
+- ~~Support consistency for *crash-safe*.~~ (not yet...)
+  - ~~Tracker (Logic Log)~~
+  - ~~Camera (Physics Log)~~
+
+- Support *pub/sub* keys.
+- Support set key's *expire time*.
+- ~~Support *cache eviction*.~~ (not yet...)
+- ~~Support *double-write consistency* plan for MySQL.~~ (not yet...)
+
+## Ideas Came From? 🧠
+
+- [*Elastic Search*](https://github.com/elastic/elasticsearch) Style boost me...
+
+- Various middleware scattered in every corner...
+
+So, I just want to build a **modern** **lightweight** No-SQL(maybe kv database), which is integrated with **common middleware and common problem solutions**.
+
+## Incremental Plan? 🎯
+
+If time permits,  I'll add:(Now *ware-kv* is just stand-alone environment)
+
+- Distributed Cluster
+
+- Sentinel
+
+- Data Sharding
+
+- Master-Slave Replication
+
