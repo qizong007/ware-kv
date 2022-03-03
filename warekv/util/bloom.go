@@ -44,26 +44,26 @@ func (f *BloomFilter) location(h [4]uint64, i uint) uint {
 	return uint(location(h, i) % f.m)
 }
 
-func EstimateParameters(n uint, p float64) (m uint64, k uint64) {
+func estimateParameters(n uint, p float64) (m uint64, k uint64) {
 	m = uint64(math.Ceil(-1 * float64(n) * math.Log(p) / math.Pow(math.Log(2), 2)))
 	k = uint64(math.Ceil(math.Log(2) * float64(m) / float64(n)))
 	return
 }
 
 func NewBloomFilterWithEstimates(n uint, fp float64) *BloomFilter {
-	m, k := EstimateParameters(n, fp)
+	m, k := estimateParameters(n, fp)
 	return NewBloomFilter(m, k)
 }
 
-func (f *BloomFilter) Add(data string) *BloomFilter {
+func (f *BloomFilter) Add(data string) {
 	h := baseHashes([]byte(data))
 	for i := uint64(0); i < f.k; i++ {
 		f.mem.Set(int(f.location(h, uint(i))))
 	}
 	f.n++
-	return f
 }
 
+// Test 查看 data 是否存在
 func (f *BloomFilter) Test(data string) bool {
 	h := baseHashes([]byte(data))
 	for i := uint64(0); i < f.k; i++ {
@@ -80,6 +80,7 @@ func (f *BloomFilter) ClearAll() *BloomFilter {
 	return f
 }
 
+// EstimateFalsePositiveRate 估计 BloomFilter 的假阳性概率
 func (f *BloomFilter) EstimateFalsePositiveRate(n uint) (fpRate float64) {
 	rounds := uint32(100000)
 	f.ClearAll()
@@ -100,12 +101,8 @@ func (f *BloomFilter) EstimateFalsePositiveRate(n uint) (fpRate float64) {
 	return
 }
 
-func (f *BloomFilter) ApproximatedSize() uint32 {
-	x := float64(f.mem.Len())
-	m := float64(f.m)
-	k := float64(f.k)
-	size := -1 * m / k * math.Log(1-x/m) / math.Log(math.E)
-	return uint32(math.Floor(size + 0.5)) // round
+func (f *BloomFilter) Size() uint64 {
+	return f.n
 }
 
 type BloomView struct {
@@ -122,13 +119,4 @@ func (f *BloomFilter) Value() *BloomView {
 		K:   f.k,
 		Mem: f.mem.Value(),
 	}
-}
-
-func BloomLocations(data []byte, k uint) []uint64 {
-	locs := make([]uint64, k)
-	h := baseHashes(data)
-	for i := uint(0); i < k; i++ {
-		locs[i] = location(h, i)
-	}
-	return locs
 }

@@ -17,5 +17,5 @@ func TestBasicBloom(t *testing.T) {
 	fmt.Println(n1b)
 	fmt.Println(n2b)
 	fmt.Println(n3b)
-	fmt.Println(EstimateParameters(1000, 0.01))
+	fmt.Println(estimateParameters(1000, 0.01))
 }

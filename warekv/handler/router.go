@@ -80,6 +80,17 @@ func Register(r *gin.Engine) {
 	r.GET("/bitmap/:key/:num", GetBitmapBit)
 	r.DELETE("/bitmap/:key/:num", ClearBitmap)
 
+	// bloom filter
+	r.POST("/bloom", SetBloomSpecific)
+	r.PUT("/bloom", SetBloomSpecific)
+	r.POST("/bloom/fool", SetBloomFuzzy)
+	r.PUT("/bloom/fool", SetBloomFuzzy)
+	r.POST("/bloom/:key", AddBloom)
+	r.GET("/bloom/:key/size", GetBloomSize)
+	r.GET("/bloom/:key/:data", TestBloom)
+	r.GET("/bloom/:key/false_rate/:n", GetBloomFalseRate)
+	r.DELETE("/bloom/:key", ClearBloom)
+
 	// subscribe
 	r.POST("/subscribe", SubscribeKey)
 
