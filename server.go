@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gookit/color"
-	"ware-kv/warekv/handler"
+	"ware-kv/handler"
 	"ware-kv/warekv/machine"
 	"ware-kv/warekv/manager"
 	"ware-kv/warekv/storage"
