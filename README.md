@@ -1,21 +1,21 @@
 # ware-kv
 
-It's a kv in-memory database, based on HTTP RESTful type.
+It's a kv in-memory database, based on **HTTP RESTful** type.
 
 ## Why *ware-kv*?
 
-- Take [*Redis*](https://github.com/redis/redis), which is the main stream open-source kv in-memory database, for standard. But *ware-kv* got something different:
+- Take [Redis](https://github.com/redis/redis), which is the main stream open-source kv in-memory database, for standard. But *ware-kv* got something different:
   - Just unified HTTP RESTful interfaces, no SDK is required, out of the box!
-  - Contains some lightweight middleware:
+  - Contains some lightweight middlewares, like:
     - Message Queue
     - Bloom Filter
-    - Distributed lock
+    - Distributed Lock
   - Support web-based platform tools, including:
     - Operation usage
     - Performance monitoring
   - Provide double-write consistency plan for MySQL.
 
-- Maybe there's no database like 'this'?
+- Maybe there's no database like *ware-kv*?
 - By the way, complete the graduation project! :)
 
 ## How *ware-kv*?
@@ -51,11 +51,11 @@ It's a kv in-memory database, based on HTTP RESTful type.
 
 ## Ideas Came From? 🧠
 
-- [*Elastic Search*](https://github.com/elastic/elasticsearch) Style boost me...
+- [Elastic Search](https://github.com/elastic/elasticsearch) Style boost me...
 
 - Various middleware scattered in every corner...
 
-So, I just want to build a **modern** **lightweight** No-SQL(maybe kv database), which is integrated with **common middleware and common problem solutions**.
+So, I just want to build a **modern** **lightweight** No-SQL(maybe kv) database, which is integrated with **common middleware and common problem solutions**.
 
 ## Incremental Plan? 🎯
 
