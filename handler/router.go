@@ -2,7 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"ware-kv/warekv/util"
+	"ware-kv/util"
 )
 
 // PUT:  替换/创建指定的资源，并将其追加到相应的资源组中

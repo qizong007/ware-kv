@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"sync"
 	"time"
-	"ware-kv/warekv/util"
 )
 
 const (
@@ -88,13 +87,25 @@ func (s *SubscribeCenter) Notify(key string, newVal interface{}, event int) {
 			plans = append(plans[:i], plans[i+1:]...) // delete
 		}
 		if plans[i].status == callbackCreated {
-			if util.IsIntInList(event, *plans[i].expectEvent) {
+			if isEventInList(event, *plans[i].expectEvent) {
 				plans[i].notify(newVal)
 			} else {
 				plans = append(plans[:i], plans[i+1:]...) // delete
 			}
 		}
 	}
+}
+
+func isEventInList(event int, list []int) bool {
+	if list == nil {
+		return false
+	}
+	for i := range list {
+		if list[i] == event {
+			return true
+		}
+	}
+	return false
 }
 
 // 回调计划生成

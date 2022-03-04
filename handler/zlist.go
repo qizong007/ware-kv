@@ -3,20 +3,21 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"ware-kv/util"
 	"ware-kv/warekv/ds"
 	"ware-kv/warekv/storage"
-	"ware-kv/warekv/util"
+	zlist "ware-kv/warekv/util"
 )
 
 type SetZListParam struct {
-	Key        string           `json:"k"`
-	Val        []util.SlElement `json:"v"`
-	ExpireTime int64            `json:"expire_time" binding:"-"`
+	Key        string            `json:"k"`
+	Val        []zlist.SlElement `json:"v"`
+	ExpireTime int64             `json:"expire_time" binding:"-"`
 }
 
 type AddZListParam struct {
-	Element  *util.SlElement   `json:"e"`
-	Elements *[]util.SlElement `json:"elements"`
+	Element  *zlist.SlElement   `json:"e"`
+	Elements *[]zlist.SlElement `json:"elements"`
 }
 
 type RemoveZListByScoreParam struct {
@@ -286,7 +287,7 @@ func AddZList(c *gin.Context) {
 	zList := ds.Value2ZList(val)
 
 	if param.Element != nil {
-		zList.Add([]util.SlElement{*param.Element})
+		zList.Add([]zlist.SlElement{*param.Element})
 		setNotify(key, zList)
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.Success,
