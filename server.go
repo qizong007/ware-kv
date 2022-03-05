@@ -5,34 +5,35 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gookit/color"
 	"ware-kv/handler"
-	"ware-kv/warekv/machine"
-	"ware-kv/warekv/manager"
-	"ware-kv/warekv/storage"
+	"ware-kv/warekv"
+)
+
+const (
+	defaultPort = "7777"
 )
 
 var Server *WareKV
 
 type WareKV struct {
-	wTable          *storage.WareTable
-	router          *gin.Engine
-	subscribeCenter *manager.SubscribeCenter
-	info            *machine.Info
+	engine *warekv.WareEngine
+	router *gin.Engine
 	// options（布隆开关、日志开关）
-	// closer
 	// tracker(AOF) head|k|v|crc32 mmap
-	// camera(RDB)
-	// 热点采样
 }
 
-func Boot(port string) {
+func Boot(option *WareOption) {
 	Server = &WareKV{
-		wTable:          storage.GetWareTable(),
-		router:          gin.Default(),
-		subscribeCenter: manager.GetSubscribeCenter(),
-		info:            machine.GetWareInfo(),
+		engine: warekv.New(option.WareEngine),
+		router: gin.Default(),
 	}
+	// Server.engine start in New()
+	defer Server.engine.Close()
 	handler.Register(Server.router)
 	showFrame()
+	port := defaultPort
+	if option != nil {
+		port = option.Port
+	}
 	Server.router.Run(fmt.Sprintf(":%s", port))
 }
 

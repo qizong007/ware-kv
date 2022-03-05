@@ -1,0 +1,33 @@
+# Don't WORRY!!!
+# If you don't boost with this file, it's OK!!!
+# It's a just a default template for ware-kv.
+# If you don't boost with this file, the inner params will be like this file.
+# That's all! :)
+
+Port: 7777
+
+WareEngine:
+  # The storage engine splits the TABLE into several shards.
+  # For better performance, the WRITE is not just in time.
+  # As you can see, there's a WriteQueue.
+  Shard:
+    Num: 32 # default is 16
+    WriteQueueCap: 256 # default is 256
+    WriteTickInterval: 200 # default is 100 millisecond
+
+  # For better performance, GC plays a role.
+  GC:
+    TaskCap: 2048 # default is 1024
+    TickInterval: 1000 # default is 500 millisecond
+
+  # There's a SubscribeCenter to handle the pub/sub stuff.
+  # I mean, this is not just in time, the first time callback and retry.
+  Subscriber:
+    DefaultCallbackMethod: "POST" # default is "GET"
+    RetryQueueLen: 128 # default is 128
+    RetryTickInterval: 1000 # default is 1000 millisecond
+
+  # It means that, 'You get your machine info' is also not just in time!
+  # It's a 'cache' for real, or 'snapshot'.
+  MachineInfo:
+    FreshFrequency: 5000 # default is 1000 millisecond

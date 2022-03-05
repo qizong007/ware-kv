@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	defaultCallbackMethod            = http.MethodGet
+	defaultDefaultCallbackMethod     = http.MethodGet
 	defaultCallbackRetryQueueLen     = 128
 	defaultCallbackRetryTickInterval = time.Second
 )
@@ -35,21 +35,48 @@ var (
 	center *SubscribeCenter
 )
 
-func init() {
-	center = &SubscribeCenter{
-		record:      make(map[string][]*CallbackPlan),
-		retryQueue:  make(chan *CallbackPlan, defaultCallbackRetryQueueLen),
-		retryTicker: time.NewTicker(defaultCallbackRetryTickInterval),
-	}
-	go center.scheduledRetry()
-}
-
 // SubscribeCenter 订阅中心
 type SubscribeCenter struct {
-	record      map[string][]*CallbackPlan
-	mu          sync.Mutex
-	retryQueue  chan *CallbackPlan
-	retryTicker *time.Ticker
+	record                map[string][]*CallbackPlan
+	mu                    sync.Mutex
+	retryQueue            chan *CallbackPlan
+	retryTicker           *time.Ticker
+	retryCloser           chan bool
+	defaultCallbackMethod string
+}
+
+type SubscribeCenterOption struct {
+	DefaultCallbackMethod string `yaml:"DefaultCallbackMethod"`
+	RetryQueueLen         uint   `yaml:"RetryQueueLen"`
+	RetryTickInterval     uint   `yaml:"RetryTickInterval"`
+}
+
+func NewSubscribeCenter(option *SubscribeCenterOption) *SubscribeCenter {
+	defaultCallbackMethod := defaultDefaultCallbackMethod
+	retryQueueLen := defaultCallbackRetryQueueLen
+	retryTickInterval := defaultCallbackRetryTickInterval
+	if option != nil {
+		defaultCallbackMethod = option.DefaultCallbackMethod
+		retryQueueLen = int(option.RetryQueueLen)
+		retryTickInterval = time.Duration(option.RetryTickInterval)
+	}
+	center = &SubscribeCenter{
+		record:                make(map[string][]*CallbackPlan),
+		retryQueue:            make(chan *CallbackPlan, retryQueueLen),
+		retryTicker:           time.NewTicker(retryTickInterval),
+		retryCloser:           make(chan bool),
+		defaultCallbackMethod: defaultCallbackMethod,
+	}
+	return center
+}
+
+func (s *SubscribeCenter) Start() {
+	go center.scheduledRetry()
+	fmt.Println("Subscriber's Retry worker starts working...")
+}
+
+func (s *SubscribeCenter) Close() {
+	s.retryCloser <- true
 }
 
 func GetSubscribeCenter() *SubscribeCenter {
@@ -113,7 +140,7 @@ func (s *SubscribeCenter) generateCallbackPlan(path string, options ...CallbackP
 	plan := &CallbackPlan{
 		center:         s,
 		callbackPath:   path,
-		callbackMethod: defaultCallbackMethod,
+		callbackMethod: s.defaultCallbackMethod,
 		status:         callbackCreated,
 		expectEvent:    &[]int{CallbackSetEvent, CallbackDeleteEvent},
 	}
@@ -138,6 +165,9 @@ func (s *SubscribeCenter) scheduledRetry() {
 				}
 			}
 			s.mu.Unlock()
+		case <-s.retryCloser:
+			log.Println("Subscriber's Retry worker stops working...")
+			return
 		}
 	}
 }

@@ -17,7 +17,7 @@ It's a kv in-memory database, based on **HTTP RESTful** type.
     - Operation usage
     - Performance monitoring
   - Provide double-write consistency plan for MySQL.
-
+- Thread-safe for sure!
 - Maybe there's no database like *ware-kv*?
 - By the way, complete the graduation project! :)
 

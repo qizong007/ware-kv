@@ -1,7 +1,9 @@
 package machine
 
 import (
+	"fmt"
 	"github.com/shirou/gopsutil/process"
+	"log"
 	"os"
 	"runtime"
 	"time"
@@ -12,35 +14,69 @@ const (
 )
 
 type Info struct {
+	pid        int
+	cpuPercent float64
+	memPercent float32
+	memAlloc   uint64
+	infoTicker *time.Ticker
+	closer     chan bool
+}
+
+var (
+	wareInfo *Info
+)
+
+func NewWareInfo(option *WareInfoOption) *Info {
+	infoFreshFrequency := defaultInfoFreshFrequency
+	if option != nil {
+		infoFreshFrequency = time.Millisecond * time.Duration(option.FreshFrequency)
+	}
+	wareInfo = &Info{
+		pid:        os.Getpid(),
+		infoTicker: time.NewTicker(infoFreshFrequency),
+		closer:     make(chan bool),
+	}
+	return wareInfo
+}
+
+type WareInfoOption struct {
+	FreshFrequency uint `yaml:"FreshFrequency"`
+}
+
+type InfoView struct {
 	Pid        int
 	CpuPercent float64
 	MemPercent float32
 	MemAlloc   uint64
 }
 
-var (
-	wareInfo   *Info
-	infoTicker *time.Ticker
-)
-
-func init() {
-	wareInfo = &Info{
-		Pid: os.Getpid(),
+func GetWareInfo() *InfoView {
+	return &InfoView{
+		Pid:        wareInfo.pid,
+		CpuPercent: wareInfo.cpuPercent,
+		MemPercent: wareInfo.memPercent,
+		MemAlloc:   wareInfo.memAlloc,
 	}
-	infoTicker = time.NewTicker(defaultInfoFreshFrequency)
-	wareInfo.updateInfo()
-	go wareInfo.refresh()
 }
 
-func GetWareInfo() *Info {
-	return wareInfo
+func (i *Info) Start() {
+	wareInfo.updateInfo()
+	go wareInfo.refresh()
+	fmt.Println("MachineInfo's Refresh worker starts working...")
+}
+
+func (i *Info) Close() {
+	i.closer <- true
 }
 
 func (i *Info) refresh() {
 	for {
 		select {
-		case <-infoTicker.C:
+		case <-i.infoTicker.C:
 			i.updateInfo()
+		case <-i.closer:
+			log.Println("MachineInfo's Refresh worker stops working...")
+			return
 		}
 	}
 }
@@ -50,15 +86,15 @@ func (i *Info) updateInfo() {
 	if err != nil {
 		return
 	}
-	pid := int32(i.Pid)
+	pid := int32(i.pid)
 	for _, p := range processes {
 		if p.Pid == pid {
-			i.CpuPercent, _ = p.CPUPercent()
-			i.MemPercent, _ = p.MemoryPercent()
+			i.cpuPercent, _ = p.CPUPercent()
+			i.memPercent, _ = p.MemoryPercent()
 			break
 		}
 	}
 	var ms runtime.MemStats
 	runtime.ReadMemStats(&ms)
-	i.MemAlloc = ms.Alloc
+	i.memAlloc = ms.Alloc
 }
