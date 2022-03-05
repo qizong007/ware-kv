@@ -11,23 +11,23 @@ WareEngine:
   # For better performance, the WRITE is not just in time.
   # As you can see, there's a WriteQueue.
   Shard:
-    Num: 32 # default is 16
+    Num: 17 # default is 16, it will always be 2^n for MOD in hash (nearest 2^n)
     WriteQueueCap: 256 # default is 256
-    WriteTickInterval: 200 # default is 100 millisecond
+    WriteTickInterval: 100 # default is 100 millisecond
 
   # For better performance, GC plays a role.
   GC:
-    TaskCap: 2048 # default is 1024
-    TickInterval: 1000 # default is 500 millisecond
+    TaskCap: 1024 # default is 1024
+    TickInterval: 500 # default is 500 millisecond
 
   # There's a SubscribeCenter to handle the pub/sub stuff.
   # I mean, this is not just in time, the first time callback and retry.
   Subscriber:
-    DefaultCallbackMethod: "POST" # default is "GET"
+    DefaultCallbackMethod: "GET" # default is "GET", you can choose "POST"
     RetryQueueLen: 128 # default is 128
     RetryTickInterval: 1000 # default is 1000 millisecond
 
   # It means that, 'You get your machine info' is also not just in time!
   # It's a 'cache' for real, or 'snapshot'.
   MachineInfo:
-    FreshFrequency: 5000 # default is 1000 millisecond
+    FreshFrequency: 1000 # default is 1000 millisecond

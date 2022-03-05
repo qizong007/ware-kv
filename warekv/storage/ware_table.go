@@ -1,8 +1,10 @@
 package storage
 
 import (
+	"fmt"
 	"log"
 	"time"
+	"ware-kv/warekv/util"
 )
 
 const (
@@ -33,7 +35,7 @@ func NewWareTable(shardOption *ShardOption, gcOption *WareGCOption) *WareTable {
 	writeQueueCap := defaultWriteQueueCap
 	writeTickInterval := defaultWriteTickInterval
 	if shardOption != nil {
-		shardNum = int(shardOption.Num)
+		shardNum = int(util.Nearest2Power(shardOption.Num))
 		writeQueueCap = int(shardOption.WriteQueueCap)
 		writeTickInterval = time.Millisecond * time.Duration(shardOption.WriteTickInterval)
 	}
