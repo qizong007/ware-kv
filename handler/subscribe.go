@@ -5,14 +5,16 @@ import (
 	"log"
 	"strings"
 	"ware-kv/util"
+	"ware-kv/warekv"
 	"ware-kv/warekv/manager"
 )
 
 type SubscribeKeyParam struct {
-	Key        string    `json:"key"`
-	Path       string    `json:"path"`
-	Events     *[]string `json:"expect_events" binding:"-"`
-	RetryTimes *int      `json:"retry_times" binding:"-"`
+	Key          string    `json:"key"`
+	Path         string    `json:"path"`
+	Events       *[]string `json:"expect_events" binding:"-"`
+	RetryTimes   *int      `json:"retry_times" binding:"-"`
+	IsPersistent *bool     `json:"is_persistent" binding:"-"`
 }
 
 func SubscribeKey(c *gin.Context) {
@@ -27,11 +29,12 @@ func SubscribeKey(c *gin.Context) {
 		return
 	}
 
-	option := &manager.SubscribeOption{
+	manifest := &manager.SubscribeManifest{
 		Key:          param.Key,
 		CallbackPath: param.Path,
 		ExpectEvent:  nil,
 		RetryTimes:   0,
+		IsPersistent: false,
 	}
 	if param.Events != nil {
 		list := *param.Events
@@ -44,13 +47,16 @@ func SubscribeKey(c *gin.Context) {
 				events = append(events, manager.CallbackDeleteEvent)
 			}
 		}
-		option.ExpectEvent = events
+		manifest.ExpectEvent = events
 	}
 	if param.RetryTimes != nil {
-		option.RetryTimes = *param.RetryTimes
+		manifest.RetryTimes = *param.RetryTimes
+	}
+	if param.IsPersistent != nil {
+		manifest.IsPersistent = *param.IsPersistent
 	}
 
-	manager.GetSubscribeCenter().Subscribe(option)
+	warekv.Engine().Subscribe(manifest)
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,

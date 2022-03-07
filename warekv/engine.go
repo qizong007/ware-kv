@@ -55,6 +55,26 @@ func (e *WareEngine) Close() {
 	engine.wTable.Close()
 }
 
-func Get() *WareEngine {
+func Engine() *WareEngine {
 	return engine
+}
+
+func (e *WareEngine) Get(key *storage.Key) storage.Value {
+	return e.wTable.Get(key)
+}
+
+func (e *WareEngine) Set(key *storage.Key, value storage.Value) {
+	e.wTable.Set(key, value)
+}
+
+func (e *WareEngine) Delete(key *storage.Key) {
+	e.wTable.Delete(key)
+}
+
+func (e *WareEngine) Subscribe(option *manager.SubscribeManifest) {
+	e.subscribeCenter.Subscribe(option)
+}
+
+func (e *WareEngine) Notify(key string, newVal interface{}, event int) {
+	e.subscribeCenter.Notify(key, newVal, event)
 }

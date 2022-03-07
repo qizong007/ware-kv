@@ -56,7 +56,6 @@ func main() {
 	if _, err := os.Stat(optionPath); err == nil {
 		// file exist
 		option, err = LoadOption(optionPath)
-		fmt.Println(*option.WareEngine)
 		if err != nil {
 			log.Fatalln("Load option file failed! Err:", err)
 			return

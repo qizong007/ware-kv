@@ -60,10 +60,6 @@ func (w *WareTable) Close() {
 	log.Println("WareTable's Write worker and GC worker stop working...")
 }
 
-func GetWareTable() *WareTable {
-	return wTable
-}
-
 func (w *WareTable) wHash(key *Key) int {
 	hashCode := key.Hashcode()
 	// TableNum保持2的倍数，方便hash计算

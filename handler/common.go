@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 	"ware-kv/util"
+	"ware-kv/warekv"
 	"ware-kv/warekv/manager"
 	"ware-kv/warekv/storage"
 )
@@ -48,21 +49,21 @@ func set(key *storage.Key, newVal storage.Value, expireTime int64) {
 			del(key)
 		})
 	}
-	storage.GetWareTable().Set(key, newVal)
+	warekv.Engine().Set(key, newVal)
 	setNotify(key, newVal)
 }
 
 func del(key *storage.Key) {
-	storage.GetWareTable().Delete(key)
+	warekv.Engine().Delete(key)
 	deleteNotify(key)
 }
 
 func setNotify(key *storage.Key, newVal storage.Value) {
-	go manager.GetSubscribeCenter().Notify(key.GetKey(), newVal.GetValue(), manager.CallbackSetEvent)
+	go warekv.Engine().Notify(key.GetKey(), newVal.GetValue(), manager.CallbackSetEvent)
 }
 
 func deleteNotify(key *storage.Key) {
-	go manager.GetSubscribeCenter().Notify(key.GetKey(), nil, manager.CallbackDeleteEvent)
+	go warekv.Engine().Notify(key.GetKey(), nil, manager.CallbackDeleteEvent)
 }
 
 func keyNull(c *gin.Context) {
@@ -87,7 +88,7 @@ func findKeyAndValByParam(c *gin.Context, param string) (*storage.Key, storage.V
 		return nil, nil, fmt.Errorf("%s", util.ErrCode2Msg[util.ParamError])
 	}
 	key := storage.MakeKey(paramKey)
-	val := storage.GetWareTable().Get(key)
+	val := warekv.Engine().Get(key)
 	return key, val, nil
 }
 

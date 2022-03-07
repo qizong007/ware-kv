@@ -79,22 +79,25 @@ func (s *SubscribeCenter) Close() {
 	s.retryCloser <- true
 }
 
-func GetSubscribeCenter() *SubscribeCenter {
-	return center
-}
-
-type SubscribeOption struct {
+type SubscribeManifest struct {
 	Key          string
 	CallbackPath string
 	ExpectEvent  []int
 	RetryTimes   int
+	IsPersistent bool
 }
 
 // Subscribe 订阅
-func (s *SubscribeCenter) Subscribe(option *SubscribeOption) {
+func (s *SubscribeCenter) Subscribe(option *SubscribeManifest) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	plan := s.generateCallbackPlan(option.CallbackPath, ExpectEvent(option.ExpectEvent), RetryTimes(option.RetryTimes))
+	cpOption := &CallbackPlanOption{
+		callbackPath: option.CallbackPath,
+		events:       option.ExpectEvent,
+		retryTimes:   option.RetryTimes,
+		isPersistent: option.IsPersistent,
+	}
+	plan := s.generateCallbackPlan(cpOption)
 	key := option.Key
 	if plans, ok := s.record[key]; ok {
 		plans = append(plans, plan)
@@ -104,6 +107,16 @@ func (s *SubscribeCenter) Subscribe(option *SubscribeOption) {
 	}
 }
 
+func deleteCallbackPlan(plans []*CallbackPlan, i int) {
+	plans = append(plans[:i], plans[i+1:]...)
+}
+
+func refreshCallbackPlan(plan *CallbackPlan) {
+	plan.param = nil
+	plan.status = callbackCreated
+	plan.leftRetryTimes = plan.retryTimes
+}
+
 // Notify 通知回调
 func (s *SubscribeCenter) Notify(key string, newVal interface{}, event int) {
 	s.mu.Lock()
@@ -111,13 +124,18 @@ func (s *SubscribeCenter) Notify(key string, newVal interface{}, event int) {
 	plans := s.record[key]
 	for i := range plans {
 		if plans[i].status == callbackSuccess || plans[i].status == callbackFail {
-			plans = append(plans[:i], plans[i+1:]...) // delete
+			if plans[i].isPersistent {
+				refreshCallbackPlan(plans[i])
+			} else {
+				deleteCallbackPlan(plans, i)
+				continue
+			}
 		}
 		if plans[i].status == callbackCreated {
 			if isEventInList(event, *plans[i].expectEvent) {
 				plans[i].notify(newVal)
 			} else {
-				plans = append(plans[:i], plans[i+1:]...) // delete
+				deleteCallbackPlan(plans, i)
 			}
 		}
 	}
@@ -136,16 +154,21 @@ func isEventInList(event int, list []int) bool {
 }
 
 // 回调计划生成
-func (s *SubscribeCenter) generateCallbackPlan(path string, options ...CallbackPlanOption) *CallbackPlan {
+func (s *SubscribeCenter) generateCallbackPlan(option *CallbackPlanOption) *CallbackPlan {
 	plan := &CallbackPlan{
 		center:         s,
-		callbackPath:   path,
+		callbackPath:   option.callbackPath,
 		callbackMethod: s.defaultCallbackMethod,
 		status:         callbackCreated,
 		expectEvent:    &[]int{CallbackSetEvent, CallbackDeleteEvent},
+		isPersistent:   option.isPersistent,
 	}
-	for _, option := range options {
-		option(plan)
+	if option.retryTimes != 0 {
+		plan.retryTimes = option.retryTimes
+		plan.leftRetryTimes = option.retryTimes
+	}
+	if option.events != nil {
+		*plan.expectEvent = option.events
 	}
 	return plan
 }
@@ -181,7 +204,9 @@ type CallbackPlan struct {
 	param          interface{} // 参数缓存
 	status         int
 	expectEvent    *[]int
-	retryTimes     int // 重试次数
+	retryTimes     int
+	leftRetryTimes int
+	isPersistent   bool
 	//expectValue
 }
 
@@ -270,8 +295,8 @@ func (p *CallbackPlan) retryOrAbort(resp *http.Response) {
 }
 
 func (p *CallbackPlan) dealWithCallbackErr() {
-	if p.retryTimes > 0 {
-		p.retryTimes--
+	if p.leftRetryTimes > 0 {
+		p.leftRetryTimes--
 		p.status = callbackRetry
 		p.center.retryQueue <- p
 	} else {
@@ -279,20 +304,9 @@ func (p *CallbackPlan) dealWithCallbackErr() {
 	}
 }
 
-type CallbackPlanOption func(*CallbackPlan)
-
-func ExpectEvent(events []int) CallbackPlanOption {
-	return func(p *CallbackPlan) {
-		if events != nil {
-			*p.expectEvent = events
-		}
-	}
-}
-
-func RetryTimes(times int) CallbackPlanOption {
-	return func(p *CallbackPlan) {
-		if times != 0 {
-			p.retryTimes = times
-		}
-	}
+type CallbackPlanOption struct {
+	callbackPath string
+	events       []int
+	retryTimes   int
+	isPersistent bool
 }
