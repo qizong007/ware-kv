@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	defaultInfoFreshFrequency = time.Second
+	defaultInfoFreshFrequency = 1000
 )
 
 type Info struct {
@@ -27,7 +27,7 @@ var (
 )
 
 func NewWareInfo(option *WareInfoOption) *Info {
-	infoFreshFrequency := defaultInfoFreshFrequency
+	infoFreshFrequency := time.Millisecond * time.Duration(defaultInfoFreshFrequency)
 	if option != nil {
 		infoFreshFrequency = time.Millisecond * time.Duration(option.FreshFrequency)
 	}
@@ -41,6 +41,10 @@ func NewWareInfo(option *WareInfoOption) *Info {
 
 type WareInfoOption struct {
 	FreshFrequency uint `yaml:"FreshFrequency"`
+}
+
+func DefaultWareInfoOption() *WareInfoOption {
+	return &WareInfoOption{FreshFrequency: defaultInfoFreshFrequency}
 }
 
 type InfoView struct {

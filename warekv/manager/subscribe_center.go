@@ -13,7 +13,7 @@ import (
 const (
 	defaultDefaultCallbackMethod     = http.MethodGet
 	defaultCallbackRetryQueueLen     = 128
-	defaultCallbackRetryTickInterval = time.Second
+	defaultCallbackRetryTickInterval = 1000
 )
 
 // status
@@ -51,14 +51,22 @@ type SubscribeCenterOption struct {
 	RetryTickInterval     uint   `yaml:"RetryTickInterval"`
 }
 
+func DefaultSubscribeCenterOption() *SubscribeCenterOption {
+	return &SubscribeCenterOption{
+		DefaultCallbackMethod: defaultDefaultCallbackMethod,
+		RetryQueueLen:         defaultCallbackRetryQueueLen,
+		RetryTickInterval:     defaultCallbackRetryTickInterval,
+	}
+}
+
 func NewSubscribeCenter(option *SubscribeCenterOption) *SubscribeCenter {
 	defaultCallbackMethod := defaultDefaultCallbackMethod
 	retryQueueLen := defaultCallbackRetryQueueLen
-	retryTickInterval := defaultCallbackRetryTickInterval
+	retryTickInterval := time.Millisecond * time.Duration(defaultCallbackRetryTickInterval)
 	if option != nil {
 		defaultCallbackMethod = option.DefaultCallbackMethod
 		retryQueueLen = int(option.RetryQueueLen)
-		retryTickInterval = time.Duration(option.RetryTickInterval)
+		retryTickInterval = time.Millisecond * time.Duration(option.RetryTickInterval)
 	}
 	center = &SubscribeCenter{
 		record:                make(map[string][]*CallbackPlan),

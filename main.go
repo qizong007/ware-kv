@@ -76,5 +76,8 @@ func main() {
 		return
 	}
 
+	if option == nil {
+		panic("No Option!!! Please check your 'ware.yml'!!!")
+	}
 	Boot(option)
 }

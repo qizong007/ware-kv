@@ -22,6 +22,7 @@ type WareKV struct {
 }
 
 func Boot(option *WareOption) {
+	initOption(option)
 	Server = &WareKV{
 		engine: warekv.New(option.WareEngine),
 		router: gin.Default(),
@@ -44,4 +45,22 @@ func showFrame() {
 	color.HiCyan.Println("  | |/ |/ / /_/ / /  /  __/_____/ ,<  | |/ /")
 	color.HiBlue.Print("  |__/|__/\\__,_/_/   \\___/     /_/|_| |___/")
 	color.HiMagenta.Println("         😎version_0.0.1@qizong007")
+}
+
+func initOption(option *WareOption) {
+	engineOption := DefaultOption()
+	if option.WareEngine != nil {
+		if option.WareEngine.GC == nil {
+			option.WareEngine.GC = engineOption.WareEngine.GC
+		}
+		if option.WareEngine.Shard == nil {
+			option.WareEngine.Shard = engineOption.WareEngine.Shard
+		}
+		if option.WareEngine.Subscriber == nil {
+			option.WareEngine.Subscriber = engineOption.WareEngine.Subscriber
+		}
+		if option.WareEngine.MachineInfo == nil {
+			option.WareEngine.MachineInfo = engineOption.WareEngine.MachineInfo
+		}
+	}
 }

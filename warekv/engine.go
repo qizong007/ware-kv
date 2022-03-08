@@ -22,10 +22,19 @@ func Default() *WareEngine {
 }
 
 type WareEngineOption struct {
-	Shard       storage.ShardOption           `yaml:"Shard"`
-	GC          storage.WareGCOption          `yaml:"GC"`
-	Subscriber  manager.SubscribeCenterOption `yaml:"Subscriber"`
-	MachineInfo machine.WareInfoOption        `yaml:"MachineInfo"`
+	Shard       *storage.ShardOption           `yaml:"Shard"`
+	GC          *storage.WareGCOption          `yaml:"GC"`
+	Subscriber  *manager.SubscribeCenterOption `yaml:"Subscriber"`
+	MachineInfo *machine.WareInfoOption        `yaml:"MachineInfo"`
+}
+
+func DefaultOption() *WareEngineOption {
+	return &WareEngineOption{
+		Shard:       storage.DefaultShardOption(),
+		GC:          storage.DefaultWareGCOption(),
+		Subscriber:  manager.DefaultSubscribeCenterOption(),
+		MachineInfo: machine.DefaultWareInfoOption(),
+	}
 }
 
 func New(option *WareEngineOption) *WareEngine {
@@ -35,9 +44,9 @@ func New(option *WareEngineOption) *WareEngine {
 		engine.subscribeCenter = manager.NewSubscribeCenter(nil)
 		engine.info = machine.NewWareInfo(nil)
 	} else {
-		engine.wTable = storage.NewWareTable(&option.Shard, &option.GC)
-		engine.subscribeCenter = manager.NewSubscribeCenter(&option.Subscriber)
-		engine.info = machine.NewWareInfo(&option.MachineInfo)
+		engine.wTable = storage.NewWareTable(option.Shard, option.GC)
+		engine.subscribeCenter = manager.NewSubscribeCenter(option.Subscriber)
+		engine.info = machine.NewWareInfo(option.MachineInfo)
 	}
 	engine.start()
 	return engine

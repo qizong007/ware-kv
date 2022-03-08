@@ -9,7 +9,7 @@ import (
 const (
 	defaultShardNum          = 16
 	defaultWriteQueueCap     = 256 // 默认写请求缓存容量
-	defaultWriteTickInterval = 100 * time.Millisecond
+	defaultWriteTickInterval = 100
 )
 
 var (
@@ -28,11 +28,19 @@ type ShardOption struct {
 	WriteTickInterval uint `yaml:"WriteTickInterval"`
 }
 
+func DefaultShardOption() *ShardOption {
+	return &ShardOption{
+		Num:               defaultShardNum,
+		WriteQueueCap:     defaultWriteQueueCap,
+		WriteTickInterval: defaultWriteTickInterval,
+	}
+}
+
 func NewWareTable(shardOption *ShardOption, gcOption *WareGCOption) *WareTable {
 	wTable = &WareTable{}
 	shardNum := defaultShardNum
 	writeQueueCap := defaultWriteQueueCap
-	writeTickInterval := defaultWriteTickInterval
+	writeTickInterval := time.Millisecond * time.Duration(defaultWriteTickInterval)
 	if shardOption != nil {
 		shardNum = int(util.Nearest2Power(shardOption.Num))
 		writeQueueCap = int(shardOption.WriteQueueCap)

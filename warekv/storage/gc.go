@@ -6,7 +6,7 @@ import (
 
 const (
 	defaultGCTaskCap      = 1024 // 默认 gc 任务缓存容量
-	defaultGCTickInterval = 500 * time.Millisecond
+	defaultGCTickInterval = 500
 )
 
 type WareGC struct {
@@ -17,7 +17,7 @@ type WareGC struct {
 
 func NewWareGC(share *Shard, option *WareGCOption) *WareGC {
 	GCTaskCap := defaultGCTaskCap
-	GCTickInterval := defaultGCTickInterval
+	GCTickInterval := time.Millisecond * time.Duration(defaultGCTickInterval)
 	if option != nil {
 		GCTaskCap = int(option.TaskCap)
 		GCTickInterval = time.Millisecond * time.Duration(option.TickInterval)
@@ -32,6 +32,13 @@ func NewWareGC(share *Shard, option *WareGCOption) *WareGC {
 type WareGCOption struct {
 	TaskCap      uint `yaml:"TaskCap"`
 	TickInterval uint `yaml:"TickInterval"`
+}
+
+func DefaultWareGCOption() *WareGCOption {
+	return &WareGCOption{
+		TaskCap:      defaultGCTaskCap,
+		TickInterval: defaultGCTickInterval,
+	}
 }
 
 func (gc *WareGC) Commit(entry string) {

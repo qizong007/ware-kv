@@ -28,6 +28,6 @@ func LoadOption(file string) (*WareOption, error) {
 func DefaultOption() *WareOption {
 	return &WareOption{
 		Port:       defaultPort,
-		WareEngine: nil,
+		WareEngine: warekv.DefaultOption(),
 	}
 }
