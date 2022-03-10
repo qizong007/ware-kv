@@ -1,6 +1,6 @@
 package util
 
-func Nearest2Power(num uint) uint {
+func Next2Power(num uint) uint {
 	n := num - 1
 	n |= n >> 1
 	n |= n >> 2

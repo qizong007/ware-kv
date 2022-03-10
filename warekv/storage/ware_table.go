@@ -42,7 +42,7 @@ func NewWareTable(shardOption *ShardOption, gcOption *WareGCOption) *WareTable {
 	writeQueueCap := defaultWriteQueueCap
 	writeTickInterval := time.Millisecond * time.Duration(defaultWriteTickInterval)
 	if shardOption != nil {
-		shardNum = int(util.Nearest2Power(shardOption.Num))
+		shardNum = int(util.Next2Power(shardOption.Num))
 		writeQueueCap = int(shardOption.WriteQueueCap)
 		writeTickInterval = time.Millisecond * time.Duration(shardOption.WriteTickInterval)
 	}
