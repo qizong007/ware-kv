@@ -7,10 +7,10 @@ import (
 
 func TestTracker(t *testing.T) {
 	tracker := NewTracker(nil)
-	tracker.Write([]byte("s k1 v1\n"))
+	c := GenCreateCommand("k1", []interface{}{1,2.3,"asd",[]int{1,2,3}}, time.Now().Unix(), 1)
+	tracker.Write(c)
 	time.Sleep(time.Second * 2)
-	tracker.Write([]byte("s k2 [1,2,3]\n"))
-	time.Sleep(time.Second * 2)
-	tracker.Write([]byte("d k1\n"))
+	d := GenDeleteCommand("k1")
+	tracker.Write(d)
 	time.Sleep(time.Second * 2)
 }

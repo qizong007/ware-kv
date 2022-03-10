@@ -26,9 +26,6 @@ type TrackerOption struct {
 	BufRefreshTickInterval uint
 }
 
-type Command struct {
-}
-
 func NewTracker(option *TrackerOption) *Tracker {
 	filePath := defaultTrackPath
 	bufTickInterval := uint(defaultBufferTickInterval)
@@ -76,10 +73,10 @@ func (t *Tracker) scheduledRefresh() {
 	}
 }
 
-func (t *Tracker) Write(content []byte) {
+func (t *Tracker) Write(command Command) {
 	t.bufLock.Lock()
 	defer t.bufLock.Unlock()
-	t.buffer = append(t.buffer, content...)
+	t.buffer = append(t.buffer, []byte(command.String() + "\n")...)
 }
 
 func (t *Tracker) refresh() {
