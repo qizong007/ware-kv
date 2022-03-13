@@ -5,9 +5,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"time"
+	"ware-kv/anticorrosive"
 	"ware-kv/util"
 	"ware-kv/warekv"
-	"ware-kv/warekv/manager"
 	"ware-kv/warekv/storage"
 )
 
@@ -35,7 +35,7 @@ func Delete(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	del(key)
+	anticorrosive.Del(key)
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
@@ -46,24 +46,14 @@ func set(key *storage.Key, newVal storage.Value, expireTime int64) {
 	if expireTime != 0 {
 		newVal.WithExpireTime(expireTime)
 		time.AfterFunc(time.Duration(expireTime)*time.Second, func() {
-			del(key)
+			anticorrosive.Del(key)
 		})
 	}
-	warekv.Engine().Set(key, newVal)
-	setNotify(key, newVal)
-}
-
-func del(key *storage.Key) {
-	warekv.Engine().Delete(key)
-	deleteNotify(key)
+	anticorrosive.Set(key, newVal)
 }
 
 func setNotify(key *storage.Key, newVal storage.Value) {
-	go warekv.Engine().Notify(key.GetKey(), newVal.GetValue(), manager.CallbackSetEvent)
-}
-
-func deleteNotify(key *storage.Key) {
-	go warekv.Engine().Notify(key.GetKey(), nil, manager.CallbackDeleteEvent)
+	anticorrosive.SetNotify(key, newVal)
 }
 
 func keyNull(c *gin.Context) {

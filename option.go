@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"ware-kv/tracker"
 	"ware-kv/warekv"
 )
 
 type WareOption struct {
 	Port       string                   `yaml:"Port"`
 	WareEngine *warekv.WareEngineOption `yaml:"WareEngine"`
+	Tracker    *tracker.TrackerOption   `yaml:"Tracker"`
 }
 
 func LoadOption(file string) (*WareOption, error) {
@@ -29,5 +31,6 @@ func DefaultOption() *WareOption {
 	return &WareOption{
 		Port:       defaultPort,
 		WareEngine: warekv.DefaultOption(),
+		Tracker:    tracker.DefaultOption(),
 	}
 }

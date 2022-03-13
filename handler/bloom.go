@@ -47,7 +47,11 @@ func SetBloomSpecific(c *gin.Context) {
 	}
 
 	key := storage.MakeKey(param.Key)
-	newVal := ds.MakeBloomFilterSpecific(param.Val.M, param.Val.K)
+	option := ds.BloomFilterSpecificOption{
+		M: param.Val.M,
+		K: param.Val.K,
+	}
+	newVal := ds.MakeBloomFilterSpecific(option)
 
 	set(key, newVal, param.ExpireTime)
 
@@ -69,7 +73,11 @@ func SetBloomFuzzy(c *gin.Context) {
 	}
 
 	key := storage.MakeKey(param.Key)
-	newVal := ds.MakeBloomFilterFuzzy(param.Val.N, param.Val.Fp)
+	option := ds.BloomFilterFuzzyOption{
+		N:  param.Val.N,
+		Fp: param.Val.Fp,
+	}
+	newVal := ds.MakeBloomFilterFuzzy(option)
 
 	set(key, newVal, param.ExpireTime)
 

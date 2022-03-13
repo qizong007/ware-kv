@@ -31,3 +31,8 @@ WareEngine:
   # It's a 'cache' for real, or 'snapshot'.
   MachineInfo:
     FreshFrequency: 1000 # default is 1000 millisecond
+
+# It's a WAL.
+Tracker:
+  FilePath: ./tracker.log # relative to 'tracker' dir
+  BufRefreshTickInterval: 1000 # default is 1000 millisecond

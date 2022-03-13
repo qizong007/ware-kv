@@ -10,7 +10,6 @@ type WareEngine struct {
 	wTable          *storage.WareTable
 	subscribeCenter *manager.SubscribeCenter
 	info            *machine.Info
-	// closer
 	// camera(RDB)
 	// 热点采样
 }

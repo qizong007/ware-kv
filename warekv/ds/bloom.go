@@ -18,19 +18,29 @@ func (b *BloomFilter) GetValue() interface{} {
 	return b.filter.Value()
 }
 
+type BloomFilterSpecificOption struct {
+	M uint64
+	K uint64
+}
+
 // MakeBloomFilterSpecific 精确创建
-func MakeBloomFilterSpecific(m, k uint64) *BloomFilter {
+func MakeBloomFilterSpecific(option BloomFilterSpecificOption) *BloomFilter {
 	return &BloomFilter{
 		Base:   *NewBase(),
-		filter: util.NewBloomFilter(m, k),
+		filter: util.NewBloomFilter(option.M, option.K),
 	}
 }
 
+type BloomFilterFuzzyOption struct {
+	N  uint
+	Fp float64
+}
+
 // MakeBloomFilterFuzzy 模糊创建
-func MakeBloomFilterFuzzy(n uint, fp float64) *BloomFilter {
+func MakeBloomFilterFuzzy(option BloomFilterFuzzyOption) *BloomFilter {
 	return &BloomFilter{
 		Base:   *NewBase(),
-		filter: util.NewBloomFilterWithEstimates(n, fp),
+		filter: util.NewBloomFilterWithEstimates(option.N, option.Fp),
 	}
 }
 

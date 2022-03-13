@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gookit/color"
 	"ware-kv/handler"
+	"ware-kv/tracker"
 	"ware-kv/warekv"
 )
 
@@ -15,18 +16,21 @@ const (
 var Server *WareKV
 
 type WareKV struct {
-	engine *warekv.WareEngine
-	router *gin.Engine
-	// options（布隆开关、日志开关）
-	// tracker(AOF) head|k|v|crc32 mmap
+	engine  *warekv.WareEngine
+	router  *gin.Engine
+	tracker *tracker.Tracker
 }
 
 func Boot(option *WareOption) {
 	initOption(option)
+	tk := tracker.NewTracker(option.Tracker)
 	Server = &WareKV{
-		engine: warekv.New(option.WareEngine),
-		router: gin.Default(),
+		engine:  warekv.New(option.WareEngine),
+		router:  gin.Default(),
+		tracker: tk,
 	}
+	defer tk.Close()
+	tk.LoadTracker()
 	// Server.engine start in New()
 	defer Server.engine.Close()
 	handler.Register(Server.router)
