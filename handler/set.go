@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
 	"ware-kv/warekv/ds"
@@ -89,6 +90,7 @@ func AddSet(c *gin.Context) {
 
 	st := ds.Value2Set(val)
 
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.SetAdd, time.Now().Unix(), param.Element))
 	st.Add(param.Element)
 	setNotify(key, st)
 
@@ -129,6 +131,7 @@ func RemoveSet(c *gin.Context) {
 
 	st := ds.Value2Set(val)
 
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.SetRemove, time.Now().Unix(), param.Element))
 	st.Remove(param.Element)
 	setNotify(key, st)
 

@@ -93,8 +93,7 @@ func (t *Tracker) LoadTracker() {
 		case CreateOp:
 			command = &CreateCommand{}
 		case ModifyOp:
-			// TODO
-			return
+			command = &ModifyCommand{}
 		case DeleteOp:
 			command = &DeleteCommand{}
 		}
@@ -105,7 +104,6 @@ func (t *Tracker) LoadTracker() {
 }
 
 func resolveCommand(command string, cmd Command) {
-	fmt.Println(command)
 	err := json.Unmarshal([]byte(command), cmd)
 	if err != nil {
 		log.Println("genCreateCommand json.Unmarshal fail", err)

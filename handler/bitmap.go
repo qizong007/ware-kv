@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
 	"ware-kv/warekv/ds"
@@ -42,7 +43,7 @@ func SetBitmap(c *gin.Context) {
 		// new
 		bitmap = ds.MakeBitmap()
 		bitmap.SetBit(num)
-		cmd := tracker.NewCreateCommand(param.Key, tracker.BitmapStruct, nil, bitmap.CreateTime, param.ExpireTime)
+		cmd := tracker.NewCreateCommand(key.GetKey(), tracker.BitmapStruct, num, bitmap.CreateTime, param.ExpireTime)
 		set(key, bitmap, param.ExpireTime, cmd)
 	} else {
 		// update
@@ -50,6 +51,7 @@ func SetBitmap(c *gin.Context) {
 			return
 		}
 		bitmap = ds.Value2Bitmap(val)
+		wal(tracker.NewModifyCommand(key.GetKey(), tracker.BitmapSet, time.Now().Unix(), num))
 		bitmap.SetBit(num)
 		setNotify(key, bitmap)
 	}
@@ -182,6 +184,7 @@ func ClearBitmap(c *gin.Context) {
 	}
 
 	bitmap := ds.Value2Bitmap(val)
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.BitmapClear, time.Now().Unix(), num))
 	bitmap.ClearBit(num)
 
 	setNotify(key, bitmap)

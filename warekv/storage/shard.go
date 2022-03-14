@@ -60,6 +60,12 @@ func (s *Shard) Set(key *Key, val Value) {
 	}
 }
 
+func (s *Shard) SetInTime(key *Key, val Value) {
+	s.rw.Lock()
+	defer s.rw.Unlock()
+	s.table[key.GetKey()] = val
+}
+
 func (s *Shard) Delete(key *Key) {
 	s.writeQueue <- &writeReq{
 		event: DeleteEvent,

@@ -75,6 +75,10 @@ func (e *WareEngine) Set(key *storage.Key, value storage.Value) {
 	e.wTable.Set(key, value)
 }
 
+func (e *WareEngine) SetInTime(key *storage.Key, value storage.Value) {
+	e.wTable.SetInTime(key, value)
+}
+
 func (e *WareEngine) Delete(key *storage.Key) {
 	e.wTable.Delete(key)
 }

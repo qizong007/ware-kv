@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
 	"ware-kv/warekv/ds"
@@ -286,7 +287,9 @@ func AddList(c *gin.Context) {
 	list := ds.Value2List(val)
 
 	if param.Element != nil {
-		list.Append([]interface{}{param.Element})
+		element := []interface{}{param.Element}
+		wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListAdd, time.Now().Unix(), element))
+		list.Append(element)
 		setNotify(key, list)
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.Success,
@@ -294,6 +297,7 @@ func AddList(c *gin.Context) {
 		return
 	}
 
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListAdd, time.Now().Unix(), param.Elements))
 	list.Append(param.Elements)
 	setNotify(key, list)
 
@@ -335,6 +339,7 @@ func RemoveListElement(c *gin.Context) {
 	list := ds.Value2List(val)
 
 	if param.Val != nil {
+		wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListRemoveVal, time.Now().Unix(), param.Val))
 		list.RemoveVal(param.Val)
 		setNotify(key, list)
 		util.MakeResponse(c, &util.WareResponse{
@@ -344,6 +349,7 @@ func RemoveListElement(c *gin.Context) {
 	}
 
 	// param.Pos != nil
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListRemoveAt, time.Now().Unix(), *param.Pos))
 	list.RemoveAt(*param.Pos)
 	setNotify(key, list)
 	util.MakeResponse(c, &util.WareResponse{

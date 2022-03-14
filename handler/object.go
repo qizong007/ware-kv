@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
 	"ware-kv/warekv/ds"
@@ -90,6 +91,7 @@ func SetObjectFieldByKey(c *gin.Context) {
 	}
 
 	object := ds.Value2Object(val)
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ObjectSetFieldByKey, time.Now().Unix(), filed, param.Val))
 	object.SetFieldByKey(filed, param.Val)
 	setNotify(key, object)
 

@@ -37,8 +37,7 @@ func Delete(c *gin.Context) {
 		return
 	}
 
-	cmd := tracker.NewDeleteCommand(key.GetKey())
-	tracker.GetTracker().Write(cmd)
+	wal(tracker.NewDeleteCommand(key.GetKey()))
 	anticorrosive.Del(key)
 
 	util.MakeResponse(c, &util.WareResponse{
@@ -47,7 +46,7 @@ func Delete(c *gin.Context) {
 }
 
 func set(key *storage.Key, newVal storage.Value, expireTime int64, cmd tracker.Command) {
-	tracker.GetTracker().Write(cmd)
+	wal(cmd)
 	if expireTime != 0 {
 		newVal.WithExpireTime(expireTime)
 		time.AfterFunc(time.Duration(expireTime)*time.Second, func() {
@@ -59,6 +58,10 @@ func set(key *storage.Key, newVal storage.Value, expireTime int64, cmd tracker.C
 
 func setNotify(key *storage.Key, newVal storage.Value) {
 	anticorrosive.SetNotify(key, newVal)
+}
+
+func wal(cmd tracker.Command) {
+	tracker.GetTracker().Write(cmd)
 }
 
 func keyNull(c *gin.Context) {
@@ -95,26 +98,11 @@ func isValNil(val storage.Value) bool {
 }
 
 func isKVEffective(c *gin.Context, val storage.Value) bool {
-	if val == nil {
-		log.Println("key is not existed")
+	isEffective, code := anticorrosive.IsKVEffective(val)
+	if !isEffective {
 		util.MakeResponse(c, &util.WareResponse{
-			Code: util.KeyNotExisted,
+			Code: code,
 		})
-		return false
 	}
-	if !val.IsAlive() {
-		log.Println("key is dead")
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.KeyHasDeleted,
-		})
-		return false
-	}
-	if val.IsExpired() {
-		log.Println("key has been expired")
-		util.MakeResponse(c, &util.WareResponse{
-			Code: util.KeyHasExpired,
-		})
-		return false
-	}
-	return true
+	return isEffective
 }

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"time"
-	"ware-kv/anticorrosive"
+	"ware-kv/warekv"
 	"ware-kv/warekv/ds"
 	"ware-kv/warekv/storage"
 	"ware-kv/warekv/util"
@@ -29,8 +29,17 @@ var struct2MakeFunc = map[string]func(interface{}) storage.Value{
 	ListStruct: func(list interface{}) storage.Value {
 		return ds.MakeList(list.([]interface{}))
 	},
-	ZListStruct: func(list interface{}) storage.Value {
-		return ds.MakeZList(list.([]util.SlElement))
+	ZListStruct: func(l interface{}) storage.Value {
+		list := l.([]interface{})
+		elements := make([]util.SlElement, len(list))
+		for i := range list {
+			e := list[i].(map[string]interface{})
+			elements[i] = util.SlElement{
+				Score: e["score"].(float64),
+				Val:   e["val"],
+			}
+		}
+		return ds.MakeZList(elements)
 	},
 	SetStruct: func(list interface{}) storage.Value {
 		return ds.MakeSet(list.([]interface{}))
@@ -41,15 +50,25 @@ var struct2MakeFunc = map[string]func(interface{}) storage.Value{
 	CounterStruct: func(num interface{}) storage.Value {
 		return ds.MakeCounter(int64(num.(float64)))
 	},
-	BitmapStruct: func(null interface{}) storage.Value {
-		return ds.MakeBitmap()
+	BitmapStruct: func(num interface{}) storage.Value {
+		bm := ds.MakeBitmap()
+		bm.SetBit(int(num.(float64)))
+		return bm
 	},
 	BloomStructSpecific: func(param interface{}) storage.Value {
-		option := param.(ds.BloomFilterSpecificOption)
+		mp := param.(map[string]interface{})
+		option := ds.BloomFilterSpecificOption{
+			M: uint64(mp["M"].(float64)),
+			K: uint64(mp["K"].(float64)),
+		}
 		return ds.MakeBloomFilterSpecific(option)
 	},
 	BloomStructFuzzy: func(param interface{}) storage.Value {
-		option := param.(ds.BloomFilterFuzzyOption)
+		mp := param.(map[string]interface{})
+		option := ds.BloomFilterFuzzyOption{
+			N:  uint(mp["N"].(float64)),
+			Fp: mp["Fp"].(float64),
+		}
 		return ds.MakeBloomFilterFuzzy(option)
 	},
 }
@@ -93,10 +112,10 @@ func (c *CreateCommand) Execute() {
 		expireTime := c.ExpireTime - (now - c.CreateTime)
 		val.WithExpireTime(expireTime)
 		time.AfterFunc(time.Duration(expireTime)*time.Second, func() {
-			anticorrosive.Del(key)
+			warekv.Engine().Delete(key)
 		})
 	}
-	anticorrosive.Set(key, val)
+	warekv.Engine().SetInTime(key, val)
 }
 
 func (c *CreateCommand) GetOpType() string {

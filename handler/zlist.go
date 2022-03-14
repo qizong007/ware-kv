@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
 	"ware-kv/warekv/ds"
@@ -289,7 +290,9 @@ func AddZList(c *gin.Context) {
 	zList := ds.Value2ZList(val)
 
 	if param.Element != nil {
-		zList.Add([]zlist.SlElement{*param.Element})
+		slElement := []zlist.SlElement{*param.Element}
+		wal(tracker.NewModifyCommand(key.GetKey(), tracker.ZListAdd, time.Now().Unix(), slElement))
+		zList.Add(slElement)
 		setNotify(key, zList)
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.Success,
@@ -297,6 +300,7 @@ func AddZList(c *gin.Context) {
 		return
 	}
 
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ZListAdd, time.Now().Unix(), *param.Elements))
 	zList.Add(*param.Elements)
 	setNotify(key, zList)
 
@@ -347,6 +351,7 @@ func RemoveZListByScore(c *gin.Context) {
 	zList := ds.Value2ZList(val)
 
 	if param.Score != nil {
+		wal(tracker.NewModifyCommand(key.GetKey(), tracker.ZListRemoveScore, time.Now().Unix(), *param.Score))
 		zList.RemoveScore(*param.Score)
 		setNotify(key, zList)
 		util.MakeResponse(c, &util.WareResponse{
@@ -356,6 +361,7 @@ func RemoveZListByScore(c *gin.Context) {
 	}
 
 	if param.Scores != nil {
+		wal(tracker.NewModifyCommand(key.GetKey(), tracker.ZListRemoveScores, time.Now().Unix(), *param.Scores))
 		zList.RemoveScores(*param.Scores)
 		setNotify(key, zList)
 		util.MakeResponse(c, &util.WareResponse{
@@ -365,6 +371,7 @@ func RemoveZListByScore(c *gin.Context) {
 	}
 
 	// param.Min != nil && param.Max != nil
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ZListRemoveInScore, time.Now().Unix(), *param.Min, *param.Max))
 	if err = zList.RemoveInScore(*param.Min, *param.Max); err != nil {
 		log.Println("RemoveInScore Fail", err)
 		util.MakeResponse(c, &util.WareResponse{

@@ -90,6 +90,11 @@ func (w *WareTable) Set(key *Key, val Value) {
 	w.TableList[pos].Set(key, val)
 }
 
+func (w *WareTable) SetInTime(key *Key, val Value) {
+	pos := w.wHash(key)
+	w.TableList[pos].SetInTime(key, val)
+}
+
 // Delete Mark-Sweep
 func (w *WareTable) Delete(key *Key) {
 	pos := w.wHash(key)

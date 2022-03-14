@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
 	"ware-kv/warekv/ds"
@@ -115,7 +116,7 @@ func ClearBloom(c *gin.Context) {
 	}
 
 	filter := ds.Value2BloomFilter(val)
-
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.BloomFilterClear, time.Now().Unix()))
 	filter.ClearAll()
 	setNotify(key, filter)
 
@@ -204,6 +205,7 @@ func AddBloom(c *gin.Context) {
 	}
 
 	filter := ds.Value2BloomFilter(val)
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.BloomFilterAdd, time.Now().Unix(), data))
 	filter.Add(data)
 	setNotify(key, filter)
 

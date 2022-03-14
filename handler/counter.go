@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
 	"ware-kv/warekv/ds"
@@ -49,6 +50,7 @@ func IncrCounter(c *gin.Context) {
 	}
 
 	counter := ds.Value2Counter(val)
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.CounterIncr, time.Now().Unix()))
 	counter.Incr()
 
 	setNotify(key, counter)
@@ -89,6 +91,7 @@ func IncrByCounter(c *gin.Context) {
 	}
 
 	counter := ds.Value2Counter(val)
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.CounterIncrBy, time.Now().Unix(), delta))
 	counter.IncrBy(delta)
 
 	setNotify(key, counter)
@@ -109,6 +112,7 @@ func DecrCounter(c *gin.Context) {
 	}
 
 	counter := ds.Value2Counter(val)
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.CounterDecr, time.Now().Unix()))
 	counter.Decr()
 
 	setNotify(key, counter)
@@ -149,6 +153,7 @@ func DecrByCounter(c *gin.Context) {
 	}
 
 	counter := ds.Value2Counter(val)
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.CounterDecrBy, time.Now().Unix(), delta))
 	counter.DecrBy(delta)
 
 	setNotify(key, counter)
