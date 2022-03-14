@@ -1,0 +1,5 @@
+c{"k":"trash2","s":"set","v":[1,3.14,"wq",false],"c":1647230983,"e":0}
+c{"k":"wq","s":"obj","v":{"address":{"city":"厦门","province":"福建"},"age":18,"is_handsome":true,"name":"wq"},"c":1647230988,"e":0}
+c{"k":"elements","s":"lst","v":[1,3.14,"Sam","Jack",true,{"age":18,"name":"wq"},[-1,0,0.9]],"c":1647230996,"e":0}
+c{"k":"c","s":"cnt","v":10,"c":1647231001,"e":0}
+c{"k":"filter","s":"bfs","v":{"M":1000,"K":4},"c":1647231007,"e":0}

@@ -125,3 +125,9 @@ func (s *Shard) closeWriteWorker() {
 	close(s.writeQueue)
 	s.wqTicker.Stop()
 }
+
+func (s *Shard) Count() int {
+	s.rw.RLock()
+	defer s.rw.RUnlock()
+	return len(s.table)
+}

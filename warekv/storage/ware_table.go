@@ -54,6 +54,10 @@ func NewWareTable(shardOption *ShardOption, gcOption *WareGCOption) *WareTable {
 	return wTable
 }
 
+func GetWareTable() *WareTable {
+	return wTable
+}
+
 func (w *WareTable) Start() {
 	for _, shard := range w.TableList {
 		shard.Start()
@@ -90,4 +94,12 @@ func (w *WareTable) Set(key *Key, val Value) {
 func (w *WareTable) Delete(key *Key) {
 	pos := w.wHash(key)
 	w.TableList[pos].Delete(key)
+}
+
+func (w *WareTable) Count() []int {
+	list := make([]int, w.TableNum)
+	for i := range list {
+		list[i] = w.TableList[i].Count()
+	}
+	return list
 }
