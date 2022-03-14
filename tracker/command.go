@@ -5,17 +5,14 @@ import "fmt"
 type TrackOp string
 
 const (
-	CreateOp = "c"
-	ModifyOp = "m"
-	DeleteOp = "d"
+	CreateOp    = "c"
+	ModifyOp    = "m"
+	DeleteOp    = "d"
+	SubscribeOp = "s"
 )
 
 type Command interface {
 	fmt.Stringer
 	Execute()
 	GetOpType() string
-}
-
-type CommandBase struct {
-	Key string `json:"k"`
 }

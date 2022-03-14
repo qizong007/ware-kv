@@ -74,7 +74,7 @@ var struct2MakeFunc = map[string]func(interface{}) storage.Value{
 }
 
 type CreateCommand struct {
-	CommandBase
+	Key        string      `json:"k"`
 	Structure  string      `json:"s"`
 	Val        interface{} `json:"v"`
 	CreateTime int64       `json:"c"`
@@ -83,11 +83,11 @@ type CreateCommand struct {
 
 func NewCreateCommand(key string, structure string, val interface{}, createTime, expireTime int64) *CreateCommand {
 	return &CreateCommand{
-		CommandBase: CommandBase{key},
-		Structure:   structure,
-		Val:         val,
-		CreateTime:  createTime,
-		ExpireTime:  expireTime,
+		Key:        key,
+		Structure:  structure,
+		Val:        val,
+		CreateTime: createTime,
+		ExpireTime: expireTime,
 	}
 }
 

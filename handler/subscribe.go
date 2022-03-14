@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"strings"
+	"ware-kv/tracker"
 	"ware-kv/util"
 	"ware-kv/warekv"
 	"ware-kv/warekv/manager"
@@ -56,6 +57,7 @@ func SubscribeKey(c *gin.Context) {
 		manifest.IsPersistent = *param.IsPersistent
 	}
 
+	wal(tracker.NewSubCommand(manifest))
 	warekv.Engine().Subscribe(manifest)
 
 	util.MakeResponse(c, &util.WareResponse{

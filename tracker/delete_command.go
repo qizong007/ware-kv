@@ -8,11 +8,11 @@ import (
 )
 
 type DeleteCommand struct {
-	CommandBase
+	Key string `json:"k"`
 }
 
 func NewDeleteCommand(key string) *DeleteCommand {
-	return &DeleteCommand{CommandBase{key}}
+	return &DeleteCommand{key}
 }
 
 func (c *DeleteCommand) String() string {

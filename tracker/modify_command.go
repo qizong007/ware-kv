@@ -104,7 +104,7 @@ var str2ModifyFunc = map[string]func(storage.Value, []interface{}){
 }
 
 type ModifyCommand struct {
-	CommandBase
+	Key        string        `json:"k"`
 	ModifyFunc string        `json:"mf"`
 	UpdateTime int64         `json:"u"`
 	Params     []interface{} `json:"p"`
@@ -112,10 +112,10 @@ type ModifyCommand struct {
 
 func NewModifyCommand(key string, modifyFunc string, updateTime int64, params ...interface{}) *ModifyCommand {
 	return &ModifyCommand{
-		CommandBase: CommandBase{key},
-		ModifyFunc:  modifyFunc,
-		UpdateTime:  updateTime,
-		Params:      params,
+		Key:        key,
+		ModifyFunc: modifyFunc,
+		UpdateTime: updateTime,
+		Params:     params,
 	}
 }
 
