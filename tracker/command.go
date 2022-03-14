@@ -17,5 +17,5 @@ type Command interface {
 }
 
 type CommandBase struct {
-	Key string  `json:"k"`
+	Key string `json:"k"`
 }

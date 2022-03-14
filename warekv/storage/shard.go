@@ -36,7 +36,7 @@ func newShard(writeQueueCap int, writeTickInterval time.Duration, gcOption *Ware
 		wqTicker:   time.NewTicker(writeTickInterval),
 		closer:     make(chan bool),
 	}
-	shard.gc = 	NewWareGC(shard, gcOption)
+	shard.gc = NewWareGC(shard, gcOption)
 	return shard
 }
 
@@ -120,7 +120,7 @@ func (s *Shard) handleGC() {
 	s.rw.Unlock()
 }
 
-func (s *Shard) closeWriteWorker()  {
+func (s *Shard) closeWriteWorker() {
 	s.handleWriteQueue()
 	close(s.writeQueue)
 	s.wqTicker.Stop()

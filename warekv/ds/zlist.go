@@ -41,14 +41,6 @@ func Value2ZList(val storage.Value) *ZList {
 	return val.(*ZList)
 }
 
-// ZListView 深拷贝
-func ZListView(origin *ZList) *ZList {
-	origin.rw.RLock()
-	defer origin.rw.RUnlock()
-	orig := origin.skipList.GetList()
-	return MakeZList(orig)
-}
-
 // GetListBetween 左闭右开
 func (zl *ZList) GetListBetween(left int, right int) ([]util.SlElement, error) {
 	zl.rw.RLock()
@@ -121,6 +113,7 @@ func (zl *ZList) GetListInScore(min float64, max float64) ([]util.SlElement, err
 func (zl *ZList) Add(list []util.SlElement) {
 	zl.rw.Lock()
 	defer zl.rw.Unlock()
+	zl.Update()
 	for i := range list {
 		zl.skipList.Insert(list[i].Score, list[i].Val)
 	}
@@ -129,12 +122,14 @@ func (zl *ZList) Add(list []util.SlElement) {
 func (zl *ZList) RemoveScore(score float64) {
 	zl.rw.Lock()
 	defer zl.rw.Unlock()
+	zl.Update()
 	zl.skipList.Delete(score)
 }
 
 func (zl *ZList) RemoveScores(scores []float64) {
 	zl.rw.Lock()
 	defer zl.rw.Unlock()
+	zl.Update()
 	for i := range scores {
 		zl.skipList.Delete(scores[i])
 	}
@@ -147,6 +142,7 @@ func (zl *ZList) RemoveInScore(min float64, max float64) error {
 	}
 	zl.rw.Lock()
 	defer zl.rw.Unlock()
+	zl.Update()
 	for i := range list {
 		zl.skipList.Delete(list[i].Score)
 	}

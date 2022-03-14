@@ -37,5 +37,6 @@ func (o *Object) GetFieldByKey(key string) interface{} {
 func (o *Object) SetFieldByKey(key string, val interface{}) {
 	o.rw.Lock()
 	defer o.rw.Unlock()
+	o.Update()
 	o.object[key] = val
 }

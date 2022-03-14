@@ -7,4 +7,5 @@ type Value interface {
 	IsAlive() bool
 	IsExpired() bool
 	WithExpireTime(t int64)
+	Update()
 }

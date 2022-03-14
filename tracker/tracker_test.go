@@ -15,7 +15,7 @@ func TestTrackerWrite(t *testing.T) {
 	tk.Write(c)
 	d := NewDeleteCommand("k1")
 	tk.Write(d)
-	cl := NewCreateCommand("k2", ListStruct, []interface{}{1,3.14,"wq"}, time.Now().Unix(), 0)
+	cl := NewCreateCommand("k2", ListStruct, []interface{}{1, 3.14, "wq"}, time.Now().Unix(), 0)
 	tk.Write(cl)
 	time.Sleep(time.Second * 2)
 }

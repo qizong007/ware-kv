@@ -57,6 +57,7 @@ func (b *BloomFilter) GetSize() uint64 {
 func (b *BloomFilter) Add(data string) {
 	b.rw.Lock()
 	defer b.rw.Unlock()
+	b.Update()
 	b.filter.Add(data)
 }
 
@@ -69,6 +70,7 @@ func (b *BloomFilter) Test(data string) bool {
 func (b *BloomFilter) ClearAll() {
 	b.rw.Lock()
 	defer b.rw.Unlock()
+	b.Update()
 	b.filter.ClearAll()
 }
 

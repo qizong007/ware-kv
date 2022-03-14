@@ -104,12 +104,14 @@ func (l *List) GetListEqualToVal(val interface{}) []interface{} {
 func (l *List) Append(list []interface{}) {
 	l.rw.Lock()
 	defer l.rw.Unlock()
+	l.Update()
 	*l.list = append(*l.list, list...)
 }
 
 func (l *List) RemoveAt(idx int) {
 	l.rw.Lock()
 	defer l.rw.Unlock()
+	l.Update()
 	for i := range *l.list {
 		if i == idx {
 			*l.list = append((*l.list)[:i], (*l.list)[i+1:]...)
@@ -121,6 +123,7 @@ func (l *List) RemoveAt(idx int) {
 func (l *List) RemoveVal(val interface{}) {
 	l.rw.Lock()
 	defer l.rw.Unlock()
+	l.Update()
 	for i, v := range *l.list {
 		if reflect.DeepEqual(v, val) {
 			*l.list = append((*l.list)[:i], (*l.list)[i+1:]...)

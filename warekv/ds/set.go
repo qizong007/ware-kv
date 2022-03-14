@@ -51,12 +51,14 @@ func (s *Set) Contains(e interface{}) bool {
 func (s *Set) Add(e interface{}) {
 	s.rw.Lock()
 	defer s.rw.Unlock()
+	s.Update()
 	s.set.Add(e)
 }
 
 func (s *Set) Remove(e interface{}) {
 	s.rw.Lock()
 	defer s.rw.Unlock()
+	s.Update()
 	s.set.Remove(e)
 }
 

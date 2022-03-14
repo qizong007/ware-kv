@@ -58,11 +58,13 @@ func (b *Bitmap) GetBit(num int) int {
 func (b *Bitmap) SetBit(num int) {
 	b.rw.Lock()
 	defer b.rw.Unlock()
+	b.Update()
 	b.bitmap.Set(num)
 }
 
 func (b *Bitmap) ClearBit(num int) {
 	b.rw.Lock()
 	defer b.rw.Unlock()
+	b.Update()
 	b.bitmap.Clear(num)
 }

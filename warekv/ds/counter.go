@@ -26,6 +26,7 @@ func Value2Counter(val storage.Value) *Counter {
 }
 
 func (c *Counter) IncrBy(delta int64) {
+	c.Update()
 	atomic.AddInt64(&c.num, delta)
 }
 

@@ -132,7 +132,7 @@ func (t *Tracker) scheduledRefresh() {
 func (t *Tracker) Write(command Command) {
 	t.bufLock.Lock()
 	defer t.bufLock.Unlock()
-	t.buffer = append(t.buffer, []byte(command.GetOpType() + command.String()+"\n")...)
+	t.buffer = append(t.buffer, []byte(command.GetOpType()+command.String()+"\n")...)
 }
 
 func (t *Tracker) refresh() {
