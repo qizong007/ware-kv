@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"ware-kv/tracker"
 	"ware-kv/util"
 	"ware-kv/warekv/ds"
 )
@@ -41,7 +42,8 @@ func SetBitmap(c *gin.Context) {
 		// new
 		bitmap = ds.MakeBitmap()
 		bitmap.SetBit(num)
-		set(key, bitmap, param.ExpireTime)
+		cmd := tracker.NewCreateCommand(param.Key, tracker.BitmapStruct, nil, bitmap.CreateTime, param.ExpireTime)
+		set(key, bitmap, param.ExpireTime, cmd)
 	} else {
 		// update
 		if !isKVEffective(c, val) {

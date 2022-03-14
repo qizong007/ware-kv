@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"ware-kv/tracker"
 	"ware-kv/util"
 	"ware-kv/warekv/ds"
 	"ware-kv/warekv/storage"
@@ -53,7 +54,8 @@ func SetBloomSpecific(c *gin.Context) {
 	}
 	newVal := ds.MakeBloomFilterSpecific(option)
 
-	set(key, newVal, param.ExpireTime)
+	cmd := tracker.NewCreateCommand(param.Key, tracker.BloomStructSpecific, option, newVal.CreateTime, param.ExpireTime)
+	set(key, newVal, param.ExpireTime, cmd)
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
@@ -79,7 +81,8 @@ func SetBloomFuzzy(c *gin.Context) {
 	}
 	newVal := ds.MakeBloomFilterFuzzy(option)
 
-	set(key, newVal, param.ExpireTime)
+	cmd := tracker.NewCreateCommand(param.Key, tracker.BloomStructFuzzy, option, newVal.CreateTime, param.ExpireTime)
+	set(key, newVal, param.ExpireTime, cmd)
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,

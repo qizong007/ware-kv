@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"ware-kv/tracker"
 	"ware-kv/util"
 	"ware-kv/warekv/ds"
 	"ware-kv/warekv/storage"
@@ -33,7 +34,8 @@ func SetSet(c *gin.Context) {
 	key := storage.MakeKey(param.Key)
 	newVal := ds.MakeSet(param.Val)
 
-	set(key, newVal, param.ExpireTime)
+	cmd := tracker.NewCreateCommand(param.Key, tracker.SetStruct, param.Val, newVal.CreateTime, param.ExpireTime)
+	set(key, newVal, param.ExpireTime, cmd)
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,

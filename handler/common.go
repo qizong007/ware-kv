@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 	"ware-kv/anticorrosive"
+	"ware-kv/tracker"
 	"ware-kv/util"
 	"ware-kv/warekv"
 	"ware-kv/warekv/storage"
@@ -35,6 +36,9 @@ func Delete(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+
+	cmd := tracker.NewDeleteCommand(key.GetKey())
+	tracker.GetTracker().Write(cmd)
 	anticorrosive.Del(key)
 
 	util.MakeResponse(c, &util.WareResponse{
@@ -42,7 +46,8 @@ func Delete(c *gin.Context) {
 	})
 }
 
-func set(key *storage.Key, newVal storage.Value, expireTime int64) {
+func set(key *storage.Key, newVal storage.Value, expireTime int64, cmd tracker.Command) {
+	tracker.GetTracker().Write(cmd)
 	if expireTime != 0 {
 		newVal.WithExpireTime(expireTime)
 		time.AfterFunc(time.Duration(expireTime)*time.Second, func() {
