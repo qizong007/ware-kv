@@ -12,17 +12,15 @@ const (
 	DeleteEvent
 )
 
-// Shard 表分片
 type Shard struct {
 	table      map[string]Value
 	rw         sync.RWMutex
-	writeQueue chan *writeReq // 写请求缓存队列
-	wqTicker   *time.Ticker   // 写队列的定时器
+	writeQueue chan *writeReq // write request's queue
+	wqTicker   *time.Ticker   // write request's ticker
 	gc         *WareGC
 	closer     chan bool
 }
 
-// 写请求
 type writeReq struct {
 	event writeEvent
 	key   *Key
@@ -72,12 +70,12 @@ func (s *Shard) Delete(key *Key) {
 func (s *Shard) scheduledBatchCommit() {
 	for {
 		select {
-		case <-s.wqTicker.C: // 批量写入
+		case <-s.wqTicker.C: // Batch WRITE
 			if len(s.writeQueue) == 0 {
 				continue
 			}
 			s.handleWriteQueue()
-		case <-s.gc.gcTicker.C: // 批量清扫
+		case <-s.gc.gcTicker.C: // Batch SWEEP
 			if len(s.gc.gcTasks) == 0 {
 				continue
 			}

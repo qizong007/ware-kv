@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-// 该 Bitmap 的每一位默认为0
+// For this 'Bitmap', every single bit is born to be 0.
 
 type Bitmap struct {
 	val    []uint64
@@ -15,7 +15,7 @@ func NewBitmap() *Bitmap {
 	return &Bitmap{}
 }
 
-// NewBitmapWithCap cap 单位为 bit
+// NewBitmapWithCap cap's unit is [bit]
 func NewBitmapWithCap(cap uint64) *Bitmap {
 	return &Bitmap{
 		val: make([]uint64, 0, (cap>>6)+1),
@@ -49,11 +49,11 @@ func (bitmap *Bitmap) Has(num int) bool {
 
 func (bitmap *Bitmap) Set(num int) {
 	seg, offset := getSegAndOffsetByNum(num)
-	// 扩容
+	// expand capacity
 	for seg >= len(bitmap.val) {
 		bitmap.val = append(bitmap.val, 0)
 	}
-	// 判断num是否已经存在bitmap中
+	// check if 'num' has already been in the bitmap
 	if bitmap.getBit(seg, offset) == 0 {
 		bitmap.setBit(seg, offset)
 	}
@@ -97,13 +97,13 @@ func (bitmap *Bitmap) BitCount(start int, end int) int {
 	for i := startSeg; i <= endSeg; i++ {
 		count += hammingWeight(bitmap.val[i])
 	}
-	// start 所在段
+	// the segment 'start' at
 	for i := uint(0); i < startOffset; i++ {
 		if bitmap.getBit(startSeg, i) != 0 {
 			count--
 		}
 	}
-	// end 所在段
+	// the segment 'end' at
 	for i := endOffset; i < 64; i++ {
 		if bitmap.getBit(endSeg, i) != 0 {
 			count--

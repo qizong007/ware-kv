@@ -17,7 +17,7 @@ func (s *Set) GetValue() interface{} {
 	return val
 }
 
-// 深拷贝
+// Deep-Copy
 func (s *Set) setView() []interface{} {
 	s.rw.RLock()
 	defer s.rw.RUnlock()
@@ -72,21 +72,18 @@ func getTwoSetView(s1 *Set, s2 *Set) (*util.Set, *util.Set) {
 	return util.NewSet(list1), util.NewSet(list2)
 }
 
-// Intersect 交集
 func (s *Set) Intersect(another *Set) *Set {
 	set1, set2 := getTwoSetView(s, another)
 	list := set1.Intersect(set2).Get()
 	return MakeSet(list)
 }
 
-// Union 并集
 func (s *Set) Union(another *Set) *Set {
 	set1, set2 := getTwoSetView(s, another)
 	list := set1.Union(set2).Get()
 	return MakeSet(list)
 }
 
-// Diff 差集
 func (s *Set) Diff(another *Set) *Set {
 	set1, set2 := getTwoSetView(s, another)
 	list := set1.Diff(set2).Get()

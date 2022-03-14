@@ -8,7 +8,7 @@ import (
 
 const (
 	defaultShardNum          = 16
-	defaultWriteQueueCap     = 256 // 默认写请求缓存容量
+	defaultWriteQueueCap     = 256
 	defaultWriteTickInterval = 100
 )
 
@@ -90,7 +90,7 @@ func (w *WareTable) Set(key *Key, val Value) {
 	w.TableList[pos].Set(key, val)
 }
 
-// Delete 标记删除
+// Delete Mark-Sweep
 func (w *WareTable) Delete(key *Key) {
 	pos := w.wHash(key)
 	w.TableList[pos].Delete(key)

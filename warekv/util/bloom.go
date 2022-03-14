@@ -63,7 +63,7 @@ func (f *BloomFilter) Add(data string) {
 	f.n++
 }
 
-// Test 查看 data 是否存在
+// Test check if data exists
 func (f *BloomFilter) Test(data string) bool {
 	h := baseHashes([]byte(data))
 	for i := uint64(0); i < f.k; i++ {
@@ -80,7 +80,6 @@ func (f *BloomFilter) ClearAll() *BloomFilter {
 	return f
 }
 
-// EstimateFalsePositiveRate 估计 BloomFilter 的假阳性概率
 func (f *BloomFilter) EstimateFalsePositiveRate(n uint) (fpRate float64) {
 	rounds := uint32(100000)
 	f.ClearAll()

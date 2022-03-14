@@ -7,7 +7,7 @@ import (
 	"ware-kv/warekv/util"
 )
 
-// ZList 有序列表
+// ZList sorted-list
 type ZList struct {
 	Base
 	skipList *util.SkipList
@@ -41,7 +41,7 @@ func Value2ZList(val storage.Value) *ZList {
 	return val.(*ZList)
 }
 
-// GetListBetween 左闭右开
+// GetListBetween Left-Close and Right-Open
 func (zl *ZList) GetListBetween(left int, right int) ([]util.SlElement, error) {
 	zl.rw.RLock()
 	defer zl.rw.RUnlock()

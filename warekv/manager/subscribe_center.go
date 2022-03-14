@@ -18,11 +18,11 @@ const (
 
 // status
 const (
-	callbackCreated = iota // 回调任务创建（初始状态）
-	callbackRequest        // 回调请求中
-	callbackRetry          // 回调重试中
-	callbackSuccess        // 回调成功（终态）
-	callbackFail           // 回调失败（终态）
+	callbackCreated = iota // callback task created (Start)
+	callbackRequest        // callback task requesting
+	callbackRetry          // callback task retrying
+	callbackSuccess        // callback task SUCCESS (Final)
+	callbackFail           // callback task FAIL (Final)
 )
 
 // event
@@ -35,7 +35,6 @@ var (
 	center *SubscribeCenter
 )
 
-// SubscribeCenter 订阅中心
 type SubscribeCenter struct {
 	record                map[string][]*CallbackPlan
 	mu                    sync.Mutex
@@ -95,7 +94,6 @@ type SubscribeManifest struct {
 	IsPersistent bool
 }
 
-// Subscribe 订阅
 func (s *SubscribeCenter) Subscribe(option *SubscribeManifest) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -125,7 +123,7 @@ func refreshCallbackPlan(plan *CallbackPlan) {
 	plan.leftRetryTimes = plan.retryTimes
 }
 
-// Notify 通知回调
+// Notify just callback
 func (s *SubscribeCenter) Notify(key string, newVal interface{}, event int) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -161,7 +159,6 @@ func isEventInList(event int, list []int) bool {
 	return false
 }
 
-// 回调计划生成
 func (s *SubscribeCenter) generateCallbackPlan(option *CallbackPlanOption) *CallbackPlan {
 	plan := &CallbackPlan{
 		center:         s,
@@ -203,13 +200,13 @@ func (s *SubscribeCenter) scheduledRetry() {
 	}
 }
 
-// CallbackPlan 回调计划
-// 回调成功段时间后，统一卸载任务
+// CallbackPlan
+// If the callback plan execute SUCCESS, the plan will be uninstalled
 type CallbackPlan struct {
 	center         *SubscribeCenter
 	callbackPath   string
 	callbackMethod string
-	param          interface{} // 参数缓存
+	param          interface{} // param cache
 	status         int
 	expectEvent    *[]int
 	retryTimes     int
@@ -221,7 +218,7 @@ type CallbackPlan struct {
 func (p *CallbackPlan) notify(newVal interface{}) {
 	p.param = newVal
 	p.status = callbackRequest
-	// 按照回调方法分发请求
+	// distribute by callback method
 	p.distribute()
 }
 
@@ -256,20 +253,20 @@ func (p *CallbackPlan) generateGetPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// fixme: 解析newVal
+	// fixme: resolve newVal
 	return fmt.Sprintf("%s?newVal=%s", p.callbackPath, paramStr), nil
 }
 
 func (p *CallbackPlan) notifyInGet() {
 	getPath, err := p.generateGetPath()
 	if err != nil {
-		log.Println("generateGetPath(), json解析错误", err)
+		log.Println("generateGetPath(), json.Unmarshall Fail", err)
 		return
 	}
 	resp, err := http.Get(getPath)
 	if err != nil {
 		p.dealWithCallbackErr()
-		log.Println("http.Get(getPath), GET回调错误", err)
+		log.Println("http.Get(getPath), GET callback Fail", err)
 		return
 	}
 	defer resp.Body.Close()
@@ -279,7 +276,7 @@ func (p *CallbackPlan) notifyInGet() {
 func (p *CallbackPlan) notifyWithBody() {
 	req, err := p.generateRequest()
 	if err != nil {
-		log.Println("p.generateRequest(), 生成 req 错误", err)
+		log.Println("p.generateRequest(), generate 'req' Fail", err)
 		return
 	}
 	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
@@ -287,7 +284,7 @@ func (p *CallbackPlan) notifyWithBody() {
 	resp, err := client.Do(req)
 	if err != nil {
 		p.dealWithCallbackErr()
-		log.Println("client.Do(req) 回调错误", err)
+		log.Println("client.Do(req) callback FAIL", err)
 		return
 	}
 	defer resp.Body.Close()

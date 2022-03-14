@@ -4,13 +4,16 @@ import "math/rand"
 
 const (
 	maxLevel    = 16   // Should be enough for 2^16 elements
-	probability = 0.25 // 基于时间与空间综合 best practice 值, 越上层概率越小，可以通过调整概率因子 p 来减小额外使用空间
+	probability = 0.25 // It's the best practice value (Based on Time and Space)
+	// Higher level, smaller probability
+	// Just modify the probability factor P to reduce additional space
 )
 
 type slNode struct {
-	score   float64
-	val     interface{}
-	forward []*slNode // forward[i] 表示在第 i 层，当前节点的下一个节点
+	score float64
+	val   interface{}
+	// forward[i]: the slNode is current node's next one, which is at i_th layer
+	forward []*slNode
 }
 
 type SlElement struct {

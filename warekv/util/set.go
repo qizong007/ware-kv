@@ -47,7 +47,6 @@ func (s *Set) Remove(e interface{}) {
 	}
 }
 
-// Intersect 交集
 func (s *Set) Intersect(another *Set) *Set {
 	res := make(map[interface{}]void)
 	if s.Size() <= another.Size() {
@@ -66,7 +65,6 @@ func (s *Set) Intersect(another *Set) *Set {
 	return &Set{set: res}
 }
 
-// Union 并集
 func (s *Set) Union(another *Set) *Set {
 	res := make(map[interface{}]void)
 	for e := range s.set {
@@ -80,7 +78,6 @@ func (s *Set) Union(another *Set) *Set {
 	return &Set{set: res}
 }
 
-// Diff 差集
 func (s *Set) Diff(another *Set) *Set {
 	res := make(map[interface{}]void)
 	for e := range s.set {

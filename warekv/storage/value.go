@@ -1,6 +1,6 @@
 package storage
 
-// Value 所有数据结构都需要实现它
+// Value all the data structure should implements it
 type Value interface {
 	GetValue() interface{}
 	DeleteValue()

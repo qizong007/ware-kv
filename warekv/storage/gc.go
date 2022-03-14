@@ -5,14 +5,14 @@ import (
 )
 
 const (
-	defaultGCTaskCap      = 1024 // 默认 gc 任务缓存容量
+	defaultGCTaskCap      = 1024 // gc task queue's capacity
 	defaultGCTickInterval = 500
 )
 
 type WareGC struct {
 	shard    *Shard
-	gcTasks  chan string  // gc task 任务队列（存key）
-	gcTicker *time.Ticker // gc task 的定时器
+	gcTasks  chan string  // gc task's queue (for storing KEY)
+	gcTicker *time.Ticker // gc task's ticker
 }
 
 func NewWareGC(share *Shard, option *WareGCOption) *WareGC {

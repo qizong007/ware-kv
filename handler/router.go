@@ -5,14 +5,16 @@ import (
 	"ware-kv/util"
 )
 
-// PUT:  替换/创建指定的资源，并将其追加到相应的资源组中
-// POST: 把指定的资源当做一个资源组，并在其下创建/追加一个新的元素，使其隶属于当前资源
+// PUT:
+//	Create/Replace the resource，and appends it to the resource group
+// POST:
+//  Create/Append a new element that belongs to the CURRENT resource to the resource group
 
 func Register(r *gin.Engine) {
-	// 添加计时器
+	// add ticker
 	r.Use(util.TimeKeeping())
 
-	// 获取系统信息
+	// get machine info
 	r.GET("/", Info)
 	r.GET("/info", Info)
 

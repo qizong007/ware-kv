@@ -8,9 +8,10 @@ func (k *Key) Hashcode() int {
 	h := 0
 	if len(k.val) > 0 {
 		for _, c := range k.val {
-			// (h << 5) - h --> h*31
-			// 31是素数，相乘得到的结果比其他方式更容易产生唯一性
-			// 也就是说产生 hash 值重复的概率比较小 --> 降低冲突概率
+			// (h << 5) - h --> h*31, the '31' is a prime number
+			// The result is more likely to be unique when multiplied than otherwise,
+			// and the probability of creating hash value duplicates is low,
+			// so it [ Reduces the probability of Conflicts ]
 			h = ((h << 5) - h) + int(c)
 		}
 	}

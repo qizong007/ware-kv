@@ -64,6 +64,10 @@ func (c *LRUCache) removeOldest() {
 	}
 }
 
+func (c *LRUCache) Delete(key *storage.Key) {
+	// TODO
+}
+
 func (c *LRUCache) Len() int {
 	return c.ll.Len()
 }

@@ -10,8 +10,8 @@ type WareEngine struct {
 	wTable          *storage.WareTable
 	subscribeCenter *manager.SubscribeCenter
 	info            *machine.Info
-	// camera(RDB)
-	// 热点采样
+	// TODO camera(RDB)
+	// TODO Hot Key Sampling
 }
 
 var engine *WareEngine
