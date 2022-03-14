@@ -62,32 +62,33 @@ func (s *Set) Remove(e interface{}) {
 	s.set.Remove(e)
 }
 
+func getTwoSetView(s1 *Set, s2 *Set) (*util.Set, *util.Set) {
+	s1.rw.RLock()
+	list1 := s1.set.Get()
+	s1.rw.RUnlock()
+	s2.rw.RLock()
+	list2 := s2.set.Get()
+	s2.rw.RUnlock()
+	return util.NewSet(list1), util.NewSet(list2)
+}
+
 // Intersect 交集
 func (s *Set) Intersect(another *Set) *Set {
-	s.rw.RLock()
-	defer s.rw.RUnlock()
-	another.rw.RLock()
-	defer another.rw.RUnlock()
-	list := s.set.Intersect(another.set).Get()
+	set1, set2 := getTwoSetView(s, another)
+	list := set1.Intersect(set2).Get()
 	return MakeSet(list)
 }
 
 // Union 并集
 func (s *Set) Union(another *Set) *Set {
-	s.rw.RLock()
-	defer s.rw.RUnlock()
-	another.rw.RLock()
-	defer another.rw.RUnlock()
-	list := s.set.Union(another.set).Get()
+	set1, set2 := getTwoSetView(s, another)
+	list := set1.Union(set2).Get()
 	return MakeSet(list)
 }
 
 // Diff 差集
 func (s *Set) Diff(another *Set) *Set {
-	s.rw.RLock()
-	defer s.rw.RUnlock()
-	another.rw.RLock()
-	defer another.rw.RUnlock()
-	list := s.set.Diff(another.set).Get()
+	set1, set2 := getTwoSetView(s, another)
+	list := set1.Diff(set2).Get()
 	return MakeSet(list)
 }
