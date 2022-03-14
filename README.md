@@ -43,9 +43,9 @@ It's a kv in-memory database, based on **HTTP RESTful** type.
 
 ### Others
 
-- ~~Support consistency for *crash-safe*.~~ (not yet...)
-  - ~~Tracker (Logic Log)~~
-  - ~~Camera (Physics Log)~~
+- Support consistency for *crash-safe*.
+  - Tracker (Logic `WAL`)
+  - ~~Camera (Physics Log)~~(not yet...)
 
 - Support *pub/sub* keys.
 - Support set key's *expire time*.
