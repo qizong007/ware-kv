@@ -190,32 +190,10 @@ func ContainsSet(c *gin.Context) {
 }
 
 func InterSet(c *gin.Context) {
-	_, val1, err := findKeyAndValByParam(c, "set1")
-	if err != nil {
-		keyNull(c)
+	set1, set2, ok := get2SetIsOk(c)
+	if !ok {
 		return
 	}
-	if !isKVEffective(c, val1) {
-		return
-	}
-	if !isKVTypeCorrect(c, val1, ds.SetDS) {
-		return
-	}
-
-	_, val2, err := findKeyAndValByParam(c, "set2")
-	if err != nil {
-		keyNull(c)
-		return
-	}
-	if !isKVEffective(c, val2) {
-		return
-	}
-	if !isKVTypeCorrect(c, val2, ds.SetDS) {
-		return
-	}
-
-	set1 := ds.Value2Set(val1)
-	set2 := ds.Value2Set(val2)
 
 	inter := set1.Intersect(set2).GetValue()
 
@@ -226,32 +204,10 @@ func InterSet(c *gin.Context) {
 }
 
 func UnionSet(c *gin.Context) {
-	_, val1, err := findKeyAndValByParam(c, "set1")
-	if err != nil {
-		paramNull(c, "set1")
+	set1, set2, ok := get2SetIsOk(c)
+	if !ok {
 		return
 	}
-	if !isKVEffective(c, val1) {
-		return
-	}
-	if !isKVTypeCorrect(c, val1, ds.SetDS) {
-		return
-	}
-
-	_, val2, err := findKeyAndValByParam(c, "set2")
-	if err != nil {
-		paramNull(c, "set2")
-		return
-	}
-	if !isKVEffective(c, val2) {
-		return
-	}
-	if !isKVTypeCorrect(c, val2, ds.SetDS) {
-		return
-	}
-
-	set1 := ds.Value2Set(val1)
-	set2 := ds.Value2Set(val2)
 
 	union := set1.Union(set2).GetValue()
 
@@ -262,32 +218,10 @@ func UnionSet(c *gin.Context) {
 }
 
 func DiffSet(c *gin.Context) {
-	_, val1, err := findKeyAndValByParam(c, "set1")
-	if err != nil {
-		keyNull(c)
+	set1, set2, ok := get2SetIsOk(c)
+	if !ok {
 		return
 	}
-	if !isKVEffective(c, val1) {
-		return
-	}
-	if !isKVTypeCorrect(c, val1, ds.SetDS) {
-		return
-	}
-
-	_, val2, err := findKeyAndValByParam(c, "set2")
-	if err != nil {
-		keyNull(c)
-		return
-	}
-	if !isKVEffective(c, val2) {
-		return
-	}
-	if !isKVTypeCorrect(c, val2, ds.SetDS) {
-		return
-	}
-
-	set1 := ds.Value2Set(val1)
-	set2 := ds.Value2Set(val2)
 
 	diff := set1.Diff(set2).GetValue()
 
@@ -295,4 +229,34 @@ func DiffSet(c *gin.Context) {
 		Code: util.Success,
 		Val:  diff,
 	})
+}
+
+func get2SetIsOk(c *gin.Context) (*ds.Set, *ds.Set, bool) {
+	_, val1, err := findKeyAndValByParam(c, "set1")
+	if err != nil {
+		keyNull(c)
+		return nil, nil, false
+	}
+	if !isKVEffective(c, val1) {
+		return nil, nil, false
+	}
+	if !isKVTypeCorrect(c, val1, ds.SetDS) {
+		return nil, nil, false
+	}
+
+	_, val2, err := findKeyAndValByParam(c, "set2")
+	if err != nil {
+		keyNull(c)
+		return nil, nil, false
+	}
+	if !isKVEffective(c, val2) {
+		return nil, nil, false
+	}
+	if !isKVTypeCorrect(c, val2, ds.SetDS) {
+		return nil, nil, false
+	}
+
+	set1 := ds.Value2Set(val1)
+	set2 := ds.Value2Set(val2)
+	return set1, set2, true
 }
