@@ -19,7 +19,7 @@ func (o *Object) GetValue() interface{} {
 
 func MakeObject(object map[string]interface{}) *Object {
 	return &Object{
-		Base:   *NewBase(),
+		Base:   *NewBase(ObjectDS),
 		object: object,
 	}
 }

@@ -50,6 +50,10 @@ func SetBitmap(c *gin.Context) {
 		if !isKVEffective(c, val) {
 			return
 		}
+		if !isKVTypeCorrect(c, val, ds.BitmapDS) {
+			return
+		}
+
 		bitmap = ds.Value2Bitmap(val)
 		wal(tracker.NewModifyCommand(key.GetKey(), tracker.BitmapSet, time.Now().Unix(), num))
 		bitmap.SetBit(num)
@@ -70,6 +74,10 @@ func GetBitmapLen(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+	if !isKVTypeCorrect(c, val, ds.BitmapDS) {
+		return
+	}
+
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 		Val:  ds.Value2Bitmap(val).GetLen(),
@@ -83,6 +91,9 @@ func GetBitmapBit(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.BitmapDS) {
 		return
 	}
 
@@ -125,6 +136,9 @@ func GetBitCount(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.BitmapDS) {
 		return
 	}
 
@@ -180,6 +194,12 @@ func ClearBitmap(c *gin.Context) {
 	key, val, err := findKeyAndValue(c)
 	if err != nil {
 		keyNull(c)
+		return
+	}
+	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.BitmapDS) {
 		return
 	}
 

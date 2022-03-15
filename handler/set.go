@@ -52,6 +52,10 @@ func GetSetSize(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+	if !isKVTypeCorrect(c, val, ds.SetDS) {
+		return
+	}
+
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 		Val:  ds.Value2Set(val).GetSize(),
@@ -85,6 +89,9 @@ func AddSet(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.SetDS) {
 		return
 	}
 
@@ -128,6 +135,9 @@ func RemoveSet(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+	if !isKVTypeCorrect(c, val, ds.SetDS) {
+		return
+	}
 
 	st := ds.Value2Set(val)
 
@@ -169,6 +179,9 @@ func ContainsSet(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+	if !isKVTypeCorrect(c, val, ds.SetDS) {
+		return
+	}
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
@@ -185,12 +198,19 @@ func InterSet(c *gin.Context) {
 	if !isKVEffective(c, val1) {
 		return
 	}
+	if !isKVTypeCorrect(c, val1, ds.SetDS) {
+		return
+	}
+
 	_, val2, err := findKeyAndValByParam(c, "set2")
 	if err != nil {
 		keyNull(c)
 		return
 	}
 	if !isKVEffective(c, val2) {
+		return
+	}
+	if !isKVTypeCorrect(c, val2, ds.SetDS) {
 		return
 	}
 
@@ -214,12 +234,19 @@ func UnionSet(c *gin.Context) {
 	if !isKVEffective(c, val1) {
 		return
 	}
+	if !isKVTypeCorrect(c, val1, ds.SetDS) {
+		return
+	}
+
 	_, val2, err := findKeyAndValByParam(c, "set2")
 	if err != nil {
 		paramNull(c, "set2")
 		return
 	}
 	if !isKVEffective(c, val2) {
+		return
+	}
+	if !isKVTypeCorrect(c, val2, ds.SetDS) {
 		return
 	}
 
@@ -243,12 +270,19 @@ func DiffSet(c *gin.Context) {
 	if !isKVEffective(c, val1) {
 		return
 	}
+	if !isKVTypeCorrect(c, val1, ds.SetDS) {
+		return
+	}
+
 	_, val2, err := findKeyAndValByParam(c, "set2")
 	if err != nil {
 		keyNull(c)
 		return
 	}
 	if !isKVEffective(c, val2) {
+		return
+	}
+	if !isKVTypeCorrect(c, val2, ds.SetDS) {
 		return
 	}
 

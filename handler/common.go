@@ -106,3 +106,13 @@ func isKVEffective(c *gin.Context, val storage.Value) bool {
 	}
 	return isEffective
 }
+
+func isKVTypeCorrect(c *gin.Context, val storage.Value, tp storage.DSType) bool {
+	if !anticorrosive.IsKVTypeCorrect(val, tp) {
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ValueTypeError,
+		})
+		return false
+	}
+	return true
+}

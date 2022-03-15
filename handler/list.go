@@ -58,6 +58,10 @@ func GetListLen(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+	if !isKVTypeCorrect(c, val, ds.ListDS) {
+		return
+	}
+
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 		Val:  ds.Value2List(val).GetLen(),
@@ -82,6 +86,9 @@ func GetListByPos(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ListDS) {
 		return
 	}
 
@@ -129,6 +136,9 @@ func GetListBetween(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ListDS) {
 		return
 	}
 
@@ -184,6 +194,9 @@ func GetListStartAt(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+	if !isKVTypeCorrect(c, val, ds.ListDS) {
+		return
+	}
 
 	list := ds.Value2List(val)
 
@@ -227,6 +240,9 @@ func GetListEndAt(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ListDS) {
 		return
 	}
 
@@ -283,6 +299,9 @@ func AddList(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+	if !isKVTypeCorrect(c, val, ds.ListDS) {
+		return
+	}
 
 	list := ds.Value2List(val)
 
@@ -333,6 +352,9 @@ func RemoveListElement(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ListDS) {
 		return
 	}
 

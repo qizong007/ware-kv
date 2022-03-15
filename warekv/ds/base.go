@@ -2,9 +2,22 @@ package ds
 
 import (
 	"time"
+	"ware-kv/warekv/storage"
+)
+
+const (
+	StringDS = iota
+	CounterDS
+	ObjectDS
+	ListDS
+	ZListDS
+	SetDS
+	BitmapDS
+	BloomFilterDS
 )
 
 type Base struct {
+	Type       storage.DSType
 	CreateTime int64
 	UpdateTime int64
 	DeleteTime int64
@@ -12,9 +25,10 @@ type Base struct {
 	Version    uint64
 }
 
-func NewBase() *Base {
+func NewBase(tp storage.DSType) *Base {
 	t := time.Now().Unix()
 	return &Base{
+		Type:       tp,
 		CreateTime: t,
 		UpdateTime: t,
 		DeleteTime: 0,
@@ -49,4 +63,8 @@ func (b *Base) WithExpireTime(delta int64) {
 func (b *Base) Update() {
 	b.UpdateTime = time.Now().Unix()
 	b.Version++
+}
+
+func (b *Base) GetType() storage.DSType {
+	return b.Type
 }

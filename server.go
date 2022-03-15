@@ -37,7 +37,7 @@ func Boot(option *WareOption) {
 	defer Server.engine.Close()
 	handler.Register(Server.router)
 	fmt.Println(" -----------------------------------")
-	fmt.Printf("  ware-kv Loading cost %s  \n", time.Since(bootTime).String())
+	fmt.Printf("  Ware-KV Loading Cost %s  \n", time.Since(bootTime).String())
 	fmt.Println(" -----------------------------------")
 	showFrame()
 	port := defaultPort

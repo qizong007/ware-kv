@@ -41,3 +41,10 @@ func IsKVEffective(val storage.Value) (bool, int) {
 	}
 	return true, 0
 }
+
+func IsKVTypeCorrect(val storage.Value, tp storage.DSType) bool {
+	if val.GetType() != tp {
+		return false
+	}
+	return true
+}

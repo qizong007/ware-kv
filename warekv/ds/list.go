@@ -31,7 +31,7 @@ func (l *List) listView() []interface{} {
 
 func MakeList(list []interface{}) *List {
 	return &List{
-		Base: *NewBase(),
+		Base: *NewBase(ListDS),
 		list: &list,
 	}
 }

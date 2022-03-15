@@ -48,6 +48,9 @@ func IncrCounter(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+	if !isKVTypeCorrect(c, val, ds.CounterDS) {
+		return
+	}
 
 	counter := ds.Value2Counter(val)
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.CounterIncr, time.Now().Unix()))
@@ -67,6 +70,9 @@ func IncrByCounter(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.CounterDS) {
 		return
 	}
 
@@ -110,6 +116,9 @@ func DecrCounter(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+	if !isKVTypeCorrect(c, val, ds.CounterDS) {
+		return
+	}
 
 	counter := ds.Value2Counter(val)
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.CounterDecr, time.Now().Unix()))
@@ -129,6 +138,9 @@ func DecrByCounter(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.CounterDS) {
 		return
 	}
 

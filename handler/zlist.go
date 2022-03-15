@@ -61,6 +61,10 @@ func GetZListLen(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+	if !isKVTypeCorrect(c, val, ds.ZListDS) {
+		return
+	}
+
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 		Val:  ds.Value2ZList(val).GetLen(),
@@ -85,6 +89,9 @@ func GetZListByPos(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ZListDS) {
 		return
 	}
 
@@ -132,6 +139,9 @@ func GetZListBetween(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ZListDS) {
 		return
 	}
 
@@ -187,6 +197,9 @@ func GetZListStartAt(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+	if !isKVTypeCorrect(c, val, ds.ZListDS) {
+		return
+	}
 
 	zList := ds.Value2ZList(val)
 
@@ -230,6 +243,9 @@ func GetZListEndAt(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ZListDS) {
 		return
 	}
 
@@ -284,6 +300,9 @@ func AddZList(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ZListDS) {
 		return
 	}
 
@@ -345,6 +364,9 @@ func RemoveZListByScore(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ZListDS) {
 		return
 	}
 

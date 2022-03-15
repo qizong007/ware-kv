@@ -32,7 +32,7 @@ func MakeZList(list []util.SlElement) *ZList {
 		sl.Insert(list[i].Score, list[i].Val)
 	}
 	return &ZList{
-		Base:     *NewBase(),
+		Base:     *NewBase(ZListDS),
 		skipList: sl,
 	}
 }

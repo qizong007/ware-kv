@@ -21,7 +21,7 @@ func (b *Bitmap) GetValue() interface{} {
 
 func MakeBitmap() *Bitmap {
 	return &Bitmap{
-		Base:   *NewBase(),
+		Base:   *NewBase(BitmapDS),
 		bitmap: util.NewBitmap(),
 	}
 }

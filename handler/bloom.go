@@ -99,6 +99,10 @@ func GetBloomSize(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+	if !isKVTypeCorrect(c, val, ds.BloomFilterDS) {
+		return
+	}
+
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 		Val:  ds.Value2BloomFilter(val).GetSize(),
@@ -112,6 +116,9 @@ func ClearBloom(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.BloomFilterDS) {
 		return
 	}
 
@@ -138,6 +145,9 @@ func TestBloom(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.BloomFilterDS) {
 		return
 	}
 
@@ -175,6 +185,10 @@ func GetBloomFalseRate(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+	if !isKVTypeCorrect(c, val, ds.BloomFilterDS) {
+		return
+	}
+
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 		Val:  ds.Value2BloomFilter(val).EstimateFalsePositiveRate(n),
@@ -201,6 +215,9 @@ func AddBloom(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.BloomFilterDS) {
 		return
 	}
 

@@ -27,7 +27,7 @@ func (s *Set) setView() []interface{} {
 
 func MakeSet(list []interface{}) *Set {
 	return &Set{
-		Base: *NewBase(),
+		Base: *NewBase(SetDS),
 		set:  util.NewSet(list),
 	}
 }

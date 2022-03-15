@@ -15,7 +15,7 @@ func (s *String) GetValue() interface{} {
 
 func MakeString(val string) *String {
 	return &String{
-		Base: *NewBase(),
+		Base: *NewBase(StringDS),
 		str:  val,
 	}
 }

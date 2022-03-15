@@ -52,6 +52,10 @@ func GetObjectFieldByKey(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
+	if !isKVTypeCorrect(c, val, ds.ObjectDS) {
+		return
+	}
+
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 		Val:  ds.Value2Object(val).GetFieldByKey(c.Param("field")),
@@ -76,6 +80,9 @@ func SetObjectFieldByKey(c *gin.Context) {
 		return
 	}
 	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ObjectDS) {
 		return
 	}
 

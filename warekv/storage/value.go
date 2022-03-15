@@ -8,4 +8,7 @@ type Value interface {
 	IsExpired() bool
 	WithExpireTime(t int64)
 	Update()
+	GetType() DSType
 }
+
+type DSType int

@@ -16,7 +16,7 @@ func (c *Counter) GetValue() interface{} {
 
 func MakeCounter(val int64) *Counter {
 	return &Counter{
-		Base: *NewBase(),
+		Base: *NewBase(CounterDS),
 		num:  val,
 	}
 }
