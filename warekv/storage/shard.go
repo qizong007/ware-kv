@@ -67,6 +67,10 @@ func (s *Shard) SetInTime(key *Key, val Value) {
 }
 
 func (s *Shard) Delete(key *Key) {
+	s.rw.Lock()
+	s.table[key.GetKey()].DeleteValue()
+	s.rw.Unlock()
+	// mark and sweep
 	s.writeQueue <- &writeReq{
 		event: DeleteEvent,
 		key:   key,
@@ -103,7 +107,6 @@ func (s *Shard) handleWriteQueue() {
 		case SetEvent:
 			s.table[key] = entry.value
 		case DeleteEvent:
-			s.table[key].DeleteValue()
 			s.gc.Commit(key)
 		}
 		if len(s.writeQueue) == 0 {
