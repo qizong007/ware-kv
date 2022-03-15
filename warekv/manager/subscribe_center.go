@@ -87,11 +87,11 @@ func (s *SubscribeCenter) Close() {
 }
 
 type SubscribeManifest struct {
-	Key          string
-	CallbackPath string
-	ExpectEvent  []int
-	RetryTimes   int
-	IsPersistent bool
+	Key          string `json:"k"`
+	CallbackPath string `json:"cp"`
+	ExpectEvent  []int  `json:"e"`
+	RetryTimes   int    `json:"rt"`
+	IsPersistent bool   `json:"ip"`
 }
 
 func (s *SubscribeCenter) Subscribe(option *SubscribeManifest) {

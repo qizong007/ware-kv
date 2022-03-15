@@ -74,6 +74,8 @@ func (t *Tracker) Close() {
 }
 
 func (t *Tracker) LoadTracker() {
+	log.Println("Tracker start loading...")
+	start := time.Now()
 	data, err := ioutil.ReadAll(t.file)
 	if err != nil {
 		panic(fmt.Sprintf("loadTracker Fail: %v", err))
@@ -96,11 +98,13 @@ func (t *Tracker) LoadTracker() {
 			command = &ModifyCommand{}
 		case DeleteOp:
 			command = &DeleteCommand{}
+		case SubscribeOp:
+			command = &SubCommand{}
 		}
 		resolveCommand(line[1:], command)
 		command.Execute()
 	}
-	log.Println("Tracker finish loading...")
+	log.Printf("Tracker finish loading in %s...\n", time.Since(start).String())
 }
 
 func resolveCommand(command string, cmd Command) {

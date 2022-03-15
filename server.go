@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gookit/color"
+	"time"
 	"ware-kv/handler"
 	"ware-kv/tracker"
 	"ware-kv/warekv"
@@ -22,6 +23,7 @@ type WareKV struct {
 }
 
 func Boot(option *WareOption) {
+	bootTime := time.Now()
 	initOption(option)
 	tk := tracker.NewTracker(option.Tracker)
 	Server = &WareKV{
@@ -34,6 +36,9 @@ func Boot(option *WareOption) {
 	// Server.engine start in New()
 	defer Server.engine.Close()
 	handler.Register(Server.router)
+	fmt.Println(" -----------------------------------")
+	fmt.Printf("  ware-kv Loading cost %s  \n", time.Since(bootTime).String())
+	fmt.Println(" -----------------------------------")
 	showFrame()
 	port := defaultPort
 	if option != nil {
