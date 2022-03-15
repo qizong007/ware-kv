@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	defaultTrackPath          = "./tracker.tracker"
+	defaultTrackPath          = "./tracker.log"
 	defaultBufferTickInterval = 1000
 )
 
