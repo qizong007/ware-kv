@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"math/rand"
 )
 
@@ -138,14 +137,12 @@ func (sl *SkipList) Delete(score float64) {
 	x = x.Next()
 
 	for x != nil && x.score == score {
-		fmt.Println(x, score)
 		for i := 0; i < sl.level; i++ {
 			if update[i].forward[i] != x {
 				break
 			}
 			update[i].forward[i] = x.forward[i]
 		}
-		fmt.Println(sl.len)
 		sl.len--
 		x = x.Next()
 	}
