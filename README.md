@@ -9,6 +9,12 @@ It's a kv in-memory database, based on **HTTP RESTful** type.
 
 - Take [Redis](https://github.com/redis/redis), which is the main stream open-source kv in-memory database, for standard. But *ware-kv* got something different:
   - Just unified HTTP RESTful interfaces, no SDK is required, out of the box!
+  - Redis's basic element can only store `string` , but ware-kv can store
+    - string
+    - integer number
+    - float number
+    - list (except `set`)
+    - map-dict (except `set`)
   - Contains some lightweight middlewares, like:
     - Message Queue
     - Bloom Filter
@@ -35,16 +41,15 @@ It's a kv in-memory database, based on **HTTP RESTful** type.
 ### Special *Wares*
 
 - counter
-
 - bloom filter
+- distributed lock
 - ~~message queue~~ (not yet...)
-- ~~lock~~ (not yet...)
 - ~~cache~~ (not yet...)
 
 ### Others
 
 - Support consistency for *crash-safe*.
-  - Tracker (Logic `WAL`)
+  - Tracker (Logic Log like `WAL`)
   - ~~Camera (Physics Log)~~(not yet...)
 
 - Support *pub/sub* keys.
