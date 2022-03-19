@@ -143,9 +143,11 @@ func (zl *ZList) RemoveInScore(min float64, max float64) error {
 	zl.rw.Lock()
 	defer zl.rw.Unlock()
 	zl.Update()
+	fmt.Println(zl.skipList.Len())
 	for i := range list {
 		zl.skipList.Delete(list[i].Score)
 	}
+	fmt.Println(zl.skipList.Len())
 	return nil
 }
 

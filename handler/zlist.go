@@ -407,3 +407,60 @@ func RemoveZListByScore(c *gin.Context) {
 		Code: util.Success,
 	})
 }
+
+func GetZListBetweenScores(c *gin.Context) {
+	minStr := c.Param("min")
+	maxStr := c.Param("max")
+
+	if minStr == "" && maxStr == "" || minStr != "" && maxStr == "" || minStr == "" && maxStr != "" {
+		log.Println("GetZListBetweenScores min or max is <nil>!")
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ParamError,
+			Msg:  "min or max is <nil>!",
+		})
+		return
+	}
+
+	_, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
+	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ZListDS) {
+		return
+	}
+
+	zList := ds.Value2ZList(val)
+
+	min, err := util.Str2Float64(minStr)
+	if err != nil {
+		log.Println("Str2Float64 fail", err)
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.TypeTransformError,
+		})
+		return
+	}
+	max, err := util.Str2Float64(maxStr)
+	if err != nil {
+		log.Println("Str2Float64 fail", err)
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.TypeTransformError,
+		})
+		return
+	}
+	res, err := zList.GetListInScore(min, max)
+	if err != nil {
+		log.Println("GetListInScore fail", err)
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ScopeError,
+		})
+		return
+	}
+	util.MakeResponse(c, &util.WareResponse{
+		Code: util.Success,
+		Val:  res,
+	})
+}

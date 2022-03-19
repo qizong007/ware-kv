@@ -1,6 +1,9 @@
 package util
 
-import "math/rand"
+import (
+	"fmt"
+	"math/rand"
+)
 
 const (
 	maxLevel    = 16   // Should be enough for 2^16 elements
@@ -38,6 +41,7 @@ type SkipList struct {
 func NewSkipList() *SkipList {
 	return &SkipList{
 		header: &slNode{forward: make([]*slNode, maxLevel)},
+		len:    0,
 	}
 }
 
@@ -75,7 +79,7 @@ func (sl *SkipList) GetList() []SlElement {
 	return list
 }
 
-func (sl *SkipList) Search(score float64) (*slNode, bool) {
+func (sl *SkipList) Search(score float64) ([]*slNode, bool) {
 	x := sl.header
 	for i := sl.level - 1; i >= 0; i-- {
 		for x.forward[i] != nil && x.forward[i].score < score {
@@ -83,9 +87,16 @@ func (sl *SkipList) Search(score float64) (*slNode, bool) {
 		}
 	}
 	x = x.Next()
+
+	res := make([]*slNode, 0)
 	if x != nil && x.score == score {
-		return x, true
+		for x != nil && x.score == score {
+			res = append(res, x)
+			x = x.Next()
+		}
+		return res, true
 	}
+
 	return nil, false
 }
 
@@ -99,11 +110,6 @@ func (sl *SkipList) Insert(score float64, value interface{}) *slNode {
 		update[i] = x
 	}
 	x = x.Next()
-
-	if x != nil && x.score == score {
-		x.val = value
-		return x
-	}
 
 	level := randomLevel()
 	if level > sl.level {
@@ -120,7 +126,7 @@ func (sl *SkipList) Insert(score float64, value interface{}) *slNode {
 	return newNode
 }
 
-func (sl *SkipList) Delete(score float64) *slNode {
+func (sl *SkipList) Delete(score float64) {
 	update := make([]*slNode, maxLevel)
 	x := sl.header
 	for i := sl.level - 1; i >= 0; i-- {
@@ -131,18 +137,18 @@ func (sl *SkipList) Delete(score float64) *slNode {
 	}
 	x = x.Next()
 
-	if x != nil && x.score == score {
+	for x != nil && x.score == score {
+		fmt.Println(x, score)
 		for i := 0; i < sl.level; i++ {
 			if update[i].forward[i] != x {
-				return nil
+				break
 			}
 			update[i].forward[i] = x.forward[i]
 		}
+		fmt.Println(sl.len)
 		sl.len--
-		return x
+		x = x.Next()
 	}
-
-	return nil
 }
 
 func (sl *SkipList) Len() int {

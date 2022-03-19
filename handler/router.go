@@ -61,6 +61,7 @@ func Register(r *gin.Engine) {
 	r.GET("/zlist/:key/start/:left", GetZListStartAt)
 	r.GET("/zlist/:key/end/:right", GetZListEndAt)
 	r.GET("/zlist/:key/between/:left/:right", GetZListBetween)
+	r.GET("/zlist/:key/in/:min/:max", GetZListBetweenScores)
 	r.DELETE("/zlist/:key", RemoveZListByScore)
 
 	// set
