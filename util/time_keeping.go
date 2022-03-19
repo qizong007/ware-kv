@@ -12,6 +12,7 @@ const (
 func TimeKeeping() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set(TimeTag, time.Now())
+		c.Next()
 	}
 }
 

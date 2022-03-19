@@ -14,6 +14,9 @@ func Register(r *gin.Engine) {
 	// add ticker
 	r.Use(util.TimeKeeping())
 
+	// cross-origin
+	r.Use(util.Cors())
+
 	// get machine info
 	r.GET("/", Info)
 	r.GET("/info", Info)
