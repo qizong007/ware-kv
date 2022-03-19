@@ -14,6 +14,7 @@ const (
 	SetDS
 	BitmapDS
 	BloomFilterDS
+	LockDS
 )
 
 type Base struct {

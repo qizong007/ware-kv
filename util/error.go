@@ -9,6 +9,8 @@ const (
 	ValueTypeError     = 30001
 	TypeTransformError = 70001
 	ScopeError         = 80001
+	LockRaceError      = 90001
+	LockReleaseError   = 90002
 )
 
 var ErrCode2Msg = map[int]string{
@@ -20,4 +22,6 @@ var ErrCode2Msg = map[int]string{
 	ValueTypeError:     "Error request type!",
 	TypeTransformError: "something wrong with type transform...",
 	ScopeError:         "scope is not in a right way!",
+	LockRaceError:      "lock race failed",
+	LockReleaseError:   "lock release failed",
 }

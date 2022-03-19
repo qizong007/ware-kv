@@ -13,6 +13,11 @@ func Set(key *storage.Key, newVal storage.Value) {
 	SetNotify(key, newVal)
 }
 
+func SetInTime(key *storage.Key, newVal storage.Value) {
+	warekv.Engine().SetInTime(key, newVal)
+	SetNotify(key, newVal)
+}
+
 func SetNotify(key *storage.Key, newVal storage.Value) {
 	go warekv.Engine().Notify(key.GetKey(), newVal.GetValue(), manager.CallbackSetEvent)
 }

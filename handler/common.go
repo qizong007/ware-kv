@@ -56,6 +56,17 @@ func set(key *storage.Key, newVal storage.Value, expireTime int64, cmd tracker.C
 	anticorrosive.Set(key, newVal)
 }
 
+func setInTime(key *storage.Key, newVal storage.Value, expireTime int64, cmd tracker.Command) {
+	wal(cmd)
+	if expireTime != 0 {
+		newVal.WithExpireTime(expireTime)
+		time.AfterFunc(time.Duration(expireTime)*time.Second, func() {
+			anticorrosive.Del(key)
+		})
+	}
+	anticorrosive.SetInTime(key, newVal)
+}
+
 func setNotify(key *storage.Key, newVal storage.Value) {
 	anticorrosive.SetNotify(key, newVal)
 }

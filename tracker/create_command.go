@@ -20,6 +20,7 @@ const (
 	BitmapStruct        = "bm"
 	BloomStructSpecific = "bfs"
 	BloomStructFuzzy    = "bff"
+	LockStruct          = "lk"
 )
 
 var struct2MakeFunc = map[string]func(interface{}) storage.Value{
@@ -70,6 +71,9 @@ var struct2MakeFunc = map[string]func(interface{}) storage.Value{
 			Fp: mp["Fp"].(float64),
 		}
 		return ds.MakeBloomFilterFuzzy(option)
+	},
+	LockStruct: func(param interface{}) storage.Value {
+		return ds.MakeLock()
 	},
 }
 
