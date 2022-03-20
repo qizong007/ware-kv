@@ -33,6 +33,8 @@ Just take a look at the [wiki](https://github.com/qizong007/ware-kv/wiki).
 
 ## How *ware-kv*?
 
+> Click [here](https://github.com/qizong007/ware-kv/wiki#more-usage) to see more.
+
 ### Basic *Wares*
 
 - string
