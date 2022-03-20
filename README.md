@@ -5,6 +5,10 @@
 
 It's a kv in-memory database, based on **HTTP RESTful** type.
 
+# Usage
+
+Just take a look at the [wiki](https://github.com/qizong007/ware-kv/wiki).
+
 ## Why *ware-kv*?
 
 - Take [Redis](https://github.com/redis/redis), which is the main stream open-source kv in-memory database, for standard. But *ware-kv* got something different:
