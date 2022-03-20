@@ -35,4 +35,4 @@ WareEngine:
 # It's a WAL.
 Tracker:
   FilePath: ./tracker.log # relative to 'tracker' dir
-  BufRefreshTickInterval: 1000 # default is 1000 millisecond
+  BufRefreshTickInterval: 1000 # default is 1000 millisecond, 0 is real-time mode

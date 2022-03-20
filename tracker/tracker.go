@@ -19,11 +19,12 @@ const (
 var tracker *Tracker
 
 type Tracker struct {
-	file      *os.File
-	buffer    []byte
-	bufLock   sync.Mutex
-	bufTicker *time.Ticker
-	closer    chan bool
+	file       *os.File
+	buffer     []byte
+	bufLock    sync.Mutex
+	bufTicker  *time.Ticker
+	closer     chan bool
+	isRealTime bool
 }
 
 type TrackerOption struct {
@@ -41,9 +42,13 @@ func DefaultOption() *TrackerOption {
 func NewTracker(option *TrackerOption) *Tracker {
 	filePath := defaultTrackPath
 	bufTickInterval := uint(defaultBufferTickInterval)
+	isRealTime := false
 	if option != nil {
 		filePath = option.FilePath
 		bufTickInterval = option.BufRefreshTickInterval
+		if bufTickInterval == 0 {
+			isRealTime = true
+		}
 	}
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_APPEND, os.ModePerm)
 	if err != nil {
@@ -51,12 +56,17 @@ func NewTracker(option *TrackerOption) *Tracker {
 		return nil
 	}
 	tracker = &Tracker{
-		file:      file,
-		buffer:    make([]byte, 0),
-		bufTicker: time.NewTicker(time.Duration(bufTickInterval) * time.Millisecond),
-		closer:    make(chan bool),
+		file:       file,
+		buffer:     make([]byte, 0),
+		isRealTime: isRealTime,
 	}
-	tracker.start()
+	if !isRealTime {
+		tracker.closer = make(chan bool)
+		tracker.bufTicker = time.NewTicker(time.Duration(bufTickInterval) * time.Millisecond)
+		tracker.start()
+	} else {
+		log.Println("Tracker start real-time refresh mode...")
+	}
 	return tracker
 }
 
@@ -70,6 +80,9 @@ func (t *Tracker) start() {
 }
 
 func (t *Tracker) Close() {
+	if t.isRealTime {
+		return
+	}
 	t.closer <- true
 }
 
@@ -135,11 +148,18 @@ func (t *Tracker) Write(command Command) {
 	t.bufLock.Lock()
 	defer t.bufLock.Unlock()
 	t.buffer = append(t.buffer, []byte(command.GetOpType()+command.String()+"\n")...)
+	if t.isRealTime {
+		t.flushToDisk()
+	}
 }
 
 func (t *Tracker) refresh() {
 	t.bufLock.Lock()
 	defer t.bufLock.Unlock()
+	t.flushToDisk()
+}
+
+func (t *Tracker) flushToDisk() {
 	if len(t.buffer) == 0 {
 		return
 	}
