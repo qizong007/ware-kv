@@ -33,35 +33,7 @@ Just take a look at the [wiki](https://github.com/qizong007/ware-kv/wiki).
 
 ## How *ware-kv*?
 
-> Click [here](https://github.com/qizong007/ware-kv/wiki#more-usage) to see more.
-
-### Basic *Wares*
-
-- string
-- list
-- sort-list
-- object
-- set
-- bitmap
-
-### Special *Wares*
-
-- counter
-- bloom filter
-- distributed lock
-- ~~message queue~~ (not yet...)
-- ~~cache~~ (not yet...)
-
-### Others
-
-- Support consistency for *crash-safe*.
-  - Tracker (Logic Log like `WAL`)
-  - ~~Camera (Physics Log)~~(not yet...)
-
-- Support *pub/sub* keys.
-- Support set key's *expire time*.
-- ~~Support *cache eviction*.~~ (not yet...)
-- ~~Support *double-write consistency* plan for MySQL.~~ (not yet...)
+Click [here](https://github.com/qizong007/ware-kv/wiki#more-usage) to see more.
 
 ## Ideas Came From? 🧠
 
