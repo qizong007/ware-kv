@@ -5,7 +5,7 @@
 
 It's a kv in-memory database, based on **HTTP RESTful** type.
 
-# Usage
+## Usage
 
 Just take a look at the [wiki](https://github.com/qizong007/ware-kv/wiki).
 
