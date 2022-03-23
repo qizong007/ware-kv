@@ -101,7 +101,6 @@ func Register(r *gin.Engine) {
 	r.POST("/lock/:key", Lock)
 	r.PUT("/lock/:key", Lock)
 	r.POST("/unlock/:key", Unlock)
-	r.PUT("/unlock/:key", Unlock)
 
 	// subscribe
 	r.POST("/subscribe", SubscribeKey)
