@@ -8,12 +8,17 @@ import (
 	"net/http"
 	"sync"
 	"time"
+	"ware-kv/warekv/util"
 )
 
 const (
 	defaultDefaultCallbackMethod     = http.MethodGet
 	defaultCallbackRetryQueueLen     = 128
+	callbackRetryQueueLenMin         = 1
+	callbackRetryQueueLenMax         = 64 * 1024 * 1024
 	defaultCallbackRetryTickInterval = 1000
+	callbackRetryTickIntervalMin     = 200
+	callbackRetryTickIntervalMax     = 5000
 )
 
 // status
@@ -64,8 +69,9 @@ func NewSubscribeCenter(option *SubscribeCenterOption) *SubscribeCenter {
 	retryTickInterval := time.Millisecond * time.Duration(defaultCallbackRetryTickInterval)
 	if option != nil {
 		defaultCallbackMethod = option.DefaultCallbackMethod
-		retryQueueLen = int(option.RetryQueueLen)
-		retryTickInterval = time.Millisecond * time.Duration(option.RetryTickInterval)
+		retryQueueLen = util.SetIfHitLimit(int(option.RetryQueueLen), callbackRetryQueueLenMin, callbackRetryQueueLenMax)
+		tickInterval := util.SetIfHitLimit(int(option.RetryTickInterval), callbackRetryTickIntervalMin, callbackRetryTickIntervalMax)
+		retryTickInterval = time.Millisecond * time.Duration(tickInterval)
 	}
 	center = &SubscribeCenter{
 		record:                make(map[string][]*CallbackPlan),

@@ -8,8 +8,14 @@ import (
 
 const (
 	defaultShardNum          = 16
+	shardNumMin              = 8
+	shardNumMax              = 16 * 1024
 	defaultWriteQueueCap     = 256
+	writeQueueCapMin         = 128
+	writeQueueCapMax         = 64 * 1024 * 1024
 	defaultWriteTickInterval = 100
+	writeTickIntervalMin     = 50
+	writeTickIntervalMax     = 1000
 )
 
 var (
@@ -42,9 +48,10 @@ func NewWareTable(shardOption *ShardOption, gcOption *WareGCOption) *WareTable {
 	writeQueueCap := defaultWriteQueueCap
 	writeTickInterval := time.Millisecond * time.Duration(defaultWriteTickInterval)
 	if shardOption != nil {
-		shardNum = int(util.Next2Power(shardOption.Num))
-		writeQueueCap = int(shardOption.WriteQueueCap)
-		writeTickInterval = time.Millisecond * time.Duration(shardOption.WriteTickInterval)
+		shardNum = util.SetIfHitLimit(int(util.Next2Power(shardOption.Num)), shardNumMin, shardNumMax)
+		writeQueueCap = util.SetIfHitLimit(int(shardOption.WriteQueueCap), writeQueueCapMin, writeQueueCapMax)
+		tickInterval := util.SetIfHitLimit(int(shardOption.WriteTickInterval), writeTickIntervalMin, writeTickIntervalMax)
+		writeTickInterval = time.Millisecond * time.Duration(tickInterval)
 	}
 	wTable.TableList = make([]*Shard, shardNum)
 	wTable.TableNum = shardNum

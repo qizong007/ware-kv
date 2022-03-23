@@ -11,28 +11,28 @@ WareEngine:
   # For better performance, the WRITE is not just in time.
   # As you can see, there's a WriteQueue.
   Shard:
-    Num: 16 # default is 16, it will always be 2^n for MOD in hash (nearest 2^n)
-    WriteQueueCap: 256 # default is 256
-    WriteTickInterval: 100 # default is 100 millisecond
+    Num: 16 # default is 16, it will always be 2^n for MOD in hash (nearest 2^n ｜ scale: 8 - 16k)
+    WriteQueueCap: 256 # default is 256 (scale: 128 - 64M)
+    WriteTickInterval: 100 # default is 100 millisecond (scale: 50 - 1000)
 
   # For better performance, GC plays a role.
   GC:
-    TaskCap: 1024 # default is 1024
-    TickInterval: 500 # default is 500 millisecond
+    TaskCap: 1024 # default is 1024 (scale: 256 - 64M)
+    TickInterval: 500 # default is 500 millisecond (scale: 100 - 5000)
 
   # There's a SubscribeCenter to handle the pub/sub stuff.
   # I mean, this is not just in time, the first time callback and retry.
   Subscriber:
     DefaultCallbackMethod: "GET" # default is "GET", you can choose "POST"
-    RetryQueueLen: 128 # default is 128
-    RetryTickInterval: 1000 # default is 1000 millisecond
+    RetryQueueLen: 128 # default is 128 (scale: 1 - 64M)
+    RetryTickInterval: 1000 # default is 1000 millisecond (scale: 200 - 5000)
 
   # It means that, 'You get your machine info' is also not just in time!
   # It's a 'cache' for real, or 'snapshot'.
   MachineInfo:
-    FreshFrequency: 1000 # default is 1000 millisecond
+    FreshFrequency: 1000 # default is 1000 millisecond (scale: 100 - 5000)
 
 # It's a WAL.
 Tracker:
   FilePath: ./tracker.log # relative to 'tracker' dir
-  BufRefreshTickInterval: 1000 # default is 1000 millisecond, 0 is real-time mode
+  BufRefreshTickInterval: 1000 # default is 1000 millisecond, 0 is real-time mode (scale: 200 - 5000)

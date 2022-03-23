@@ -8,10 +8,13 @@ import (
 	"runtime"
 	"time"
 	"ware-kv/warekv/storage"
+	"ware-kv/warekv/util"
 )
 
 const (
 	defaultInfoFreshFrequency = 1000
+	infoFreshFrequencyMin     = 100
+	infoFreshFrequencyMax     = 5000
 )
 
 type Info struct {
@@ -31,7 +34,8 @@ var (
 func NewWareInfo(option *WareInfoOption) *Info {
 	infoFreshFrequency := time.Millisecond * time.Duration(defaultInfoFreshFrequency)
 	if option != nil {
-		infoFreshFrequency = time.Millisecond * time.Duration(option.FreshFrequency)
+		freshFrequency := util.SetIfHitLimit(int(option.FreshFrequency), infoFreshFrequencyMin, infoFreshFrequencyMax)
+		infoFreshFrequency = time.Millisecond * time.Duration(freshFrequency)
 	}
 	wareInfo = &Info{
 		pid:        os.Getpid(),

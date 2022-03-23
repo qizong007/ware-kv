@@ -9,11 +9,14 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"ware-kv/warekv/util"
 )
 
 const (
 	defaultTrackPath          = "./tracker.log"
 	defaultBufferTickInterval = 1000
+	bufferTickIntervalMin     = 200
+	bufferTickIntervalMax     = 5000
 )
 
 var tracker *Tracker
@@ -49,12 +52,14 @@ func NewTracker(option *TrackerOption) *Tracker {
 		if bufTickInterval == 0 {
 			isRealTime = true
 		}
+		bufTickInterval = uint(util.SetIfHitLimit(int(bufTickInterval), bufferTickIntervalMin, bufferTickIntervalMax))
 	}
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_APPEND, os.ModePerm)
 	if err != nil {
 		panic(fmt.Sprintf("NewTracker Fail: %v", err))
 		return nil
 	}
+	fmt.Println(bufTickInterval)
 	tracker = &Tracker{
 		file:       file,
 		buffer:     make([]byte, 0),

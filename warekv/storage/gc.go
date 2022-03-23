@@ -2,11 +2,16 @@ package storage
 
 import (
 	"time"
+	"ware-kv/warekv/util"
 )
 
 const (
-	defaultGCTaskCap      = 1024 // gc task queue's capacity
+	defaultGCTaskCap      = 1024             // gc task queue's capacity
+	gcTaskCapMin          = 256              // gc task queue's capacity
+	gcTaskCapMax          = 64 * 1024 * 1024 // gc task queue's capacity
 	defaultGCTickInterval = 500
+	gcTickIntervalMin     = 100
+	gcTickIntervalMax     = 5000
 )
 
 type WareGC struct {
@@ -19,8 +24,9 @@ func NewWareGC(share *Shard, option *WareGCOption) *WareGC {
 	GCTaskCap := defaultGCTaskCap
 	GCTickInterval := time.Millisecond * time.Duration(defaultGCTickInterval)
 	if option != nil {
-		GCTaskCap = int(option.TaskCap)
-		GCTickInterval = time.Millisecond * time.Duration(option.TickInterval)
+		GCTaskCap = util.SetIfHitLimit(int(option.TaskCap), gcTaskCapMin, gcTaskCapMax)
+		tickInterval := util.SetIfHitLimit(int(option.TickInterval), gcTickIntervalMin, gcTickIntervalMax)
+		GCTickInterval = time.Millisecond * time.Duration(tickInterval)
 	}
 	return &WareGC{
 		shard:    share,
