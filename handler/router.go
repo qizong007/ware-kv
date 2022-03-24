@@ -54,6 +54,10 @@ func Register(r *gin.Engine) {
 	r.GET("/list/:key/end/:right", GetListEndAt)
 	r.GET("/list/:key/between/:left/:right", GetListBetween)
 	r.DELETE("/list/:key", RemoveListElement)
+	r.POST("/list/:key/rpush", RPushList)
+	r.DELETE("/list/:key/rpop", RPopList)
+	r.POST("/list/:key/lpush", LPushList)
+	r.DELETE("/list/:key/lpop", LPopList)
 
 	// zlist
 	r.POST("/zlist", SetZList)

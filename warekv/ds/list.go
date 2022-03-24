@@ -136,3 +136,33 @@ func (l *List) GetLen() int {
 	defer l.rw.RUnlock()
 	return len(*l.list)
 }
+
+func (l *List) RPush(ele interface{}) {
+	l.Append([]interface{}{ele})
+}
+
+func (l *List) RPop() interface{} {
+	l.rw.Lock()
+	defer l.rw.Unlock()
+	l.Update()
+	last := len(*l.list) - 1
+	res := (*l.list)[last]
+	*l.list = (*l.list)[:last]
+	return res
+}
+
+func (l *List) LPush(ele interface{}) {
+	l.rw.Lock()
+	defer l.rw.Unlock()
+	l.Update()
+	*l.list = append([]interface{}{ele}, *l.list...)
+}
+
+func (l *List) LPop() interface{} {
+	l.rw.Lock()
+	defer l.rw.Unlock()
+	l.Update()
+	res := (*l.list)[0]
+	*l.list = (*l.list)[1:]
+	return res
+}

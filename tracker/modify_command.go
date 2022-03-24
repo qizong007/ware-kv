@@ -19,6 +19,10 @@ const (
 	ListAdd             = "lst_a"
 	ListRemoveAt        = "lst_ra"
 	ListRemoveVal       = "lst_rv"
+	ListRPush           = "lst_rps"
+	ListLPush           = "lst_lps"
+	ListRPop            = "lst_rpp"
+	ListLPop            = "lst_lpp"
 	ZListAdd            = "zl_a"
 	ZListRemoveScore    = "zl_rs"
 	ZListRemoveScores   = "zl_rss"
@@ -59,6 +63,18 @@ var str2ModifyFunc = map[string]func(storage.Value, []interface{}){
 	ListRemoveAt: func(val storage.Value, params []interface{}) {
 		pos := int(params[0].(float64))
 		val.(*ds.List).RemoveAt(pos)
+	},
+	ListRPush: func(val storage.Value, params []interface{}) {
+		val.(*ds.List).RPush(params[0])
+	},
+	ListLPush: func(val storage.Value, params []interface{}) {
+		val.(*ds.List).LPush(params[0])
+	},
+	ListRPop: func(val storage.Value, params []interface{}) {
+		val.(*ds.List).RPop()
+	},
+	ListLPop: func(val storage.Value, params []interface{}) {
+		val.(*ds.List).LPop()
 	},
 	ZListAdd: func(val storage.Value, params []interface{}) {
 		list := params[0].([]interface{})

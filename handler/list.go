@@ -26,6 +26,10 @@ type RemoveListElementParam struct {
 	Pos *int
 }
 
+type PushListParam struct {
+	Element interface{} `json:"e"`
+}
+
 func SetList(c *gin.Context) {
 	param := SetListParam{}
 	err := c.ShouldBindJSON(&param)
@@ -376,5 +380,139 @@ func RemoveListElement(c *gin.Context) {
 	setNotify(key, list)
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
+	})
+}
+
+func RPushList(c *gin.Context) {
+	param := PushListParam{}
+	err := c.BindJSON(&param)
+	if err != nil {
+		log.Println("BindJSON fail")
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ParamError,
+			Msg:  "Param bind json fail!",
+		})
+		return
+	}
+
+	if param.Element == nil {
+		log.Println("RPushList's param is <nil>!")
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ParamError,
+			Msg:  "Param all <nil>!",
+		})
+		return
+	}
+
+	key, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
+	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ListDS) {
+		return
+	}
+
+	list := ds.Value2List(val)
+
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListRPush, time.Now().Unix(), param.Element))
+	list.RPush(param.Element)
+	setNotify(key, list)
+	util.MakeResponse(c, &util.WareResponse{
+		Code: util.Success,
+	})
+}
+
+func LPushList(c *gin.Context) {
+	param := PushListParam{}
+	err := c.BindJSON(&param)
+	if err != nil {
+		log.Println("BindJSON fail")
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ParamError,
+			Msg:  "Param bind json fail!",
+		})
+		return
+	}
+
+	if param.Element == nil {
+		log.Println("LPushList's param is <nil>!")
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ParamError,
+			Msg:  "Param all <nil>!",
+		})
+		return
+	}
+
+	key, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
+	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ListDS) {
+		return
+	}
+
+	list := ds.Value2List(val)
+
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListLPush, time.Now().Unix(), param.Element))
+	list.LPush(param.Element)
+	setNotify(key, list)
+	util.MakeResponse(c, &util.WareResponse{
+		Code: util.Success,
+	})
+}
+
+func RPopList(c *gin.Context) {
+	key, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
+	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ListDS) {
+		return
+	}
+
+	list := ds.Value2List(val)
+
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListRPop, time.Now().Unix(), nil))
+	tail := list.RPop()
+	setNotify(key, list)
+	util.MakeResponse(c, &util.WareResponse{
+		Code: util.Success,
+		Val:  tail,
+	})
+}
+
+func LPopList(c *gin.Context) {
+	key, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
+	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, ds.ListDS) {
+		return
+	}
+
+	list := ds.Value2List(val)
+
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListLPop, time.Now().Unix(), nil))
+	head := list.LPop()
+	setNotify(key, list)
+	util.MakeResponse(c, &util.WareResponse{
+		Code: util.Success,
+		Val:  head,
 	})
 }
