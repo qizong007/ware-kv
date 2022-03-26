@@ -24,7 +24,6 @@ type Info struct {
 	memAlloc   uint64
 	infoTicker *time.Ticker
 	closer     chan bool
-	wTable     *storage.WareTable
 }
 
 var (
@@ -41,7 +40,6 @@ func NewWareInfo(option *WareInfoOption) *Info {
 		pid:        os.Getpid(),
 		infoTicker: time.NewTicker(infoFreshFrequency),
 		closer:     make(chan bool),
-		wTable:     storage.GetWareTable(),
 	}
 	wareInfo.start()
 	return wareInfo
@@ -56,22 +54,22 @@ func DefaultWareInfoOption() *WareInfoOption {
 }
 
 type InfoView struct {
-	Pid          int
-	CpuPercent   float64
-	MemPercent   float32
-	MemAlloc     uint64
-	ShardKeyNums []int
-	KeysTotal    int
+	Pid        int
+	CpuPercent float64
+	MemPercent float32
+	MemAlloc   uint64
+	KeysTotal  int
+	TableType  string
 }
 
 func GetWareInfo() *InfoView {
 	return &InfoView{
-		Pid:          wareInfo.pid,
-		CpuPercent:   wareInfo.cpuPercent,
-		MemPercent:   wareInfo.memPercent,
-		MemAlloc:     wareInfo.memAlloc,
-		ShardKeyNums: wareInfo.wTable.Count(),
-		KeysTotal:    sumKeysCount(wareInfo.wTable.Count()),
+		Pid:        wareInfo.pid,
+		CpuPercent: wareInfo.cpuPercent,
+		MemPercent: wareInfo.memPercent,
+		MemAlloc:   wareInfo.memAlloc,
+		KeysTotal:  storage.GlobalTable.KeyNum(),
+		TableType:  storage.GlobalTable.Type(),
 	}
 }
 

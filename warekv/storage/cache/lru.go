@@ -19,7 +19,7 @@ type LRUCache struct {
 	rw        sync.RWMutex
 }
 
-func New(maxBytes int64) *LRUCache {
+func NewLRUCache(maxBytes int64) *LRUCache {
 	return &LRUCache{
 		maxBytes: maxBytes,
 		ll:       list.New(),
@@ -59,9 +59,9 @@ func (c *LRUCache) Set(key *storage.Key, value storage.Value) {
 		// c.usedBytes += int64(len(key) + value.Len())
 	}
 	// memory usage check
-	for c.maxBytes != 0 && c.maxBytes < c.usedBytes {
-		c.removeOldest()
-	}
+	//for c.maxBytes != 0 && c.maxBytes < c.usedBytes {
+	//	c.removeOldest()
+	//}
 }
 
 func (c *LRUCache) removeOldest() {
@@ -90,5 +90,15 @@ func (c *LRUCache) Len() int {
 }
 
 func (c *LRUCache) Close() {
-	// TODO
+	// compatible with the interface
+}
+
+func (c *LRUCache) KeyNum() int {
+	c.rw.RLock()
+	defer c.rw.RUnlock()
+	return len(c.cache)
+}
+
+func (c *LRUCache) Type() string {
+	return "LRUCache"
 }

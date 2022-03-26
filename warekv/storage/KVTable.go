@@ -8,4 +8,8 @@ type KVTable interface {
 	SetInTime(key *Key, val Value)
 	Delete(key *Key)
 	closer.Closer // for resource collection
+	KeyNum() int
+	Type() string
 }
+
+var GlobalTable KVTable

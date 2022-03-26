@@ -47,6 +47,7 @@ func New(option *WareEngineOption) *WareEngine {
 		engine.subscribeCenter = manager.NewSubscribeCenter(option.Subscriber)
 		engine.info = machine.NewWareInfo(option.MachineInfo)
 	}
+	storage.GlobalTable = engine.wTable
 	return engine
 }
 
