@@ -1,12 +1,14 @@
-package storage
+package cache
 
 import (
 	"container/list"
+	"sync"
+	"ware-kv/warekv/storage"
 )
 
 type entry struct {
-	key   *Key
-	value Value
+	key   *storage.Key
+	value storage.Value
 }
 
 type LRUCache struct {
@@ -14,6 +16,7 @@ type LRUCache struct {
 	usedBytes int64
 	ll        *list.List
 	cache     map[string]*list.Element
+	rw        sync.RWMutex
 }
 
 func New(maxBytes int64) *LRUCache {
@@ -24,7 +27,9 @@ func New(maxBytes int64) *LRUCache {
 	}
 }
 
-func (c *LRUCache) Get(key *Key) Value {
+func (c *LRUCache) Get(key *storage.Key) storage.Value {
+	c.rw.RLock()
+	defer c.rw.RUnlock()
 	if ele, ok := c.cache[key.GetKey()]; ok {
 		c.ll.MoveToFront(ele) // fresh
 		kv := ele.Value.(*entry)
@@ -33,7 +38,9 @@ func (c *LRUCache) Get(key *Key) Value {
 	return nil
 }
 
-func (c *LRUCache) Set(key *Key, value Value) {
+func (c *LRUCache) Set(key *storage.Key, value storage.Value) {
+	c.rw.Lock()
+	defer c.rw.Unlock()
 	if e, ok := c.cache[key.GetKey()]; ok {
 		// update
 		c.ll.MoveToFront(e)
@@ -51,14 +58,14 @@ func (c *LRUCache) Set(key *Key, value Value) {
 		// todo: c.usedBytes
 		// c.usedBytes += int64(len(key) + value.Len())
 	}
-	// 检测是否内存超了
+	// memory usage check
 	for c.maxBytes != 0 && c.maxBytes < c.usedBytes {
 		c.removeOldest()
 	}
 }
 
 func (c *LRUCache) removeOldest() {
-	last := c.ll.Back() // 取最旧的元素
+	last := c.ll.Back() // get the oldest element
 	if last != nil {
 		c.ll.Remove(last)
 		kv := last.Value.(*entry)
@@ -68,14 +75,20 @@ func (c *LRUCache) removeOldest() {
 	}
 }
 
-func (c *LRUCache) SetInTime(key *Key, val Value) {
+func (c *LRUCache) SetInTime(key *storage.Key, val storage.Value) {
 	c.Set(key, val)
 }
 
-func (c *LRUCache) Delete(key *Key) {
+func (c *LRUCache) Delete(key *storage.Key) {
 	// TODO
 }
 
 func (c *LRUCache) Len() int {
+	c.rw.RLock()
+	defer c.rw.RUnlock()
 	return c.ll.Len()
+}
+
+func (c *LRUCache) Close() {
+	// TODO
 }

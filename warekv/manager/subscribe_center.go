@@ -80,10 +80,11 @@ func NewSubscribeCenter(option *SubscribeCenterOption) *SubscribeCenter {
 		retryCloser:           make(chan bool),
 		defaultCallbackMethod: defaultCallbackMethod,
 	}
+	center.start()
 	return center
 }
 
-func (s *SubscribeCenter) Start() {
+func (s *SubscribeCenter) start() {
 	go center.scheduledRetry()
 	fmt.Println("Subscriber's Retry worker starts working...")
 }

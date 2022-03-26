@@ -58,6 +58,7 @@ func NewWareTable(shardOption *ShardOption, gcOption *WareGCOption) *WareTable {
 	for i := range wTable.TableList {
 		wTable.TableList[i] = newShard(writeQueueCap, writeTickInterval, gcOption)
 	}
+	wTable.start()
 	return wTable
 }
 
@@ -65,7 +66,7 @@ func GetWareTable() *WareTable {
 	return wTable
 }
 
-func (w *WareTable) Start() {
+func (w *WareTable) start() {
 	for _, shard := range w.TableList {
 		shard.Start()
 	}

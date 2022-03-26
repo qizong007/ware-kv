@@ -43,6 +43,7 @@ func NewWareInfo(option *WareInfoOption) *Info {
 		closer:     make(chan bool),
 		wTable:     storage.GetWareTable(),
 	}
+	wareInfo.start()
 	return wareInfo
 }
 
@@ -82,7 +83,7 @@ func sumKeysCount(list []int) int {
 	return sum
 }
 
-func (i *Info) Start() {
+func (i *Info) start() {
 	wareInfo.updateInfo()
 	go wareInfo.refresh()
 	fmt.Println("MachineInfo's Refresh worker starts working...")

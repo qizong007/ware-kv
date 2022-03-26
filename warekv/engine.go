@@ -7,7 +7,7 @@ import (
 )
 
 type WareEngine struct {
-	wTable          *storage.WareTable
+	wTable          storage.KVTable
 	subscribeCenter *manager.SubscribeCenter
 	info            *machine.Info
 	// TODO camera(RDB)
@@ -47,14 +47,7 @@ func New(option *WareEngineOption) *WareEngine {
 		engine.subscribeCenter = manager.NewSubscribeCenter(option.Subscriber)
 		engine.info = machine.NewWareInfo(option.MachineInfo)
 	}
-	engine.start()
 	return engine
-}
-
-func (e *WareEngine) start() {
-	engine.wTable.Start()
-	engine.subscribeCenter.Start()
-	engine.info.Start()
 }
 
 func (e *WareEngine) Close() {
