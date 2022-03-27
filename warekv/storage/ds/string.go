@@ -1,7 +1,7 @@
 package ds
 
 import (
-	"ware-kv/warekv/storage"
+	"ware-kv/warekv/util"
 )
 
 type String struct {
@@ -15,13 +15,9 @@ func (s *String) GetValue() interface{} {
 
 func MakeString(val string) *String {
 	return &String{
-		Base: *NewBase(StringDS),
+		Base: *NewBase(util.StringDS),
 		str:  val,
 	}
-}
-
-func Value2String(val storage.Value) *String {
-	return val.(*String)
 }
 
 func (s *String) GetLen() int {

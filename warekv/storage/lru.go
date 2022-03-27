@@ -1,14 +1,13 @@
-package cache
+package storage
 
 import (
 	"container/list"
 	"sync"
-	"ware-kv/warekv/storage"
 )
 
 type entry struct {
-	key   *storage.Key
-	value storage.Value
+	key   *Key
+	value Value
 }
 
 type LRUCache struct {
@@ -27,7 +26,7 @@ func NewLRUCache(maxBytes int64) *LRUCache {
 	}
 }
 
-func (c *LRUCache) Get(key *storage.Key) storage.Value {
+func (c *LRUCache) Get(key *Key) Value {
 	c.rw.RLock()
 	defer c.rw.RUnlock()
 	if ele, ok := c.cache[key.GetKey()]; ok {
@@ -38,7 +37,7 @@ func (c *LRUCache) Get(key *storage.Key) storage.Value {
 	return nil
 }
 
-func (c *LRUCache) Set(key *storage.Key, value storage.Value) {
+func (c *LRUCache) Set(key *Key, value Value) {
 	c.rw.Lock()
 	defer c.rw.Unlock()
 	if e, ok := c.cache[key.GetKey()]; ok {
@@ -75,11 +74,11 @@ func (c *LRUCache) removeOldest() {
 	}
 }
 
-func (c *LRUCache) SetInTime(key *storage.Key, val storage.Value) {
+func (c *LRUCache) SetInTime(key *Key, val Value) {
 	c.Set(key, val)
 }
 
-func (c *LRUCache) Delete(key *storage.Key) {
+func (c *LRUCache) Delete(key *Key) {
 	// TODO
 }
 

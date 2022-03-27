@@ -6,8 +6,9 @@ import (
 	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
-	"ware-kv/warekv/ds"
 	"ware-kv/warekv/storage"
+	"ware-kv/warekv/storage/ds"
+	dstype "ware-kv/warekv/util"
 )
 
 type SetObjectParam struct {
@@ -52,13 +53,13 @@ func GetObjectFieldByKey(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ObjectDS) {
+	if !isKVTypeCorrect(c, val, dstype.ObjectDS) {
 		return
 	}
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
-		Val:  ds.Value2Object(val).GetFieldByKey(c.Param("field")),
+		Val:  storage.Value2Object(val).GetFieldByKey(c.Param("field")),
 	})
 }
 
@@ -82,7 +83,7 @@ func SetObjectFieldByKey(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ObjectDS) {
+	if !isKVTypeCorrect(c, val, dstype.ObjectDS) {
 		return
 	}
 
@@ -97,7 +98,7 @@ func SetObjectFieldByKey(c *gin.Context) {
 		return
 	}
 
-	object := ds.Value2Object(val)
+	object := storage.Value2Object(val)
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ObjectSetFieldByKey, time.Now().Unix(), filed, param.Val))
 	object.SetFieldByKey(filed, param.Val)
 	setNotify(key, object)

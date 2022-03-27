@@ -6,6 +6,7 @@ import (
 	"ware-kv/warekv"
 	"ware-kv/warekv/manager"
 	"ware-kv/warekv/storage"
+	dstype "ware-kv/warekv/util"
 )
 
 func Set(key *storage.Key, newVal storage.Value) {
@@ -47,7 +48,7 @@ func IsKVEffective(val storage.Value) (bool, int) {
 	return true, 0
 }
 
-func IsKVTypeCorrect(val storage.Value, tp storage.DSType) bool {
+func IsKVTypeCorrect(val storage.Value, tp dstype.DSType) bool {
 	if val.GetType() != tp {
 		return false
 	}

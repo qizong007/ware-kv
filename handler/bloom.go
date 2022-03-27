@@ -6,8 +6,9 @@ import (
 	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
-	"ware-kv/warekv/ds"
 	"ware-kv/warekv/storage"
+	"ware-kv/warekv/storage/ds"
+	dstype "ware-kv/warekv/util"
 )
 
 type BloomSpecificOption struct {
@@ -99,13 +100,13 @@ func GetBloomSize(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.BloomFilterDS) {
+	if !isKVTypeCorrect(c, val, dstype.BloomFilterDS) {
 		return
 	}
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
-		Val:  ds.Value2BloomFilter(val).GetSize(),
+		Val:  storage.Value2BloomFilter(val).GetSize(),
 	})
 }
 
@@ -118,11 +119,11 @@ func ClearBloom(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.BloomFilterDS) {
+	if !isKVTypeCorrect(c, val, dstype.BloomFilterDS) {
 		return
 	}
 
-	filter := ds.Value2BloomFilter(val)
+	filter := storage.Value2BloomFilter(val)
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.BloomFilterClear, time.Now().Unix()))
 	filter.ClearAll()
 	setNotify(key, filter)
@@ -147,13 +148,13 @@ func TestBloom(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.BloomFilterDS) {
+	if !isKVTypeCorrect(c, val, dstype.BloomFilterDS) {
 		return
 	}
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
-		Val:  ds.Value2BloomFilter(val).Test(data),
+		Val:  storage.Value2BloomFilter(val).Test(data),
 	})
 }
 
@@ -185,13 +186,13 @@ func GetBloomFalseRate(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.BloomFilterDS) {
+	if !isKVTypeCorrect(c, val, dstype.BloomFilterDS) {
 		return
 	}
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
-		Val:  ds.Value2BloomFilter(val).EstimateFalsePositiveRate(n),
+		Val:  storage.Value2BloomFilter(val).EstimateFalsePositiveRate(n),
 	})
 }
 
@@ -217,11 +218,11 @@ func AddBloom(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.BloomFilterDS) {
+	if !isKVTypeCorrect(c, val, dstype.BloomFilterDS) {
 		return
 	}
 
-	filter := ds.Value2BloomFilter(val)
+	filter := storage.Value2BloomFilter(val)
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.BloomFilterAdd, time.Now().Unix(), data))
 	filter.Add(data)
 	setNotify(key, filter)

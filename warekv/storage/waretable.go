@@ -64,7 +64,7 @@ func NewWareTable(shardOption *ShardOption, gcOption *WareGCOption) *WareTable {
 
 func (w *WareTable) start() {
 	for _, shard := range w.TableList {
-		shard.Start()
+		shard.start()
 	}
 	log.Println("WareTable's Write worker and GC worker start working...")
 }

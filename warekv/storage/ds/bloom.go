@@ -2,7 +2,6 @@ package ds
 
 import (
 	"sync"
-	"ware-kv/warekv/storage"
 	"ware-kv/warekv/util"
 )
 
@@ -26,7 +25,7 @@ type BloomFilterSpecificOption struct {
 // MakeBloomFilterSpecific 精确创建
 func MakeBloomFilterSpecific(option BloomFilterSpecificOption) *BloomFilter {
 	return &BloomFilter{
-		Base:   *NewBase(BloomFilterDS),
+		Base:   *NewBase(util.BloomFilterDS),
 		filter: util.NewBloomFilter(option.M, option.K),
 	}
 }
@@ -39,13 +38,9 @@ type BloomFilterFuzzyOption struct {
 // MakeBloomFilterFuzzy 模糊创建
 func MakeBloomFilterFuzzy(option BloomFilterFuzzyOption) *BloomFilter {
 	return &BloomFilter{
-		Base:   *NewBase(BloomFilterDS),
+		Base:   *NewBase(util.BloomFilterDS),
 		filter: util.NewBloomFilterWithEstimates(option.N, option.Fp),
 	}
-}
-
-func Value2BloomFilter(val storage.Value) *BloomFilter {
-	return val.(*BloomFilter)
 }
 
 func (b *BloomFilter) GetSize() uint64 {

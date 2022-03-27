@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
-	"ware-kv/warekv/storage"
+	"ware-kv/warekv/util"
 )
 
 type Lock struct {
@@ -40,12 +40,8 @@ func (l *Lock) GetValue() interface{} {
 
 func MakeLock() *Lock {
 	return &Lock{
-		Base: *NewBase(LockDS),
+		Base: *NewBase(util.LockDS),
 	}
-}
-
-func Value2Lock(val storage.Value) *Lock {
-	return val.(*Lock)
 }
 
 func (l *Lock) Lock(t int64, guid string) error {

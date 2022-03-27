@@ -6,8 +6,8 @@ import (
 	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
-	"ware-kv/warekv/ds"
 	"ware-kv/warekv/storage"
+	"ware-kv/warekv/storage/ds"
 	zlist "ware-kv/warekv/util"
 )
 
@@ -61,13 +61,13 @@ func GetZListLen(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ZListDS) {
+	if !isKVTypeCorrect(c, val, zlist.ZListDS) {
 		return
 	}
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
-		Val:  ds.Value2ZList(val).GetLen(),
+		Val:  storage.Value2ZList(val).GetLen(),
 	})
 }
 
@@ -91,11 +91,11 @@ func GetZListByPos(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ZListDS) {
+	if !isKVTypeCorrect(c, val, zlist.ZListDS) {
 		return
 	}
 
-	zList := ds.Value2ZList(val)
+	zList := storage.Value2ZList(val)
 
 	pos, err := util.Str2Int(posStr)
 	if err != nil {
@@ -141,11 +141,11 @@ func GetZListBetween(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ZListDS) {
+	if !isKVTypeCorrect(c, val, zlist.ZListDS) {
 		return
 	}
 
-	zList := ds.Value2ZList(val)
+	zList := storage.Value2ZList(val)
 
 	left, err := util.Str2Int(leftStr)
 	if err != nil {
@@ -197,11 +197,11 @@ func GetZListStartAt(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ZListDS) {
+	if !isKVTypeCorrect(c, val, zlist.ZListDS) {
 		return
 	}
 
-	zList := ds.Value2ZList(val)
+	zList := storage.Value2ZList(val)
 
 	left, err := util.Str2Int(leftStr)
 	if err != nil {
@@ -245,11 +245,11 @@ func GetZListEndAt(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ZListDS) {
+	if !isKVTypeCorrect(c, val, zlist.ZListDS) {
 		return
 	}
 
-	zList := ds.Value2ZList(val)
+	zList := storage.Value2ZList(val)
 
 	right, err := util.Str2Int(rightStr)
 	if err != nil {
@@ -302,11 +302,11 @@ func AddZList(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ZListDS) {
+	if !isKVTypeCorrect(c, val, zlist.ZListDS) {
 		return
 	}
 
-	zList := ds.Value2ZList(val)
+	zList := storage.Value2ZList(val)
 
 	if param.Element != nil {
 		slElement := []zlist.SlElement{*param.Element}
@@ -366,11 +366,11 @@ func RemoveZListByScore(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ZListDS) {
+	if !isKVTypeCorrect(c, val, zlist.ZListDS) {
 		return
 	}
 
-	zList := ds.Value2ZList(val)
+	zList := storage.Value2ZList(val)
 
 	if param.Score != nil {
 		wal(tracker.NewModifyCommand(key.GetKey(), tracker.ZListRemoveScore, time.Now().Unix(), *param.Score))
@@ -429,11 +429,11 @@ func GetZListBetweenScores(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ZListDS) {
+	if !isKVTypeCorrect(c, val, zlist.ZListDS) {
 		return
 	}
 
-	zList := ds.Value2ZList(val)
+	zList := storage.Value2ZList(val)
 
 	min, err := util.Str2Float64(minStr)
 	if err != nil {

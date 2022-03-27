@@ -2,7 +2,6 @@ package ds
 
 import (
 	"sync"
-	"ware-kv/warekv/storage"
 	"ware-kv/warekv/util"
 )
 
@@ -27,13 +26,9 @@ func (s *Set) setView() []interface{} {
 
 func MakeSet(list []interface{}) *Set {
 	return &Set{
-		Base: *NewBase(SetDS),
+		Base: *NewBase(util.SetDS),
 		set:  util.NewSet(list),
 	}
-}
-
-func Value2Set(val storage.Value) *Set {
-	return val.(*Set)
 }
 
 func (s *Set) GetSize() int {

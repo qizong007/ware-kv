@@ -8,7 +8,9 @@ import (
 	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
-	"ware-kv/warekv/ds"
+	"ware-kv/warekv/storage"
+	"ware-kv/warekv/storage/ds"
+	dstype "ware-kv/warekv/util"
 )
 
 const (
@@ -72,10 +74,10 @@ func Lock(c *gin.Context) {
 		if !isKVEffective(c, val) {
 			return
 		}
-		if !isKVTypeCorrect(c, val, ds.LockDS) {
+		if !isKVTypeCorrect(c, val, dstype.LockDS) {
 			return
 		}
-		lock = ds.Value2Lock(val)
+		lock = storage.Value2Lock(val)
 	}
 	err = lock.Lock(timeLimit, guid)
 	if err != nil {
@@ -115,11 +117,11 @@ func Unlock(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.LockDS) {
+	if !isKVTypeCorrect(c, val, dstype.LockDS) {
 		return
 	}
 
-	lock := ds.Value2Lock(val)
+	lock := storage.Value2Lock(val)
 
 	err = lock.Unlock(param.Guid)
 	if err != nil {

@@ -6,8 +6,9 @@ import (
 	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
-	"ware-kv/warekv/ds"
 	"ware-kv/warekv/storage"
+	"ware-kv/warekv/storage/ds"
+	dstype "ware-kv/warekv/util"
 )
 
 type SetCounterParam struct {
@@ -48,11 +49,11 @@ func IncrCounter(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.CounterDS) {
+	if !isKVTypeCorrect(c, val, dstype.CounterDS) {
 		return
 	}
 
-	counter := ds.Value2Counter(val)
+	counter := storage.Value2Counter(val)
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.CounterIncr, time.Now().Unix()))
 	counter.Incr()
 
@@ -72,7 +73,7 @@ func IncrByCounter(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.CounterDS) {
+	if !isKVTypeCorrect(c, val, dstype.CounterDS) {
 		return
 	}
 
@@ -96,7 +97,7 @@ func IncrByCounter(c *gin.Context) {
 		return
 	}
 
-	counter := ds.Value2Counter(val)
+	counter := storage.Value2Counter(val)
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.CounterIncrBy, time.Now().Unix(), delta))
 	counter.IncrBy(delta)
 
@@ -116,11 +117,11 @@ func DecrCounter(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.CounterDS) {
+	if !isKVTypeCorrect(c, val, dstype.CounterDS) {
 		return
 	}
 
-	counter := ds.Value2Counter(val)
+	counter := storage.Value2Counter(val)
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.CounterDecr, time.Now().Unix()))
 	counter.Decr()
 
@@ -140,7 +141,7 @@ func DecrByCounter(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.CounterDS) {
+	if !isKVTypeCorrect(c, val, dstype.CounterDS) {
 		return
 	}
 
@@ -164,7 +165,7 @@ func DecrByCounter(c *gin.Context) {
 		return
 	}
 
-	counter := ds.Value2Counter(val)
+	counter := storage.Value2Counter(val)
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.CounterDecrBy, time.Now().Unix(), delta))
 	counter.DecrBy(delta)
 

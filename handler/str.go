@@ -5,8 +5,9 @@ import (
 	"log"
 	"ware-kv/tracker"
 	"ware-kv/util"
-	"ware-kv/warekv/ds"
 	"ware-kv/warekv/storage"
+	"ware-kv/warekv/storage/ds"
+	dstype "ware-kv/warekv/util"
 )
 
 type SetStrParam struct {
@@ -47,12 +48,12 @@ func GetStrLen(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.StringDS) {
+	if !isKVTypeCorrect(c, val, dstype.StringDS) {
 		return
 	}
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
-		Val:  ds.Value2String(val).GetLen(),
+		Val:  storage.Value2String(val).GetLen(),
 	})
 }

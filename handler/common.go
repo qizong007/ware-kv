@@ -10,6 +10,7 @@ import (
 	"ware-kv/util"
 	"ware-kv/warekv"
 	"ware-kv/warekv/storage"
+	dstype "ware-kv/warekv/util"
 )
 
 func Get(c *gin.Context) {
@@ -118,7 +119,7 @@ func isKVEffective(c *gin.Context, val storage.Value) bool {
 	return isEffective
 }
 
-func isKVTypeCorrect(c *gin.Context, val storage.Value, tp storage.DSType) bool {
+func isKVTypeCorrect(c *gin.Context, val storage.Value, tp dstype.DSType) bool {
 	if !anticorrosive.IsKVTypeCorrect(val, tp) {
 		util.MakeResponse(c, &util.WareResponse{
 			Code: util.ValueTypeError,

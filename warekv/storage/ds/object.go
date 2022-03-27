@@ -2,7 +2,7 @@ package ds
 
 import (
 	"sync"
-	"ware-kv/warekv/storage"
+	"ware-kv/warekv/util"
 )
 
 type Object struct {
@@ -19,13 +19,9 @@ func (o *Object) GetValue() interface{} {
 
 func MakeObject(object map[string]interface{}) *Object {
 	return &Object{
-		Base:   *NewBase(ObjectDS),
+		Base:   *NewBase(util.ObjectDS),
 		object: object,
 	}
-}
-
-func Value2Object(val storage.Value) *Object {
-	return val.(*Object)
 }
 
 func (o *Object) GetFieldByKey(key string) interface{} {

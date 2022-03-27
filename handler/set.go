@@ -6,8 +6,9 @@ import (
 	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
-	"ware-kv/warekv/ds"
 	"ware-kv/warekv/storage"
+	"ware-kv/warekv/storage/ds"
+	dstype "ware-kv/warekv/util"
 )
 
 type SetSetParam struct {
@@ -52,13 +53,13 @@ func GetSetSize(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.SetDS) {
+	if !isKVTypeCorrect(c, val, dstype.SetDS) {
 		return
 	}
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
-		Val:  ds.Value2Set(val).GetSize(),
+		Val:  storage.Value2Set(val).GetSize(),
 	})
 }
 
@@ -91,11 +92,11 @@ func AddSet(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.SetDS) {
+	if !isKVTypeCorrect(c, val, dstype.SetDS) {
 		return
 	}
 
-	st := ds.Value2Set(val)
+	st := storage.Value2Set(val)
 
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.SetAdd, time.Now().Unix(), param.Element))
 	st.Add(param.Element)
@@ -135,11 +136,11 @@ func RemoveSet(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.SetDS) {
+	if !isKVTypeCorrect(c, val, dstype.SetDS) {
 		return
 	}
 
-	st := ds.Value2Set(val)
+	st := storage.Value2Set(val)
 
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.SetRemove, time.Now().Unix(), param.Element))
 	st.Remove(param.Element)
@@ -179,13 +180,13 @@ func ContainsSet(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.SetDS) {
+	if !isKVTypeCorrect(c, val, dstype.SetDS) {
 		return
 	}
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
-		Val:  ds.Value2Set(val).Contains(param.Element),
+		Val:  storage.Value2Set(val).Contains(param.Element),
 	})
 }
 
@@ -240,7 +241,7 @@ func get2SetIsOk(c *gin.Context) (*ds.Set, *ds.Set, bool) {
 	if !isKVEffective(c, val1) {
 		return nil, nil, false
 	}
-	if !isKVTypeCorrect(c, val1, ds.SetDS) {
+	if !isKVTypeCorrect(c, val1, dstype.SetDS) {
 		return nil, nil, false
 	}
 
@@ -252,11 +253,11 @@ func get2SetIsOk(c *gin.Context) (*ds.Set, *ds.Set, bool) {
 	if !isKVEffective(c, val2) {
 		return nil, nil, false
 	}
-	if !isKVTypeCorrect(c, val2, ds.SetDS) {
+	if !isKVTypeCorrect(c, val2, dstype.SetDS) {
 		return nil, nil, false
 	}
 
-	set1 := ds.Value2Set(val1)
-	set2 := ds.Value2Set(val2)
+	set1 := storage.Value2Set(val1)
+	set2 := storage.Value2Set(val2)
 	return set1, set2, true
 }

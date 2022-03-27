@@ -3,7 +3,6 @@ package ds
 import (
 	"fmt"
 	"sync"
-	"ware-kv/warekv/storage"
 	"ware-kv/warekv/util"
 )
 
@@ -21,13 +20,9 @@ func (b *Bitmap) GetValue() interface{} {
 
 func MakeBitmap() *Bitmap {
 	return &Bitmap{
-		Base:   *NewBase(BitmapDS),
+		Base:   *NewBase(util.BitmapDS),
 		bitmap: util.NewBitmap(),
 	}
-}
-
-func Value2Bitmap(val storage.Value) *Bitmap {
-	return val.(*Bitmap)
 }
 
 func (b *Bitmap) GetLen() int {

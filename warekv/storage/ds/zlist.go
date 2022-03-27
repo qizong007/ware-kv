@@ -3,7 +3,6 @@ package ds
 import (
 	"fmt"
 	"sync"
-	"ware-kv/warekv/storage"
 	"ware-kv/warekv/util"
 )
 
@@ -32,13 +31,9 @@ func MakeZList(list []util.SlElement) *ZList {
 		sl.Insert(list[i].Score, list[i].Val)
 	}
 	return &ZList{
-		Base:     *NewBase(ZListDS),
+		Base:     *NewBase(util.ZListDS),
 		skipList: sl,
 	}
-}
-
-func Value2ZList(val storage.Value) *ZList {
-	return val.(*ZList)
 }
 
 // GetListBetween Left-Close and Right-Open

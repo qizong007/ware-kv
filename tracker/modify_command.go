@@ -5,8 +5,8 @@ import (
 	"log"
 	"ware-kv/anticorrosive"
 	"ware-kv/warekv"
-	"ware-kv/warekv/ds"
 	"ware-kv/warekv/storage"
+	"ware-kv/warekv/storage/ds"
 	"ware-kv/warekv/util"
 )
 

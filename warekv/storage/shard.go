@@ -38,7 +38,7 @@ func newShard(writeQueueCap int, writeTickInterval time.Duration, gcOption *Ware
 	return shard
 }
 
-func (s *Shard) Start() {
+func (s *Shard) start() {
 	go s.scheduledBatchCommit()
 }
 

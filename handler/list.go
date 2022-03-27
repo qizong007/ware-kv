@@ -6,8 +6,9 @@ import (
 	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
-	"ware-kv/warekv/ds"
 	"ware-kv/warekv/storage"
+	"ware-kv/warekv/storage/ds"
+	dstype "ware-kv/warekv/util"
 )
 
 type SetListParam struct {
@@ -62,13 +63,13 @@ func GetListLen(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ListDS) {
+	if !isKVTypeCorrect(c, val, dstype.ListDS) {
 		return
 	}
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
-		Val:  ds.Value2List(val).GetLen(),
+		Val:  storage.Value2List(val).GetLen(),
 	})
 }
 
@@ -92,11 +93,11 @@ func GetListByPos(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ListDS) {
+	if !isKVTypeCorrect(c, val, dstype.ListDS) {
 		return
 	}
 
-	list := ds.Value2List(val)
+	list := storage.Value2List(val)
 
 	pos, err := util.Str2Int(posStr)
 	if err != nil {
@@ -142,11 +143,11 @@ func GetListBetween(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ListDS) {
+	if !isKVTypeCorrect(c, val, dstype.ListDS) {
 		return
 	}
 
-	list := ds.Value2List(val)
+	list := storage.Value2List(val)
 
 	left, err := util.Str2Int(leftStr)
 	if err != nil {
@@ -198,11 +199,11 @@ func GetListStartAt(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ListDS) {
+	if !isKVTypeCorrect(c, val, dstype.ListDS) {
 		return
 	}
 
-	list := ds.Value2List(val)
+	list := storage.Value2List(val)
 
 	left, err := util.Str2Int(leftStr)
 	if err != nil {
@@ -246,11 +247,11 @@ func GetListEndAt(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ListDS) {
+	if !isKVTypeCorrect(c, val, dstype.ListDS) {
 		return
 	}
 
-	list := ds.Value2List(val)
+	list := storage.Value2List(val)
 
 	right, err := util.Str2Int(rightStr)
 	if err != nil {
@@ -303,11 +304,11 @@ func AddList(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ListDS) {
+	if !isKVTypeCorrect(c, val, dstype.ListDS) {
 		return
 	}
 
-	list := ds.Value2List(val)
+	list := storage.Value2List(val)
 
 	if param.Element != nil {
 		element := []interface{}{param.Element}
@@ -358,11 +359,11 @@ func RemoveListElement(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ListDS) {
+	if !isKVTypeCorrect(c, val, dstype.ListDS) {
 		return
 	}
 
-	list := ds.Value2List(val)
+	list := storage.Value2List(val)
 
 	if param.Val != nil {
 		wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListRemoveVal, time.Now().Unix(), param.Val))
@@ -412,11 +413,11 @@ func RPushList(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ListDS) {
+	if !isKVTypeCorrect(c, val, dstype.ListDS) {
 		return
 	}
 
-	list := ds.Value2List(val)
+	list := storage.Value2List(val)
 
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListRPush, time.Now().Unix(), param.Element))
 	list.RPush(param.Element)
@@ -455,11 +456,11 @@ func LPushList(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ListDS) {
+	if !isKVTypeCorrect(c, val, dstype.ListDS) {
 		return
 	}
 
-	list := ds.Value2List(val)
+	list := storage.Value2List(val)
 
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListLPush, time.Now().Unix(), param.Element))
 	list.LPush(param.Element)
@@ -478,11 +479,11 @@ func RPopList(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ListDS) {
+	if !isKVTypeCorrect(c, val, dstype.ListDS) {
 		return
 	}
 
-	list := ds.Value2List(val)
+	list := storage.Value2List(val)
 
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListRPop, time.Now().Unix(), nil))
 	tail := list.RPop()
@@ -502,11 +503,11 @@ func LPopList(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.ListDS) {
+	if !isKVTypeCorrect(c, val, dstype.ListDS) {
 		return
 	}
 
-	list := ds.Value2List(val)
+	list := storage.Value2List(val)
 
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListLPop, time.Now().Unix(), nil))
 	head := list.LPop()

@@ -6,7 +6,9 @@ import (
 	"time"
 	"ware-kv/tracker"
 	"ware-kv/util"
-	"ware-kv/warekv/ds"
+	"ware-kv/warekv/storage"
+	"ware-kv/warekv/storage/ds"
+	dstype "ware-kv/warekv/util"
 )
 
 type SetBitmapParam struct {
@@ -50,11 +52,11 @@ func SetBitmap(c *gin.Context) {
 		if !isKVEffective(c, val) {
 			return
 		}
-		if !isKVTypeCorrect(c, val, ds.BitmapDS) {
+		if !isKVTypeCorrect(c, val, dstype.BitmapDS) {
 			return
 		}
 
-		bitmap = ds.Value2Bitmap(val)
+		bitmap = storage.Value2Bitmap(val)
 		wal(tracker.NewModifyCommand(key.GetKey(), tracker.BitmapSet, time.Now().Unix(), num))
 		bitmap.SetBit(num)
 		setNotify(key, bitmap)
@@ -74,13 +76,13 @@ func GetBitmapLen(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.BitmapDS) {
+	if !isKVTypeCorrect(c, val, dstype.BitmapDS) {
 		return
 	}
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
-		Val:  ds.Value2Bitmap(val).GetLen(),
+		Val:  storage.Value2Bitmap(val).GetLen(),
 	})
 }
 
@@ -93,7 +95,7 @@ func GetBitmapBit(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.BitmapDS) {
+	if !isKVTypeCorrect(c, val, dstype.BitmapDS) {
 		return
 	}
 
@@ -113,7 +115,7 @@ func GetBitmapBit(c *gin.Context) {
 
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
-		Val:  ds.Value2Bitmap(val).GetBit(num),
+		Val:  storage.Value2Bitmap(val).GetBit(num),
 	})
 }
 
@@ -138,11 +140,11 @@ func GetBitCount(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.BitmapDS) {
+	if !isKVTypeCorrect(c, val, dstype.BitmapDS) {
 		return
 	}
 
-	bitmap := ds.Value2Bitmap(val)
+	bitmap := storage.Value2Bitmap(val)
 
 	left, err := util.Str2Int(leftStr)
 	if err != nil {
@@ -199,11 +201,11 @@ func ClearBitmap(c *gin.Context) {
 	if !isKVEffective(c, val) {
 		return
 	}
-	if !isKVTypeCorrect(c, val, ds.BitmapDS) {
+	if !isKVTypeCorrect(c, val, dstype.BitmapDS) {
 		return
 	}
 
-	bitmap := ds.Value2Bitmap(val)
+	bitmap := storage.Value2Bitmap(val)
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.BitmapClear, time.Now().Unix(), num))
 	bitmap.ClearBit(num)
 

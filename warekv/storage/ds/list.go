@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"sync"
-	"ware-kv/warekv/storage"
+	"ware-kv/warekv/util"
 )
 
 type List struct {
@@ -31,13 +31,9 @@ func (l *List) listView() []interface{} {
 
 func MakeList(list []interface{}) *List {
 	return &List{
-		Base: *NewBase(ListDS),
+		Base: *NewBase(util.ListDS),
 		list: &list,
 	}
-}
-
-func Value2List(val storage.Value) *List {
-	return val.(*List)
 }
 
 func (l *List) GetListBetween(left int, right int) ([]interface{}, error) {

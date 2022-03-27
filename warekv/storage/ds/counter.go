@@ -2,7 +2,7 @@ package ds
 
 import (
 	"sync/atomic"
-	"ware-kv/warekv/storage"
+	"ware-kv/warekv/util"
 )
 
 type Counter struct {
@@ -16,13 +16,9 @@ func (c *Counter) GetValue() interface{} {
 
 func MakeCounter(val int64) *Counter {
 	return &Counter{
-		Base: *NewBase(CounterDS),
+		Base: *NewBase(util.CounterDS),
 		num:  val,
 	}
-}
-
-func Value2Counter(val storage.Value) *Counter {
-	return val.(*Counter)
 }
 
 func (c *Counter) IncrBy(delta int64) {
