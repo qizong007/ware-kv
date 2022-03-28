@@ -14,6 +14,8 @@ type Value interface {
 	WithExpireTime(t int64)
 	Update()
 	GetType() util.DSType
+	GetBase() *ds.Base
+	SetBase(*ds.Base)
 }
 
 func Value2Bitmap(val Value) *ds.Bitmap {

@@ -25,6 +25,17 @@ func MakeBitmap() *Bitmap {
 	}
 }
 
+func MakeBitmapFromList(list []uint64) *Bitmap {
+	bm := &Bitmap{
+		Base:   *NewBase(util.BitmapDS),
+		bitmap: util.NewBitmap(),
+	}
+	for i := range list {
+		bm.bitmap.Set(int(list[i]))
+	}
+	return bm
+}
+
 func (b *Bitmap) GetLen() int {
 	b.rw.RLock()
 	defer b.rw.RUnlock()

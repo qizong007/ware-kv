@@ -10,7 +10,6 @@ type WareEngine struct {
 	wTable          storage.KVTable
 	subscribeCenter *manager.SubscribeCenter
 	info            *machine.Info
-	// TODO camera(RDB)
 	// TODO Hot Key Sampling
 }
 

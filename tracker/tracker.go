@@ -59,7 +59,6 @@ func NewTracker(option *TrackerOption) *Tracker {
 		panic(fmt.Sprintf("NewTracker Fail: %v", err))
 		return nil
 	}
-	fmt.Println(bufTickInterval)
 	tracker = &Tracker{
 		file:       file,
 		buffer:     make([]byte, 0),

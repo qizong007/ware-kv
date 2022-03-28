@@ -109,7 +109,11 @@ func Register(r *gin.Engine) {
 	// subscribe
 	r.POST("/subscribe", SubscribeKey)
 
+	// camera save
+	r.POST("/camera/save", CameraSave)
+
 	// test
 	r.GET("/ping", Ping)
 	r.GET("/err", Err500)
+	r.POST("/camera/develop", CameraDevelop)
 }

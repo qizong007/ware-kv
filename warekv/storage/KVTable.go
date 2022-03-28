@@ -10,6 +10,7 @@ type KVTable interface {
 	KeyNum() int
 	Type() string
 	closer.Closer // for resource collection
+	Photographer
 }
 
 var GlobalTable KVTable

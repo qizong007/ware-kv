@@ -101,3 +101,12 @@ func (c *LRUCache) KeyNum() int {
 func (c *LRUCache) Type() string {
 	return "LRUCache"
 }
+
+func (c *LRUCache) View() []byte {
+	// TODO
+	return nil
+}
+
+func (c *LRUCache) GetFlag() Flag {
+	return TableFlag
+}

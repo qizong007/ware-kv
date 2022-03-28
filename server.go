@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gookit/color"
 	"time"
+	"ware-kv/camera"
 	"ware-kv/handler"
 	"ware-kv/tracker"
 	"ware-kv/warekv"
@@ -20,18 +21,22 @@ type WareKV struct {
 	engine  *warekv.WareEngine
 	router  *gin.Engine
 	tracker *tracker.Tracker
+	camera  *camera.Camera
 }
 
 func Boot(option *WareOption) {
 	bootTime := time.Now()
 	initOption(option)
 	tk := tracker.NewTracker(option.Tracker)
+	defer tk.Close()
+	cmr := camera.NewCamera(option.Camera)
+	defer cmr.Close()
 	Server = &WareKV{
 		engine:  warekv.New(option.WareEngine),
 		router:  gin.Default(),
 		tracker: tk,
+		camera:  cmr,
 	}
-	defer tk.Close()
 	tk.LoadTracker()
 	// Server.engine start in New()
 	defer Server.engine.Close()

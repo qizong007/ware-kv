@@ -43,6 +43,13 @@ func MakeBloomFilterFuzzy(option BloomFilterFuzzyOption) *BloomFilter {
 	}
 }
 
+func MakeBloomFilterFromView(view *util.BloomView) *BloomFilter {
+	return &BloomFilter{
+		Base:   *NewBase(util.BloomFilterDS),
+		filter: util.NewBloomFilterByView(view),
+	}
+}
+
 func (b *BloomFilter) GetSize() uint64 {
 	b.rw.RLock()
 	defer b.rw.RUnlock()

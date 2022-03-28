@@ -116,3 +116,20 @@ func (w *WareTable) KeyNum() int {
 func (w *WareTable) Type() string {
 	return "WareTable"
 }
+
+func (w *WareTable) View() []byte {
+	data := make([]byte, 0)
+	// table flag
+	data = append(data, uint8(TableFlag))
+	// keys num
+	data = append(data, util.IntToBytes(w.KeyNum())...)
+	// kv pairs
+	for _, shard := range w.TableList {
+		data = append(data, shard.view()...)
+	}
+	return data
+}
+
+func (w *WareTable) GetFlag() Flag {
+	return TableFlag
+}

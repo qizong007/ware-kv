@@ -84,6 +84,10 @@ func NewSubscribeCenter(option *SubscribeCenterOption) *SubscribeCenter {
 	return center
 }
 
+func GetSubscribeCenter() *SubscribeCenter {
+	return center
+}
+
 func (s *SubscribeCenter) start() {
 	go center.scheduledRetry()
 	fmt.Println("Subscriber's Retry worker starts working...")

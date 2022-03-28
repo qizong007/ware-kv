@@ -119,3 +119,16 @@ func (f *BloomFilter) Value() *BloomView {
 		Mem: f.mem.Value(),
 	}
 }
+
+func NewBloomFilterByView(view *BloomView) *BloomFilter {
+	bm := NewBitmapWithCap(view.M)
+	for _, num := range view.Mem {
+		bm.Set(int(num))
+	}
+	return &BloomFilter{
+		n:   view.N,
+		m:   view.M,
+		k:   view.K,
+		mem: bm,
+	}
+}

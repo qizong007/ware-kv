@@ -57,3 +57,16 @@ func (b *Base) Update() {
 func (b *Base) GetType() util.DSType {
 	return b.Type
 }
+
+func (b *Base) GetBase() *Base {
+	return b
+}
+
+func (b *Base) SetBase(base *Base) {
+	b.Type = base.Type
+	b.CreateTime = base.CreateTime
+	b.UpdateTime = base.UpdateTime
+	b.DeleteTime = base.DeleteTime
+	b.ExpireTime = base.ExpireTime
+	b.Version = base.Version
+}

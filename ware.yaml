@@ -34,5 +34,11 @@ WareEngine:
 
 # It's a WAL.
 Tracker:
-  FilePath: ./tracker.log # relative to 'tracker' dir
+  FilePath: ./tracker.log # default path is in cur dir
   BufRefreshTickInterval: 1000 # default is 1000 millisecond, 0 is real-time mode (scale: 200 - 5000)
+
+# It's a physics Log.
+Camera:
+  IsZip: false # default won't zip the file
+  FilePath: ./photo # default path is in cur dir
+  SaveTickInterval: 15 # default is 15 minutes (scale: >= 5)
