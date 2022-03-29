@@ -37,6 +37,9 @@ func Boot(option *WareOption) {
 		tracker: tk,
 		camera:  cmr,
 	}
+	// first load the camera
+	cmr.DevelopPhotos()
+	// then load the tracker
 	tk.LoadTracker()
 	// Server.engine start in New()
 	defer Server.engine.Close()

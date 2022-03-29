@@ -2,7 +2,6 @@ package camera
 
 import (
 	"encoding/json"
-	"fmt"
 	"ware-kv/warekv/storage"
 	"ware-kv/warekv/storage/ds"
 	dstype "ware-kv/warekv/util"
@@ -29,9 +28,6 @@ func reduceMetaInfo(data []byte) *MetaInfo {
 		IsZip:      (magicSwitch & zipFlag) > 0,
 		CreateTime: createTime,
 	}
-}
-
-type Content struct {
 }
 
 func reduceContent(data []byte) {
@@ -153,6 +149,5 @@ func resolveKVPair(tipe uint8, key string, baseJson string, valueJson string) {
 	var base ds.Base
 	_ = json.Unmarshal([]byte(baseJson), &base)
 	value.SetBase(&base)
-	fmt.Println(key, value.GetValue())
-	// GlobalTable.SetInTime(MakeKey(key), value)
+	storage.GlobalTable.SetInTime(storage.MakeKey(key), value)
 }

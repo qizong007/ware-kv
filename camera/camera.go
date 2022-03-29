@@ -39,11 +39,12 @@ import (
 // ( the 'key' is just a 'string' )
 
 type Camera struct {
-	filePath string
-	lock     sync.Mutex
-	ticker   *time.Ticker
-	closer   chan bool
-	isZip    bool
+	filePath   string
+	lock       sync.Mutex
+	ticker     *time.Ticker
+	closer     chan bool
+	isZip      bool
+	createTime int64
 }
 
 var camera *Camera
@@ -188,6 +189,8 @@ func (c *Camera) save(data []byte) {
 
 // DevelopPhotos decoding the bin file, load the data
 func (c *Camera) DevelopPhotos() {
+	log.Println("Camera start loading the photo...")
+	start := time.Now()
 	data, err := ioutil.ReadFile(c.filePath)
 	if err != nil {
 		log.Println("DevelopPhotos ReadFile Failed:", err)
@@ -203,7 +206,7 @@ func (c *Camera) DevelopPhotos() {
 	}
 
 	meta := reduceMetaInfo(data)
-	fmt.Println(meta)
+	c.createTime = meta.CreateTime
 
 	content := data[totalHeadLen : len(data)-checkSumLen]
 	if meta.IsZip {
@@ -211,6 +214,7 @@ func (c *Camera) DevelopPhotos() {
 	}
 
 	reduceContent(content)
+	log.Printf("Camera finish loading in %s...\n", time.Since(start).String())
 }
 
 func ifCheckHeadOK(data []byte) bool {
@@ -238,4 +242,8 @@ func ifCheckSumOK(data []byte) bool {
 		}
 	}
 	return true
+}
+
+func (c *Camera) GetCreateTime() int64 {
+	return c.createTime
 }

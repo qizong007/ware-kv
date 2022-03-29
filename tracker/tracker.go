@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"ware-kv/camera"
 	"ware-kv/warekv/util"
 )
 
@@ -17,6 +18,10 @@ const (
 	defaultBufferTickInterval = 1000
 	bufferTickIntervalMin     = 200
 	bufferTickIntervalMax     = 5000
+	// encoding
+	opTypeLen    = 1
+	timeLen      = 8
+	commandStart = opTypeLen + timeLen
 )
 
 var tracker *Tracker
@@ -108,7 +113,7 @@ func (t *Tracker) LoadTracker() {
 			continue
 		}
 		var command Command
-		switch line[0:1] {
+		switch line[0:opTypeLen] {
 		case CreateOp:
 			command = &CreateCommand{}
 		case ModifyOp:
@@ -118,7 +123,12 @@ func (t *Tracker) LoadTracker() {
 		case SubscribeOp:
 			command = &SubCommand{}
 		}
-		resolveCommand(line[1:], command)
+		createTime := resolveTimeString(line[opTypeLen:commandStart])
+		if createTime < camera.GetCamera().GetCreateTime() {
+			// camera already load
+			continue
+		}
+		resolveCommand(line[commandStart:], command)
 		command.Execute()
 	}
 	log.Printf("Tracker finish loading in %s...\n", time.Since(start).String())
@@ -148,13 +158,24 @@ func (t *Tracker) scheduledRefresh() {
 	}
 }
 
+// | OpType (1 byte) | Time (8 bytes) | CommandString (n bytes) |
 func (t *Tracker) Write(command Command) {
 	t.bufLock.Lock()
 	defer t.bufLock.Unlock()
-	t.buffer = append(t.buffer, []byte(command.GetOpType()+command.String()+"\n")...)
+	t.buffer = append(t.buffer, []byte(command.GetOpType()+getTimeString()+command.String()+"\n")...)
 	if t.isRealTime {
 		t.flushToDisk()
 	}
+}
+
+func getTimeString() string {
+	timeBytes := util.Int64ToBytes(time.Now().Unix())
+	return string(timeBytes)
+}
+
+func resolveTimeString(timeStr string) int64 {
+	timeBytes := []byte(timeStr)
+	return util.BytesToInt64(timeBytes)
 }
 
 func (t *Tracker) refresh() {
