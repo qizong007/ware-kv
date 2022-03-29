@@ -33,15 +33,18 @@ type Tracker struct {
 	bufTicker  *time.Ticker
 	closer     chan bool
 	isRealTime bool
+	isOpen     bool
 }
 
 type TrackerOption struct {
+	Open                   bool   `yaml:"Open"`
 	FilePath               string `yaml:"FilePath"`
 	BufRefreshTickInterval uint   `yaml:"BufRefreshTickInterval"`
 }
 
 func DefaultOption() *TrackerOption {
 	return &TrackerOption{
+		Open:                   true,
 		FilePath:               defaultTrackPath,
 		BufRefreshTickInterval: defaultBufferTickInterval,
 	}
@@ -52,6 +55,9 @@ func NewTracker(option *TrackerOption) *Tracker {
 	bufTickInterval := uint(defaultBufferTickInterval)
 	isRealTime := false
 	if option != nil {
+		if !option.Open {
+			return &Tracker{isOpen: false}
+		}
 		filePath = option.FilePath
 		bufTickInterval = option.BufRefreshTickInterval
 		if bufTickInterval == 0 {
@@ -65,6 +71,7 @@ func NewTracker(option *TrackerOption) *Tracker {
 		return nil
 	}
 	tracker = &Tracker{
+		isOpen:     true,
 		file:       file,
 		buffer:     make([]byte, 0),
 		isRealTime: isRealTime,
@@ -89,13 +96,16 @@ func (t *Tracker) start() {
 }
 
 func (t *Tracker) Close() {
-	if t.isRealTime {
+	if !t.isOpen || t.isRealTime {
 		return
 	}
 	t.closer <- true
 }
 
 func (t *Tracker) LoadTracker() {
+	if !t.isOpen {
+		return
+	}
 	log.Println("Tracker start loading...")
 	start := time.Now()
 	data, err := ioutil.ReadAll(t.file)
@@ -160,6 +170,9 @@ func (t *Tracker) scheduledRefresh() {
 
 // | OpType (1 byte) | Time (8 bytes) | CommandString (n bytes) |
 func (t *Tracker) Write(command Command) {
+	if !t.isOpen {
+		return
+	}
 	t.bufLock.Lock()
 	defer t.bufLock.Unlock()
 	t.buffer = append(t.buffer, []byte(command.GetOpType()+getTimeString()+command.String()+"\n")...)

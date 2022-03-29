@@ -34,6 +34,7 @@ WareEngine:
 
 # It's a WAL.
 Tracker:
+  Open: true # default is true, set 'false' to turn it down
   FilePath: ./tracker.log # default path is in cur dir
   BufRefreshTickInterval: 1000 # default is 1000 millisecond, 0 is real-time mode (scale: 200 - 5000)
 
