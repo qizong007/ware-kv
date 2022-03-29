@@ -55,7 +55,6 @@ func reduceContent(data []byte) {
 		case storage.SubscribeCenterFlag:
 			// todo
 		default:
-			fmt.Println(string(data[cur:]))
 			return
 		}
 	}

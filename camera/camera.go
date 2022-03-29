@@ -8,6 +8,7 @@ import (
 	"math"
 	"sync"
 	"time"
+	zip "ware-kv/util"
 	"ware-kv/warekv/storage"
 	"ware-kv/warekv/util"
 )
@@ -114,7 +115,7 @@ func (c *Camera) scheduledSave() {
 		case <-c.ticker.C:
 			// todo p := []storage.Photographer{storage.GlobalTable, manager.GetSubscribeCenter()}
 			p := []storage.Photographer{storage.GlobalTable}
-			c.TakePhotos(p)
+			c.TakePhotos(p, c.isZip)
 		case <-c.closer:
 			c.ticker.Stop()
 			close(c.closer)
@@ -125,7 +126,7 @@ func (c *Camera) scheduledSave() {
 }
 
 // TakePhotos encoding to bin file, just like 'take photos'
-func (c *Camera) TakePhotos(p []storage.Photographer) {
+func (c *Camera) TakePhotos(p []storage.Photographer, needZip bool) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
@@ -156,8 +157,8 @@ func (c *Camera) TakePhotos(p []storage.Photographer) {
 		view := kvPairs.View()
 		content = append(content, view...)
 	}
-	if c.isZip {
-		// todo zip
+	if needZip {
+		zip.ZipBytes(content)
 	}
 
 	data = append(data, content...)
@@ -212,7 +213,7 @@ func (c *Camera) DevelopPhotos() {
 
 	content := data[totalHeadLen : len(data)-checkSumLen]
 	if meta.IsZip {
-		// todo unzip
+		content = zip.UnzipBytes(content)
 	}
 
 	reduceContent(content)
