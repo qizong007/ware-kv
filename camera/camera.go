@@ -165,11 +165,7 @@ func (c *Camera) TakePhotos(p []storage.Photographer, needZip bool) {
 
 	// check sum (64 bytes)
 	checkSum := blake2b.Sum512(data)
-	checkSumBytes := make([]byte, checkSumLen)
-	for i := 0; i < checkSumLen; i++ {
-		checkSumBytes[i] = checkSum[i]
-	}
-	data = append(data, checkSumBytes...)
+	data = append(data, checkSum[:]...)
 
 	// save the bin file
 	c.save(data)
