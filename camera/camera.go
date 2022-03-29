@@ -50,9 +50,9 @@ var camera *Camera
 
 const (
 	magicHead           = "warekv"
-	magicHeadLen        = 6
+	magicHeadLen        = len(magicHead)
 	wareKVVersion       = "001"
-	wareKVVersionLen    = 3
+	wareKVVersionLen    = len(wareKVVersion)
 	metaDataLen         = 64
 	totalHeadLen        = magicHeadLen + wareKVVersionLen + metaDataLen
 	checkSumLen         = blake2b.Size
@@ -144,9 +144,7 @@ func (c *Camera) TakePhotos(p []storage.Photographer, needZip bool) {
 	metaBytes[0] = c.generateMagicSwitch()
 	// fill the time
 	createTimeBytes := util.Int64ToBytes(time.Now().Unix())
-	for i := range createTimeBytes {
-		metaBytes[1+i] = createTimeBytes[i]
-	}
+	copy(metaBytes[1:], createTimeBytes)
 
 	data = append(data, magicHeadBytes...)
 	data = append(data, versionBytes...)
