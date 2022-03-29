@@ -56,7 +56,8 @@ func NewTracker(option *TrackerOption) *Tracker {
 	isRealTime := false
 	if option != nil {
 		if !option.Open {
-			return &Tracker{isOpen: false}
+			tracker = &Tracker{isOpen: false}
+			return tracker
 		}
 		filePath = option.FilePath
 		bufTickInterval = option.BufRefreshTickInterval
@@ -134,7 +135,7 @@ func (t *Tracker) LoadTracker() {
 			command = &SubCommand{}
 		}
 		createTime := resolveTimeString(line[opTypeLen:commandStart])
-		if createTime < camera.GetCamera().GetCreateTime() {
+		if camera.GetCamera().IsActive() && createTime < camera.GetCamera().GetCreateTime() {
 			// camera already load
 			continue
 		}

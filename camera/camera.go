@@ -44,6 +44,7 @@ type Camera struct {
 	ticker     *time.Ticker
 	closer     chan bool
 	isZip      bool
+	isOpen     bool
 	createTime int64
 }
 
@@ -64,6 +65,7 @@ const (
 )
 
 type CameraOption struct {
+	Open             bool   `yaml:"Open"`
 	IsZip            bool   `yaml:"IsZip"`
 	FilePath         string `yaml:"FilePath"`
 	SaveTickInterval uint   `yaml:"SaveTickInterval"`
@@ -71,6 +73,7 @@ type CameraOption struct {
 
 func DefaultOption() *CameraOption {
 	return &CameraOption{
+		Open:             true,
 		IsZip:            false,
 		FilePath:         defaultCameraPath,
 		SaveTickInterval: defaultTickInterval,
@@ -82,6 +85,10 @@ func NewCamera(option *CameraOption) *Camera {
 	tickInterval := uint(defaultTickInterval)
 	isZip := false
 	if option != nil {
+		if !option.Open {
+			camera = &Camera{isOpen: false}
+			return camera
+		}
 		filePath = option.FilePath
 		isZip = option.IsZip
 		tickInterval = option.SaveTickInterval
@@ -89,6 +96,7 @@ func NewCamera(option *CameraOption) *Camera {
 	}
 	camera = &Camera{
 		filePath: filePath,
+		isOpen:   true,
 		isZip:    isZip,
 	}
 	camera.closer = make(chan bool)
@@ -107,6 +115,9 @@ func (c *Camera) start() {
 }
 
 func (c *Camera) Close() {
+	if !c.isOpen {
+		return
+	}
 	c.closer <- true
 }
 
@@ -128,6 +139,11 @@ func (c *Camera) scheduledSave() {
 
 // TakePhotos encoding to bin file, just like 'take photos'
 func (c *Camera) TakePhotos(p []storage.Photographer, needZip bool) {
+	if !c.isOpen {
+		log.Println("You don't have camera, can't take photos...")
+		return
+	}
+
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
@@ -168,6 +184,8 @@ func (c *Camera) TakePhotos(p []storage.Photographer, needZip bool) {
 
 	// save the bin file
 	c.save(data)
+
+	return
 }
 
 func (c *Camera) generateMagicSwitch() byte {
@@ -189,6 +207,10 @@ func (c *Camera) save(data []byte) {
 
 // DevelopPhotos decoding the bin file, load the data
 func (c *Camera) DevelopPhotos() {
+	if !c.isOpen {
+		return
+	}
+
 	log.Println("Camera start loading the photo...")
 	start := time.Now()
 	data, err := ioutil.ReadFile(c.filePath)
@@ -246,4 +268,8 @@ func ifCheckSumOK(data []byte) bool {
 
 func (c *Camera) GetCreateTime() int64 {
 	return c.createTime
+}
+
+func (c *Camera) IsActive() bool {
+	return c.isOpen
 }

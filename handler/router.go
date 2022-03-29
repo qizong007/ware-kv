@@ -115,5 +115,4 @@ func Register(r *gin.Engine) {
 	// test
 	r.GET("/ping", Ping)
 	r.GET("/err", Err500)
-	r.POST("/camera/develop", CameraDevelop)
 }

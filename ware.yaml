@@ -40,6 +40,7 @@ Tracker:
 
 # It's a physics Log.
 Camera:
+  Open: true # default is true, set 'false' to turn it down
   IsZip: false # default won't zip the file
   FilePath: ./photo # default path is in cur dir
   SaveTickInterval: 15 # default is 15 minutes (scale: >= 5)

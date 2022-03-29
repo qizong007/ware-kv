@@ -7,6 +7,7 @@ const (
 	KeyHasDeleted      = 20001
 	KeyHasExpired      = 20002
 	ValueTypeError     = 30001
+	CameraNotOpen      = 60001
 	TypeTransformError = 70001
 	ScopeError         = 80001
 	LockRaceError      = 90001
@@ -20,6 +21,7 @@ var ErrCode2Msg = map[int]string{
 	KeyHasDeleted:      "key has been deleted!",
 	KeyHasExpired:      "key has been expired!",
 	ValueTypeError:     "Error request type!",
+	CameraNotOpen:      "You don't have Camera though...",
 	TypeTransformError: "something wrong with type transform...",
 	ScopeError:         "scope is not in a right way!",
 	LockRaceError:      "lock race failed",

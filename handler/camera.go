@@ -24,16 +24,15 @@ func CameraSave(c *gin.Context) {
 		return
 	}
 
+	if !camera.GetCamera().IsActive() {
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.CameraNotOpen,
+		})
+	}
+
 	go camera.GetCamera().TakePhotos([]storage.Photographer{storage.GlobalTable}, param.NeedZip)
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 		Val:  "Save Worker Start...",
-	})
-}
-
-func CameraDevelop(c *gin.Context) {
-	camera.GetCamera().DevelopPhotos()
-	util.MakeResponse(c, &util.WareResponse{
-		Code: util.Success,
 	})
 }
