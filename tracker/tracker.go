@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 	"ware-kv/camera"
+	str "ware-kv/util"
 	"ware-kv/warekv/util"
 )
 
@@ -18,10 +19,7 @@ const (
 	defaultBufferTickInterval = 1000
 	bufferTickIntervalMin     = 200
 	bufferTickIntervalMax     = 5000
-	// encoding
-	opTypeLen    = 1
-	timeLen      = 8
-	commandStart = opTypeLen + timeLen
+	opTypeLen                 = 1
 )
 
 var tracker *Tracker
@@ -134,6 +132,7 @@ func (t *Tracker) LoadTracker() {
 		case SubscribeOp:
 			command = &SubCommand{}
 		}
+		commandStart := strings.IndexByte(line, '{')
 		createTime := resolveTimeString(line[opTypeLen:commandStart])
 		if camera.GetCamera().IsActive() && createTime < camera.GetCamera().GetCreateTime() {
 			// camera already load
@@ -183,13 +182,12 @@ func (t *Tracker) Write(command Command) {
 }
 
 func getTimeString() string {
-	timeBytes := util.Int64ToBytes(time.Now().Unix())
-	return string(timeBytes)
+	return fmt.Sprintf("%d", time.Now().Unix())
 }
 
 func resolveTimeString(timeStr string) int64 {
-	timeBytes := []byte(timeStr)
-	return util.BytesToInt64(timeBytes)
+	t, _ := str.Str2Int64(timeStr)
+	return t
 }
 
 func (t *Tracker) refresh() {
