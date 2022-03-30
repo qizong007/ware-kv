@@ -1,6 +1,6 @@
 package util
 
 const (
-	WareKVVersion          = "0.0.3"
-	WareKVVersionForCamera = "003"
+	WareKVVersion          = "0.0.4"
+	WareKVVersionForCamera = "004"
 )
