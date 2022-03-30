@@ -60,8 +60,9 @@ const (
 	checkSumLen         = blake2b.Size
 	zipFlag             = 1 << 0
 	defaultCameraPath   = "./photo"
-	defaultTickInterval = 15 // minutes
-	tickIntervalMin     = 5  // minutes
+	defaultTickInterval = 15                 // minutes
+	tickIntervalMin     = 5                  // minutes
+	tickIntervalMax     = int(math.MaxInt32) // minutes
 )
 
 type CameraOption struct {
@@ -92,7 +93,7 @@ func NewCamera(option *CameraOption) *Camera {
 		filePath = option.FilePath
 		isZip = option.IsZip
 		tickInterval = option.SaveTickInterval
-		tickInterval = uint(util.SetIfHitLimit(int(tickInterval), tickIntervalMin, math.MaxInt64))
+		tickInterval = uint(util.SetIfHitLimit(int(tickInterval), tickIntervalMin, tickIntervalMax))
 	}
 	camera = &Camera{
 		filePath: filePath,
