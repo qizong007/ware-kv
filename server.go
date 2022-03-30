@@ -8,6 +8,7 @@ import (
 	"ware-kv/camera"
 	"ware-kv/handler"
 	"ware-kv/tracker"
+	"ware-kv/util"
 	"ware-kv/warekv"
 )
 
@@ -61,7 +62,7 @@ func showFrame() {
 	color.HiGreen.Println("  | | /| / / __ `/ ___/ _ \\______/ //_/ | / /")
 	color.HiCyan.Println("  | |/ |/ / /_/ / /  /  __/_____/ ,<  | |/ /")
 	color.HiBlue.Print("  |__/|__/\\__,_/_/   \\___/     /_/|_| |___/")
-	color.HiMagenta.Println("         😎version_0.0.1@qizong007")
+	color.HiMagenta.Printf("         😎version_%s@qizong007\n", util.WareKVVersion)
 }
 
 func initOption(option *WareOption) {

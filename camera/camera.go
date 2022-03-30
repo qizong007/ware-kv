@@ -8,7 +8,7 @@ import (
 	"math"
 	"sync"
 	"time"
-	zip "ware-kv/util"
+	tool "ware-kv/util"
 	"ware-kv/warekv/storage"
 	"ware-kv/warekv/util"
 )
@@ -48,15 +48,17 @@ type Camera struct {
 	createTime int64
 }
 
-var camera *Camera
+var (
+	camera *Camera
+)
 
 const (
 	magicHead           = "warekv"
 	magicHeadLen        = len(magicHead)
-	wareKVVersion       = "001"
+	wareKVVersion       = tool.WareKVVersionForCamera
 	wareKVVersionLen    = len(wareKVVersion)
-	metaDataLen         = 64
 	totalHeadLen        = magicHeadLen + wareKVVersionLen + metaDataLen
+	metaDataLen         = 64
 	checkSumLen         = blake2b.Size
 	zipFlag             = 1 << 0
 	defaultCameraPath   = "./photo"
@@ -174,7 +176,7 @@ func (c *Camera) TakePhotos(p []storage.Photographer, needZip bool) {
 		content = append(content, view...)
 	}
 	if needZip {
-		zip.ZipBytes(content)
+		tool.ZipBytes(content)
 	}
 
 	data = append(data, content...)
@@ -233,7 +235,7 @@ func (c *Camera) DevelopPhotos() {
 
 	content := data[totalHeadLen : len(data)-checkSumLen]
 	if meta.IsZip {
-		content = zip.UnzipBytes(content)
+		content = tool.UnzipBytes(content)
 	}
 
 	reduceContent(content)
