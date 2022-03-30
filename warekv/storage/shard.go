@@ -182,7 +182,7 @@ func kvPairView(key string, value Value) []byte {
 	// value len (4 bytes)
 	valueLen := len(valueBytes)
 
-	data := make([]byte, 0, 9+keyLen+valueLen)
+	data := make([]byte, 0, 13+keyLen+baseLen+valueLen)
 	data = append(data, tipe)
 	data = append(data, util.IntToBytes(keyLen)...)
 	data = append(data, keyBytes...)
