@@ -2,6 +2,7 @@ package camera
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/qizong007/ware-kv/warekv/storage"
 	"github.com/qizong007/ware-kv/warekv/storage/ds"
 	dstype "github.com/qizong007/ware-kv/warekv/util"
@@ -61,6 +62,7 @@ func reduceKVTableView(data []byte, keyNum int) int {
 		return 0
 	}
 	cur := 0
+	fmt.Println(keyNum)
 	for i := 0; i < keyNum; i++ {
 		// resolve for type (1 byte)
 		tipe := data[cur]
@@ -84,6 +86,7 @@ func reduceKVTableView(data []byte, keyNum int) int {
 		valueJson := string(data[cur : cur+valueLen])
 		cur += valueLen
 
+		fmt.Println(tipe, key, baseJson, valueJson)
 		resolveKVPair(tipe, key, baseJson, valueJson)
 	}
 	return cur
@@ -150,4 +153,38 @@ func resolveKVPair(tipe uint8, key string, baseJson string, valueJson string) {
 	_ = json.Unmarshal([]byte(baseJson), &base)
 	value.SetBase(&base)
 	storage.GlobalTable.SetInTime(storage.MakeKey(key), value)
+}
+
+func reduceSubscribeCenterView(data []byte, keyNum int) int {
+	if len(data) == 0 {
+		return 0
+	}
+	cur := 0
+	for i := 0; i < keyNum; i++ {
+		// resolve for type (1 byte)
+		tipe := data[cur]
+		cur++
+		// resolve for key len (4 byte)
+		keyLen := dstype.BytesToInt(data[cur : cur+4])
+		cur += 4
+		// resolve for key (keyLen byte)
+		key := string(data[cur : cur+keyLen])
+		cur += keyLen
+		// resolve for base len (4 byte)
+		baseLen := dstype.BytesToInt(data[cur : cur+4])
+		cur += 4
+		// resolve for base json (value len byte)
+		baseJson := string(data[cur : cur+baseLen])
+		cur += baseLen
+		// resolve for value len (4 byte)
+		valueLen := dstype.BytesToInt(data[cur : cur+4])
+		cur += 4
+		// resolve for value json (value len byte)
+		valueJson := string(data[cur : cur+valueLen])
+		cur += valueLen
+
+		fmt.Println(tipe, key, baseJson, valueJson)
+		resolveKVPair(tipe, key, baseJson, valueJson)
+	}
+	return cur
 }

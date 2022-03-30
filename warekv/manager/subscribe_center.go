@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/qizong007/ware-kv/warekv/storage"
 	"github.com/qizong007/ware-kv/warekv/util"
 	"log"
 	"net/http"
@@ -320,9 +321,60 @@ func (p *CallbackPlan) dealWithCallbackErr() {
 	}
 }
 
+func (p *CallbackPlan) view() []byte {
+	view := make([]byte, 0)
+	return view
+}
+
 type CallbackPlanOption struct {
 	callbackPath string
 	events       []int
 	retryTimes   int
 	isPersistent bool
+}
+
+func (s *SubscribeCenter) View() []byte {
+	data := make([]byte, 0)
+	// subscribe center
+	data = append(data, uint8(storage.SubscribeCenterFlag))
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	// sub keys num
+	data = append(data, util.IntToBytes(len(s.record))...)
+	// sub kv pairs
+	for key, callbackPlanList := range s.record {
+		data = append(data, subKVPairView(key, callbackPlanList)...)
+	}
+	return data
+}
+
+func subKVPairView(key string, callbackPlans []*CallbackPlan) []byte {
+	// key (key len bytes)
+	keyBytes := []byte(key)
+
+	// value (value len bytes)
+	valueBytes, err := json.Marshal(callbackPlans)
+	fmt.Println(string(valueBytes))
+	if err != nil {
+		log.Println(key, "value json marsh failed!")
+		return []byte{}
+	}
+
+	// key len (4 bytes)
+	keyLen := len(keyBytes)
+
+	// value len (4 bytes)
+	valueLen := len(valueBytes)
+
+	data := make([]byte, 0, 8+keyLen+valueLen)
+	data = append(data, util.IntToBytes(keyLen)...)
+	data = append(data, keyBytes...)
+	data = append(data, util.IntToBytes(valueLen)...)
+	data = append(data, valueBytes...)
+
+	return data
+}
+
+func (s *SubscribeCenter) GetFlag() storage.Flag {
+	return storage.SubscribeCenterFlag
 }
