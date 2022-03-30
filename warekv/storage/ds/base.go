@@ -1,8 +1,8 @@
 package ds
 
 import (
+	"github.com/qizong007/ware-kv/warekv/util"
 	"time"
-	"ware-kv/warekv/util"
 )
 
 type Base struct {

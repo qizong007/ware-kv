@@ -1,9 +1,9 @@
 package warekv
 
 import (
-	"ware-kv/warekv/machine"
-	"ware-kv/warekv/manager"
-	"ware-kv/warekv/storage"
+	"github.com/qizong007/ware-kv/warekv/machine"
+	"github.com/qizong007/ware-kv/warekv/manager"
+	"github.com/qizong007/ware-kv/warekv/storage"
 )
 
 type WareEngine struct {

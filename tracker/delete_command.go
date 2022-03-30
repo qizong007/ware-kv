@@ -2,9 +2,9 @@ package tracker
 
 import (
 	"encoding/json"
+	"github.com/qizong007/ware-kv/warekv"
+	"github.com/qizong007/ware-kv/warekv/storage"
 	"log"
-	"ware-kv/warekv"
-	"ware-kv/warekv/storage"
 )
 
 type DeleteCommand struct {

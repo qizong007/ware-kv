@@ -2,13 +2,13 @@ package machine
 
 import (
 	"fmt"
+	"github.com/qizong007/ware-kv/warekv/storage"
+	"github.com/qizong007/ware-kv/warekv/util"
 	"github.com/shirou/gopsutil/process"
 	"log"
 	"os"
 	"runtime"
 	"time"
-	"ware-kv/warekv/storage"
-	"ware-kv/warekv/util"
 )
 
 const (

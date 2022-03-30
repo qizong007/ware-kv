@@ -2,8 +2,8 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/qizong007/ware-kv/warekv/machine"
 	"net/http"
-	"ware-kv/warekv/machine"
 )
 
 func Info(c *gin.Context) {

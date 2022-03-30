@@ -2,9 +2,9 @@ package ds
 
 import (
 	"fmt"
+	"github.com/qizong007/ware-kv/warekv/util"
 	"sync"
 	"time"
-	"ware-kv/warekv/util"
 )
 
 type Lock struct {

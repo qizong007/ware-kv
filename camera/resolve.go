@@ -2,9 +2,9 @@ package camera
 
 import (
 	"encoding/json"
-	"ware-kv/warekv/storage"
-	"ware-kv/warekv/storage/ds"
-	dstype "ware-kv/warekv/util"
+	"github.com/qizong007/ware-kv/warekv/storage"
+	"github.com/qizong007/ware-kv/warekv/storage/ds"
+	dstype "github.com/qizong007/ware-kv/warekv/util"
 )
 
 const (

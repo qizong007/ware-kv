@@ -1,12 +1,12 @@
 package anticorrosive
 
 import (
+	"github.com/qizong007/ware-kv/util"
+	"github.com/qizong007/ware-kv/warekv"
+	"github.com/qizong007/ware-kv/warekv/manager"
+	"github.com/qizong007/ware-kv/warekv/storage"
+	dstype "github.com/qizong007/ware-kv/warekv/util"
 	"log"
-	"ware-kv/util"
-	"ware-kv/warekv"
-	"ware-kv/warekv/manager"
-	"ware-kv/warekv/storage"
-	dstype "ware-kv/warekv/util"
 )
 
 func Set(key *storage.Key, newVal storage.Value) {

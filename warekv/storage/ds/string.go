@@ -1,7 +1,7 @@
 package ds
 
 import (
-	"ware-kv/warekv/util"
+	"github.com/qizong007/ware-kv/warekv/util"
 )
 
 type String struct {

@@ -2,9 +2,9 @@ package ds
 
 import (
 	"fmt"
+	"github.com/qizong007/ware-kv/warekv/util"
 	"reflect"
 	"sync"
-	"ware-kv/warekv/util"
 )
 
 type List struct {

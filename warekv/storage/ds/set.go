@@ -1,8 +1,8 @@
 package ds
 
 import (
+	"github.com/qizong007/ware-kv/warekv/util"
 	"sync"
-	"ware-kv/warekv/util"
 )
 
 type Set struct {

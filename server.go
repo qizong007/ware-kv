@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gookit/color"
+	"github.com/qizong007/ware-kv/camera"
+	"github.com/qizong007/ware-kv/handler"
+	"github.com/qizong007/ware-kv/tracker"
+	"github.com/qizong007/ware-kv/util"
+	"github.com/qizong007/ware-kv/warekv"
 	"time"
-	"ware-kv/camera"
-	"ware-kv/handler"
-	"ware-kv/tracker"
-	"ware-kv/util"
-	"ware-kv/warekv"
 )
 
 const (

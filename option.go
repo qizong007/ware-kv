@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/qizong007/ware-kv/camera"
+	"github.com/qizong007/ware-kv/tracker"
+	"github.com/qizong007/ware-kv/warekv"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"ware-kv/camera"
-	"ware-kv/tracker"
-	"ware-kv/warekv"
 )
 
 type WareOption struct {

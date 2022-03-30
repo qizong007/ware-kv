@@ -1,8 +1,8 @@
 package storage
 
 import (
-	"ware-kv/warekv/storage/ds"
-	"ware-kv/warekv/util"
+	"github.com/qizong007/ware-kv/warekv/storage/ds"
+	"github.com/qizong007/ware-kv/warekv/util"
 )
 
 // Value all the data structure should implement it

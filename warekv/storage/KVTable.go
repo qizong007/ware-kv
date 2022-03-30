@@ -1,6 +1,6 @@
 package storage
 
-import "ware-kv/warekv/closer"
+import "github.com/qizong007/ware-kv/warekv/closer"
 
 type KVTable interface {
 	Get(key *Key) Value

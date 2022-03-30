@@ -2,8 +2,8 @@ package ds
 
 import (
 	"fmt"
+	"github.com/qizong007/ware-kv/warekv/util"
 	"sync"
-	"ware-kv/warekv/util"
 )
 
 type Bitmap struct {

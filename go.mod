@@ -1,4 +1,4 @@
-module ware-kv
+module github.com/qizong007/ware-kv
 
 go 1.16
 

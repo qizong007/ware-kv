@@ -2,9 +2,9 @@ package tracker
 
 import (
 	"encoding/json"
+	"github.com/qizong007/ware-kv/warekv"
+	"github.com/qizong007/ware-kv/warekv/manager"
 	"log"
-	"ware-kv/warekv"
-	"ware-kv/warekv/manager"
 )
 
 type SubCommand struct {
