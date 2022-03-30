@@ -105,7 +105,6 @@ func (t *Tracker) LoadTracker() {
 	if !t.isOpen {
 		return
 	}
-	log.Println("Tracker start loading...")
 	start := time.Now()
 	data, err := ioutil.ReadAll(t.file)
 	if err != nil {
@@ -141,7 +140,7 @@ func (t *Tracker) LoadTracker() {
 		resolveCommand(line[commandStart:], command)
 		command.Execute()
 	}
-	log.Printf("Tracker finish loading in %s...\n", time.Since(start).String())
+	log.Printf("Tracker finished loading in %s...\n", time.Since(start).String())
 }
 
 func resolveCommand(command string, cmd Command) {

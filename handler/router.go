@@ -3,6 +3,8 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/qizong007/ware-kv/util"
+	"log"
+	"time"
 )
 
 // PUT:
@@ -11,6 +13,8 @@ import (
 //  Create/Append a new element that belongs to the CURRENT resource to the resource group
 
 func Register(r *gin.Engine) {
+	start := time.Now()
+
 	// add ticker
 	r.Use(util.TimeKeeping())
 
@@ -115,4 +119,6 @@ func Register(r *gin.Engine) {
 	// test
 	r.GET("/ping", Ping)
 	r.GET("/err", Err500)
+
+	log.Printf("Router finished loading in %s...\n", time.Since(start))
 }

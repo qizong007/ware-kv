@@ -214,7 +214,6 @@ func (c *Camera) DevelopPhotos() {
 		return
 	}
 
-	log.Println("Camera start loading the photo...")
 	start := time.Now()
 	data, err := ioutil.ReadFile(c.filePath)
 	if err != nil {
@@ -239,7 +238,7 @@ func (c *Camera) DevelopPhotos() {
 	}
 
 	reduceContent(content)
-	log.Printf("Camera finish loading in %s...\n", time.Since(start).String())
+	log.Printf("Camera finished loading in %s...\n", time.Since(start).String())
 }
 
 func ifCheckHeadOK(data []byte) bool {

@@ -90,7 +90,7 @@ func GetSubscribeCenter() *SubscribeCenter {
 
 func (s *SubscribeCenter) start() {
 	go center.scheduledRetry()
-	fmt.Println("Subscriber's Retry worker starts working...")
+	log.Println("Subscriber's Retry worker starts working...")
 }
 
 func (s *SubscribeCenter) Close() {

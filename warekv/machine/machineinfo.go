@@ -1,7 +1,6 @@
 package machine
 
 import (
-	"fmt"
 	"github.com/qizong007/ware-kv/warekv/storage"
 	"github.com/qizong007/ware-kv/warekv/util"
 	"github.com/shirou/gopsutil/process"
@@ -84,7 +83,7 @@ func sumKeysCount(list []int) int {
 func (i *Info) start() {
 	wareInfo.updateInfo()
 	go wareInfo.refresh()
-	fmt.Println("MachineInfo's Refresh worker starts working...")
+	log.Println("MachineInfo's Refresh worker starts working...")
 }
 
 func (i *Info) Close() {

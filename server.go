@@ -32,6 +32,7 @@ func Boot(option *WareOption) {
 	defer tk.Close()
 	cmr := camera.NewCamera(option.Camera)
 	defer cmr.Close()
+	gin.SetMode(gin.ReleaseMode)
 	Server = &WareKV{
 		engine:  warekv.New(option.WareEngine),
 		router:  gin.Default(),
@@ -45,14 +46,14 @@ func Boot(option *WareOption) {
 	// Server.engine start in New()
 	defer Server.engine.Close()
 	handler.Register(Server.router)
-	fmt.Println(" -----------------------------------")
-	fmt.Printf("  Ware-KV Loading Cost %s  \n", time.Since(bootTime).String())
-	fmt.Println(" -----------------------------------")
 	showFrame()
 	port := defaultPort
 	if option != nil {
 		port = option.Port
 	}
+	fmt.Println(" -----------------------------------------------------------")
+	fmt.Printf("  Ware-KV Loading Cost %s, listening on port:%s \n", time.Since(bootTime).String(), port)
+	fmt.Println(" -----------------------------------------------------------")
 	Server.router.Run(fmt.Sprintf(":%s", port))
 }
 
