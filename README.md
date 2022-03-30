@@ -9,6 +9,20 @@ It's a kv in-memory database, based on **HTTP RESTful** type.
 
 Just take a look at the [wiki](https://github.com/qizong007/ware-kv/wiki).
 
+## Installation
+
+You can get *ware-kv* by `go get`:
+
+```bash
+go get github.com/qizong/ware-kv
+```
+
+Then it will be installed in:
+
+ `$GOPATH/pkg/mod/github.com/qizong007/ware-kv@your_version`
+
+Or you can just download it in [Release](https://github.com/qizong007/ware-kv/releases).
+
 ## Why *ware-kv*?
 
 - Take [Redis](https://github.com/redis/redis), which is the main stream open-source kv in-memory database, for standard. But *ware-kv* got something different:
