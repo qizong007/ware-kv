@@ -14,7 +14,7 @@ Just take a look at the [wiki](https://github.com/qizong007/ware-kv/wiki).
 You can get *ware-kv* by `go get`:
 
 ```bash
-go get github.com/qizong/ware-kv
+go get github.com/qizong007/ware-kv
 ```
 
 Then it will be installed in:
