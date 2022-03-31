@@ -110,10 +110,10 @@ func (s *SubscribeCenter) Subscribe(option *SubscribeManifest) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	cpOption := &CallbackPlanOption{
-		callbackPath: option.CallbackPath,
-		events:       option.ExpectEvent,
-		retryTimes:   option.RetryTimes,
-		isPersistent: option.IsPersistent,
+		CallbackPath: option.CallbackPath,
+		Events:       option.ExpectEvent,
+		RetryTimes:   option.RetryTimes,
+		IsPersistent: option.IsPersistent,
 	}
 	plan := s.generateCallbackPlan(cpOption)
 	key := option.Key
@@ -174,18 +174,18 @@ func isEventInList(event int, list []int) bool {
 func (s *SubscribeCenter) generateCallbackPlan(option *CallbackPlanOption) *CallbackPlan {
 	plan := &CallbackPlan{
 		center:         s,
-		callbackPath:   option.callbackPath,
+		callbackPath:   option.CallbackPath,
 		callbackMethod: s.defaultCallbackMethod,
 		status:         callbackCreated,
 		expectEvent:    &[]int{CallbackSetEvent, CallbackDeleteEvent},
-		isPersistent:   option.isPersistent,
+		isPersistent:   option.IsPersistent,
 	}
-	if option.retryTimes != 0 {
-		plan.retryTimes = option.retryTimes
-		plan.leftRetryTimes = option.retryTimes
+	if option.RetryTimes != 0 {
+		plan.retryTimes = option.RetryTimes
+		plan.leftRetryTimes = option.RetryTimes
 	}
-	if option.events != nil {
-		*plan.expectEvent = option.events
+	if option.Events != nil {
+		*plan.expectEvent = option.Events
 	}
 	return plan
 }
@@ -327,15 +327,15 @@ func (p *CallbackPlan) view() []byte {
 }
 
 type CallbackPlanOption struct {
-	callbackPath string
-	events       []int
-	retryTimes   int
-	isPersistent bool
+	CallbackPath string
+	Events       []int
+	RetryTimes   int
+	IsPersistent bool
 }
 
 func (s *SubscribeCenter) View() []byte {
 	data := make([]byte, 0)
-	// subscribe center
+	// subscribe center flag
 	data = append(data, uint8(storage.SubscribeCenterFlag))
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -353,10 +353,10 @@ func subKVPairView(key string, callbackPlans []*CallbackPlan) []byte {
 	keyBytes := []byte(key)
 
 	// value (value len bytes)
-	valueBytes, err := json.Marshal(callbackPlans)
+	valueBytes, err := callbackPlanListView(callbackPlans)
 	fmt.Println(string(valueBytes))
 	if err != nil {
-		log.Println(key, "value json marsh failed!")
+		log.Println(key, "get callbackPlanListView failed!")
 		return []byte{}
 	}
 
@@ -373,6 +373,24 @@ func subKVPairView(key string, callbackPlans []*CallbackPlan) []byte {
 	data = append(data, valueBytes...)
 
 	return data
+}
+
+func callbackPlanListView(callbackPlans []*CallbackPlan) ([]byte, error) {
+	data := make([]byte, 0)
+	for _, callbackPlan := range callbackPlans {
+		cpo := &CallbackPlanOption{
+			CallbackPath: callbackPlan.callbackPath,
+			Events:       *callbackPlan.expectEvent,
+			RetryTimes:   callbackPlan.leftRetryTimes,
+			IsPersistent: callbackPlan.isPersistent,
+		}
+		cpoBytes, err := json.Marshal(cpo)
+		if err != nil {
+			return []byte{}, err
+		}
+		data = append(data, cpoBytes...)
+	}
+	return data, nil
 }
 
 func (s *SubscribeCenter) GetFlag() storage.Flag {

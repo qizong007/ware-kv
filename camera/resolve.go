@@ -2,7 +2,7 @@ package camera
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/qizong007/ware-kv/warekv/manager"
 	"github.com/qizong007/ware-kv/warekv/storage"
 	"github.com/qizong007/ware-kv/warekv/storage/ds"
 	dstype "github.com/qizong007/ware-kv/warekv/util"
@@ -50,7 +50,8 @@ func reduceContent(data []byte) {
 			num := reduceKVTableView(data[cur:], keysNum)
 			cur += num
 		case storage.SubscribeCenterFlag:
-			// todo
+			num := reduceSubscribeCenterView(data[cur:], keysNum)
+			cur += num
 		default:
 			return
 		}
@@ -62,7 +63,6 @@ func reduceKVTableView(data []byte, keyNum int) int {
 		return 0
 	}
 	cur := 0
-	fmt.Println(keyNum)
 	for i := 0; i < keyNum; i++ {
 		// resolve for type (1 byte)
 		tipe := data[cur]
@@ -86,7 +86,6 @@ func reduceKVTableView(data []byte, keyNum int) int {
 		valueJson := string(data[cur : cur+valueLen])
 		cur += valueLen
 
-		fmt.Println(tipe, key, baseJson, valueJson)
 		resolveKVPair(tipe, key, baseJson, valueJson)
 	}
 	return cur
@@ -161,21 +160,12 @@ func reduceSubscribeCenterView(data []byte, keyNum int) int {
 	}
 	cur := 0
 	for i := 0; i < keyNum; i++ {
-		// resolve for type (1 byte)
-		tipe := data[cur]
-		cur++
 		// resolve for key len (4 byte)
 		keyLen := dstype.BytesToInt(data[cur : cur+4])
 		cur += 4
 		// resolve for key (keyLen byte)
 		key := string(data[cur : cur+keyLen])
 		cur += keyLen
-		// resolve for base len (4 byte)
-		baseLen := dstype.BytesToInt(data[cur : cur+4])
-		cur += 4
-		// resolve for base json (value len byte)
-		baseJson := string(data[cur : cur+baseLen])
-		cur += baseLen
 		// resolve for value len (4 byte)
 		valueLen := dstype.BytesToInt(data[cur : cur+4])
 		cur += 4
@@ -183,8 +173,20 @@ func reduceSubscribeCenterView(data []byte, keyNum int) int {
 		valueJson := string(data[cur : cur+valueLen])
 		cur += valueLen
 
-		fmt.Println(tipe, key, baseJson, valueJson)
-		resolveKVPair(tipe, key, baseJson, valueJson)
+		resolveSubKVPair(key, valueJson)
 	}
 	return cur
+}
+
+func resolveSubKVPair(key, valueJson string) {
+	var callbackPlanOption manager.CallbackPlanOption
+	_ = json.Unmarshal([]byte(valueJson), &callbackPlanOption)
+	manifest := manager.SubscribeManifest{
+		Key:          key,
+		CallbackPath: callbackPlanOption.CallbackPath,
+		ExpectEvent:  callbackPlanOption.Events,
+		RetryTimes:   callbackPlanOption.RetryTimes,
+		IsPersistent: callbackPlanOption.IsPersistent,
+	}
+	manager.GetSubscribeCenter().Subscribe(&manifest)
 }

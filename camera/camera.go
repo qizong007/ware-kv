@@ -3,6 +3,7 @@ package camera
 import (
 	"fmt"
 	tool "github.com/qizong007/ware-kv/util"
+	"github.com/qizong007/ware-kv/warekv/manager"
 	"github.com/qizong007/ware-kv/warekv/storage"
 	"github.com/qizong007/ware-kv/warekv/util"
 	"golang.org/x/crypto/blake2b"
@@ -128,8 +129,7 @@ func (c *Camera) scheduledSave() {
 	for {
 		select {
 		case <-c.ticker.C:
-			// todo p := []storage.Photographer{storage.GlobalTable, manager.GetSubscribeCenter()}
-			p := []storage.Photographer{storage.GlobalTable}
+			p := []storage.Photographer{storage.GlobalTable, manager.GetSubscribeCenter()}
 			c.TakePhotos(p, c.isZip)
 		case <-c.closer:
 			c.ticker.Stop()
