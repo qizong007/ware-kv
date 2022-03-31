@@ -2,6 +2,7 @@ package camera
 
 import (
 	"encoding/json"
+	"github.com/qizong007/ware-kv/warekv/manager"
 	"github.com/qizong007/ware-kv/warekv/storage"
 	"github.com/qizong007/ware-kv/warekv/storage/ds"
 	dstype "github.com/qizong007/ware-kv/warekv/util"
@@ -49,7 +50,8 @@ func reduceContent(data []byte) {
 			num := reduceKVTableView(data[cur:], keysNum)
 			cur += num
 		case storage.SubscribeCenterFlag:
-			// todo
+			num := reduceSubscribeCenterView(data[cur:], keysNum)
+			cur += num
 		default:
 			return
 		}
@@ -150,4 +152,41 @@ func resolveKVPair(tipe uint8, key string, baseJson string, valueJson string) {
 	_ = json.Unmarshal([]byte(baseJson), &base)
 	value.SetBase(&base)
 	storage.GlobalTable.SetInTime(storage.MakeKey(key), value)
+}
+
+func reduceSubscribeCenterView(data []byte, keyNum int) int {
+	if len(data) == 0 {
+		return 0
+	}
+	cur := 0
+	for i := 0; i < keyNum; i++ {
+		// resolve for key len (4 byte)
+		keyLen := dstype.BytesToInt(data[cur : cur+4])
+		cur += 4
+		// resolve for key (keyLen byte)
+		key := string(data[cur : cur+keyLen])
+		cur += keyLen
+		// resolve for value len (4 byte)
+		valueLen := dstype.BytesToInt(data[cur : cur+4])
+		cur += 4
+		// resolve for value json (value len byte)
+		valueJson := string(data[cur : cur+valueLen])
+		cur += valueLen
+
+		resolveSubKVPair(key, valueJson)
+	}
+	return cur
+}
+
+func resolveSubKVPair(key, valueJson string) {
+	var callbackPlanOption manager.CallbackPlanOption
+	_ = json.Unmarshal([]byte(valueJson), &callbackPlanOption)
+	manifest := manager.SubscribeManifest{
+		Key:          key,
+		CallbackPath: callbackPlanOption.CallbackPath,
+		ExpectEvent:  callbackPlanOption.Events,
+		RetryTimes:   callbackPlanOption.RetryTimes,
+		IsPersistent: callbackPlanOption.IsPersistent,
+	}
+	manager.GetSubscribeCenter().Subscribe(&manifest)
 }

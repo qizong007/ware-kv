@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/qizong007/ware-kv/camera"
 	"github.com/qizong007/ware-kv/util"
+	"github.com/qizong007/ware-kv/warekv/manager"
 	"github.com/qizong007/ware-kv/warekv/storage"
 	"log"
 )
@@ -30,7 +31,7 @@ func CameraSave(c *gin.Context) {
 		})
 	}
 
-	go camera.GetCamera().TakePhotos([]storage.Photographer{storage.GlobalTable}, param.NeedZip)
+	go camera.GetCamera().TakePhotos([]storage.Photographer{storage.GlobalTable, manager.GetSubscribeCenter()}, param.NeedZip)
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,
 		Val:  "Save Worker Start...",
