@@ -64,7 +64,7 @@ func NewTracker(option *TrackerOption) *Tracker {
 		}
 		bufTickInterval = uint(util.SetIfHitLimit(int(bufTickInterval), bufferTickIntervalMin, bufferTickIntervalMax))
 	}
-	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_APPEND, os.ModePerm)
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
 	if err != nil {
 		panic(fmt.Sprintf("NewTracker Fail: %v", err))
 		return nil
