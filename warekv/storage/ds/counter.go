@@ -3,6 +3,7 @@ package ds
 import (
 	"github.com/qizong007/ware-kv/warekv/util"
 	"sync/atomic"
+	"unsafe"
 )
 
 type Counter struct {
@@ -10,8 +11,21 @@ type Counter struct {
 	num int64
 }
 
+var counterStructMemUsage int
+
+func init() {
+	counterStructMemUsage = int(unsafe.Sizeof(Counter{}))
+}
+
 func (c *Counter) GetValue() interface{} {
 	return atomic.LoadInt64(&c.num)
+}
+
+func (c *Counter) Size() int {
+	if c.ExpireTime != nil {
+		return counterStructMemUsage + 8
+	}
+	return counterStructMemUsage
 }
 
 func MakeCounter(val int64) *Counter {

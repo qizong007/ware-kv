@@ -5,6 +5,7 @@ import (
 	"github.com/qizong007/ware-kv/warekv/util"
 	"reflect"
 	"sync"
+	"unsafe"
 )
 
 type List struct {
@@ -13,12 +14,18 @@ type List struct {
 	rw   sync.RWMutex
 }
 
+var listStructMemUsage int
+
+func init() {
+	listStructMemUsage = int(unsafe.Sizeof(List{}))
+}
+
 func (l *List) GetValue() interface{} {
 	val := l.listView()
 	return val
 }
 
-// 深拷贝
+// deep copy
 func (l *List) listView() []interface{} {
 	l.rw.RLock()
 	defer l.rw.RUnlock()
@@ -27,6 +34,22 @@ func (l *List) listView() []interface{} {
 		list[i] = e
 	}
 	return list
+}
+
+func (l *List) Size() int {
+	size := listStructMemUsage
+	if l.ExpireTime != nil {
+		size += 8
+	}
+	l.rw.RLock()
+	defer l.rw.RUnlock()
+	if l.list == nil || len(*l.list) == 0 {
+		return size
+	}
+	if rSize := util.GetRealSizeOf(*l.list); rSize > 0 {
+		size += rSize
+	}
+	return size
 }
 
 func MakeList(list []interface{}) *List {

@@ -16,6 +16,7 @@ type Value interface {
 	GetType() util.DSType
 	GetBase() *ds.Base
 	SetBase(*ds.Base)
+	Size() int
 }
 
 func Value2Bitmap(val Value) *ds.Bitmap {

@@ -3,12 +3,19 @@ package ds
 import (
 	"github.com/qizong007/ware-kv/warekv/util"
 	"sync"
+	"unsafe"
 )
 
 type Set struct {
 	Base
 	set *util.Set
 	rw  sync.RWMutex
+}
+
+var setStructMemUsage int
+
+func init() {
+	setStructMemUsage = int(unsafe.Sizeof(Set{}))
 }
 
 func (s *Set) GetValue() interface{} {
@@ -22,6 +29,19 @@ func (s *Set) setView() []interface{} {
 	defer s.rw.RUnlock()
 	list := s.set.Get()
 	return list
+}
+
+func (s *Set) Size() int {
+	size := setStructMemUsage
+	if s.ExpireTime != nil {
+		size += 8
+	}
+	s.rw.RLock()
+	defer s.rw.RUnlock()
+	if rSize := util.GetRealSizeOf(s.set); rSize > 0 {
+		size += rSize
+	}
+	return size
 }
 
 func MakeSet(list []interface{}) *Set {

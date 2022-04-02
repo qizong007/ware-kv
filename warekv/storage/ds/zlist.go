@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/qizong007/ware-kv/warekv/util"
 	"sync"
+	"unsafe"
 )
 
 // ZList sorted-list
@@ -11,6 +12,12 @@ type ZList struct {
 	Base
 	skipList *util.SkipList
 	rw       sync.RWMutex
+}
+
+var zListStructMemUsage int
+
+func init() {
+	zListStructMemUsage = int(unsafe.Sizeof(ZList{}))
 }
 
 type ZElement struct {
@@ -23,6 +30,19 @@ func (zl *ZList) GetValue() interface{} {
 	defer zl.rw.RUnlock()
 	val := zl.skipList.GetList()
 	return val
+}
+
+func (zl *ZList) Size() int {
+	size := zListStructMemUsage
+	if zl.ExpireTime != nil {
+		size += 8
+	}
+	zl.rw.RLock()
+	defer zl.rw.RUnlock()
+	if rSize := util.GetRealSizeOf(zl.skipList); rSize > 0 {
+		size += rSize
+	}
+	return size
 }
 
 func MakeZList(list []util.SlElement) *ZList {

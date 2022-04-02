@@ -3,6 +3,7 @@ package util
 import (
 	"encoding/binary"
 	"math"
+	"unsafe"
 )
 
 type BloomFilter struct {
@@ -10,6 +11,12 @@ type BloomFilter struct {
 	m   uint64
 	k   uint64
 	mem *Bitmap
+}
+
+var bloomFilterStructMemUsage int
+
+func init() {
+	bloomFilterStructMemUsage = int(unsafe.Sizeof(BloomFilter{}))
 }
 
 func max(x, y uint64) uint64 {
@@ -131,4 +138,8 @@ func NewBloomFilterByView(view *BloomView) *BloomFilter {
 		k:   view.K,
 		mem: bm,
 	}
+}
+
+func (f *BloomFilter) MemoryUsage() int {
+	return bloomFilterStructMemUsage + f.mem.MemoryUsage()
 }

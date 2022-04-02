@@ -3,6 +3,7 @@ package ds
 import (
 	"github.com/qizong007/ware-kv/warekv/util"
 	"sync"
+	"unsafe"
 )
 
 type BloomFilter struct {
@@ -11,10 +12,26 @@ type BloomFilter struct {
 	rw     sync.RWMutex
 }
 
+var bloomFilterStructMemUsage int
+
+func init() {
+	bloomFilterStructMemUsage = int(unsafe.Sizeof(BloomFilter{}))
+}
+
 func (b *BloomFilter) GetValue() interface{} {
 	b.rw.RLock()
 	defer b.rw.RUnlock()
 	return b.filter.Value()
+}
+
+func (b *BloomFilter) Size() int {
+	baseSize := bloomFilterStructMemUsage
+	if b.ExpireTime != nil {
+		baseSize += 8
+	}
+	b.rw.RLock()
+	defer b.rw.RUnlock()
+	return baseSize + b.filter.MemoryUsage()
 }
 
 type BloomFilterSpecificOption struct {

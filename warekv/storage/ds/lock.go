@@ -5,6 +5,7 @@ import (
 	"github.com/qizong007/ware-kv/warekv/util"
 	"sync"
 	"time"
+	"unsafe"
 )
 
 type Lock struct {
@@ -13,6 +14,12 @@ type Lock struct {
 	TimeLimit int64 // if hit TimeLimit, the lock will release
 	Guid      string
 	rw        sync.RWMutex
+}
+
+var lockStructMemUsage int
+
+func init() {
+	lockStructMemUsage = int(unsafe.Sizeof(Lock{}))
 }
 
 type LockView struct {
@@ -36,6 +43,15 @@ func (l *Lock) GetValue() interface{} {
 		IsLocked: l.State,
 		TimeLeft: t,
 	}
+}
+
+func (l *Lock) Size() int {
+	size := lockStructMemUsage
+	if l.ExpireTime != nil {
+		size += 8
+	}
+	size += len(l.Guid)
+	return size
 }
 
 func MakeLock() *Lock {

@@ -2,6 +2,7 @@ package util
 
 import (
 	"encoding/json"
+	"unsafe"
 )
 
 // For this 'Bitmap', every single bit is born to be 0.
@@ -9,6 +10,12 @@ import (
 type Bitmap struct {
 	val    []uint64
 	length int
+}
+
+var bitmapStructMemUsage int
+
+func init() {
+	bitmapStructMemUsage = int(unsafe.Sizeof(Bitmap{}))
 }
 
 func NewBitmap() *Bitmap {
@@ -133,4 +140,8 @@ func (bitmap *Bitmap) Value() []uint64 {
 func (bitmap *Bitmap) String() string {
 	bytes, _ := json.Marshal(bitmap.Value())
 	return string(bytes)
+}
+
+func (bitmap *Bitmap) MemoryUsage() int {
+	return (len(bitmap.val) << 3) + bitmapStructMemUsage
 }

@@ -3,6 +3,7 @@ package ds
 import (
 	"github.com/qizong007/ware-kv/warekv/util"
 	"sync"
+	"unsafe"
 )
 
 type Object struct {
@@ -11,10 +12,29 @@ type Object struct {
 	rw     sync.RWMutex
 }
 
+var objectStructMemUsage int
+
+func init() {
+	objectStructMemUsage = int(unsafe.Sizeof(Object{}))
+}
+
 func (o *Object) GetValue() interface{} {
 	o.rw.RLock()
 	defer o.rw.RUnlock()
 	return o.object
+}
+
+func (o *Object) Size() int {
+	size := objectStructMemUsage
+	if o.ExpireTime != nil {
+		size += 8
+	}
+	o.rw.RLock()
+	defer o.rw.RUnlock()
+	if rSize := util.GetRealSizeOf(o.object); rSize > 0 {
+		size += rSize
+	}
+	return size
 }
 
 func MakeObject(object map[string]interface{}) *Object {

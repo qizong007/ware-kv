@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/qizong007/ware-kv/warekv/util"
 	"sync"
+	"unsafe"
 )
 
 type Bitmap struct {
@@ -12,10 +13,26 @@ type Bitmap struct {
 	rw     sync.RWMutex
 }
 
+var bitmapStructMemUsage int
+
+func init() {
+	bitmapStructMemUsage = int(unsafe.Sizeof(Bitmap{}))
+}
+
 func (b *Bitmap) GetValue() interface{} {
 	b.rw.RLock()
 	defer b.rw.RUnlock()
 	return b.bitmap.Value()
+}
+
+func (b *Bitmap) Size() int {
+	baseSize := bitmapStructMemUsage
+	if b.ExpireTime != nil {
+		baseSize += 8
+	}
+	b.rw.RLock()
+	defer b.rw.RUnlock()
+	return baseSize + b.bitmap.MemoryUsage()
 }
 
 func MakeBitmap() *Bitmap {
