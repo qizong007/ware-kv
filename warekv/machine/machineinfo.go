@@ -53,12 +53,13 @@ func DefaultWareInfoOption() *WareInfoOption {
 }
 
 type InfoView struct {
-	Pid        int
-	CpuPercent float64
-	MemPercent float32
-	MemAlloc   uint64
-	KeysTotal  int
-	TableType  string
+	Pid        int     `json:"pid"`
+	CpuPercent float64 `json:"cpu_percent"`
+	MemPercent float32 `json:"mem_percent"`
+	MemAlloc   uint64  `json:"mem_alloc"`
+	MemUsed    uint64  `json:"mem_used"`
+	KeysTotal  int     `json:"keys_total"`
+	TableType  string  `json:"table_type"`
 }
 
 func GetWareInfo() *InfoView {
@@ -67,17 +68,10 @@ func GetWareInfo() *InfoView {
 		CpuPercent: wareInfo.cpuPercent,
 		MemPercent: wareInfo.memPercent,
 		MemAlloc:   wareInfo.memAlloc,
+		MemUsed:    uint64(storage.GlobalTable.MemUsage()),
 		KeysTotal:  storage.GlobalTable.KeyNum(),
 		TableType:  storage.GlobalTable.Type(),
 	}
-}
-
-func sumKeysCount(list []int) int {
-	sum := 0
-	for i := range list {
-		sum += list[i]
-	}
-	return sum
 }
 
 func (i *Info) start() {

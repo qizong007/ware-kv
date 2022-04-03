@@ -133,3 +133,11 @@ func (w *WareTable) View() []byte {
 func (w *WareTable) GetFlag() Flag {
 	return TableFlag
 }
+
+func (w *WareTable) MemUsage() int64 {
+	sum := int64(0)
+	for i := 0; i < w.TableNum; i++ {
+		sum += w.TableList[i].MemUsage()
+	}
+	return sum
+}

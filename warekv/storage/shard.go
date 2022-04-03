@@ -1,9 +1,6 @@
 package storage
 
 import (
-	"encoding/json"
-	"github.com/qizong007/ware-kv/warekv/util"
-	"log"
 	"sync"
 	"time"
 )
@@ -22,6 +19,7 @@ type Shard struct {
 	wqTicker   *time.Ticker   // write request's ticker
 	gc         *WareGC
 	closer     chan bool
+	usedBytes  int64
 }
 
 type writeReq struct {
@@ -36,6 +34,7 @@ func newShard(writeQueueCap int, writeTickInterval time.Duration, gcOption *Ware
 		writeQueue: make(chan *writeReq, writeQueueCap),
 		wqTicker:   time.NewTicker(writeTickInterval),
 		closer:     make(chan bool),
+		usedBytes:  0,
 	}
 	shard.gc = NewWareGC(shard, gcOption)
 	return shard
@@ -66,12 +65,28 @@ func (s *Shard) Set(key *Key, val Value) {
 func (s *Shard) SetInTime(key *Key, val Value) {
 	s.rw.Lock()
 	defer s.rw.Unlock()
-	s.table[key.GetKey()] = val
+	s.set(key.GetKey(), val)
+}
+
+func (s *Shard) set(key string, val Value) {
+	if v, ok := s.table[key]; !ok {
+		// first time, we need to add the key bytes
+		s.usedBytes += int64(len(key))
+	} else {
+		// if already had, just sub the v.Size() before
+		s.usedBytes -= int64(v.Size())
+	}
+	s.usedBytes += int64(val.Size())
+	s.table[key] = val
 }
 
 func (s *Shard) Delete(key *Key) {
 	s.rw.Lock()
-	s.table[key.GetKey()].DeleteValue()
+	k := key.GetKey()
+	if val, ok := s.table[k]; ok {
+		s.usedBytes -= int64(len(k) + val.Size())
+		val.DeleteValue()
+	}
 	s.rw.Unlock()
 	// mark and sweep
 	s.writeQueue <- &writeReq{
@@ -108,7 +123,7 @@ func (s *Shard) handleWriteQueue() {
 		key := entry.key.GetKey()
 		switch entry.event {
 		case SetEvent:
-			s.table[key] = entry.value
+			s.set(key, entry.value)
 		case DeleteEvent:
 			s.gc.Commit(key)
 		}
@@ -143,8 +158,8 @@ func (s *Shard) Count() int {
 }
 
 func (s *Shard) view() []byte {
-	s.rw.Lock()
-	defer s.rw.Unlock()
+	s.rw.RLock()
+	defer s.rw.RUnlock()
 	view := make([]byte, 0)
 	for k, v := range s.table {
 		view = append(view, kvPairView(k, v)...)
@@ -152,44 +167,8 @@ func (s *Shard) view() []byte {
 	return view
 }
 
-func kvPairView(key string, value Value) []byte {
-	// type (1 byte)
-	tipe := byte(value.GetType())
-
-	// key (key len bytes)
-	keyBytes := []byte(key)
-
-	// base (base len bytes)
-	baseBytes, err := json.Marshal(value.GetBase())
-	if err != nil {
-		log.Println(key, "base json marsh failed!")
-		return []byte{}
-	}
-
-	// value (value len bytes)
-	valueBytes, err := json.Marshal(value.GetValue())
-	if err != nil {
-		log.Println(key, "value json marsh failed!")
-		return []byte{}
-	}
-
-	// key len (4 bytes)
-	keyLen := len(keyBytes)
-
-	// base len (4 bytes)
-	baseLen := len(baseBytes)
-
-	// value len (4 bytes)
-	valueLen := len(valueBytes)
-
-	data := make([]byte, 0, 13+keyLen+baseLen+valueLen)
-	data = append(data, tipe)
-	data = append(data, util.IntToBytes(keyLen)...)
-	data = append(data, keyBytes...)
-	data = append(data, util.IntToBytes(baseLen)...)
-	data = append(data, baseBytes...)
-	data = append(data, util.IntToBytes(valueLen)...)
-	data = append(data, valueBytes...)
-
-	return data
+func (s *Shard) MemUsage() int64 {
+	s.rw.RLock()
+	defer s.rw.RUnlock()
+	return s.usedBytes
 }

@@ -9,6 +9,7 @@ type KVTable interface {
 	Delete(key *Key)
 	KeyNum() int
 	Type() string
+	MemUsage() int64
 	closer.Closer // for resource collection
 	Photographer
 }

@@ -354,7 +354,6 @@ func subKVPairView(key string, callbackPlans []*CallbackPlan) []byte {
 
 	// value (value len bytes)
 	valueBytes, err := callbackPlanListView(callbackPlans)
-	fmt.Println(string(valueBytes))
 	if err != nil {
 		log.Println(key, "get callbackPlanListView failed!")
 		return []byte{}

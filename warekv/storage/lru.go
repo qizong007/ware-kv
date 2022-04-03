@@ -2,6 +2,7 @@ package storage
 
 import (
 	"container/list"
+	"github.com/qizong007/ware-kv/warekv/util"
 	"sync"
 )
 
@@ -44,8 +45,7 @@ func (c *LRUCache) Set(key *Key, value Value) {
 		// update
 		c.ll.MoveToFront(e)
 		kv := e.Value.(*entry)
-		// todo: c.usedBytes
-		// c.usedBytes += int64(value.Len() - kv.value.Len())
+		c.usedBytes += int64(value.Size() - kv.value.Size())
 		kv.value = value
 	} else {
 		// insert
@@ -54,23 +54,25 @@ func (c *LRUCache) Set(key *Key, value Value) {
 			value: value,
 		})
 		c.cache[key.GetKey()] = newEle
-		// todo: c.usedBytes
-		// c.usedBytes += int64(len(key) + value.Len())
+		c.usedBytes += int64(len(key.GetKey()) + value.Size())
 	}
 	// memory usage check
-	//for c.maxBytes != 0 && c.maxBytes < c.usedBytes {
-	//	c.removeOldest()
-	//}
+	for c.maxBytes != 0 && c.maxBytes < c.usedBytes {
+		c.removeOldest()
+	}
+}
+
+func (c *LRUCache) remove(e *list.Element) {
+	c.ll.Remove(e)
+	kv := e.Value.(*entry)
+	delete(c.cache, kv.key.GetKey())
+	c.usedBytes -= int64(len(kv.key.GetKey()) + kv.value.Size())
 }
 
 func (c *LRUCache) removeOldest() {
 	last := c.ll.Back() // get the oldest element
 	if last != nil {
-		c.ll.Remove(last)
-		kv := last.Value.(*entry)
-		delete(c.cache, kv.key.GetKey())
-		// todo: c.usedBytes
-		// c.usedBytes -= int64(len(kv.key) + kv.value.Len())
+		c.remove(last)
 	}
 }
 
@@ -79,7 +81,11 @@ func (c *LRUCache) SetInTime(key *Key, val Value) {
 }
 
 func (c *LRUCache) Delete(key *Key) {
-	// TODO
+	c.rw.Lock()
+	defer c.rw.Unlock()
+	if e, ok := c.cache[key.GetKey()]; ok {
+		c.remove(e)
+	}
 }
 
 func (c *LRUCache) Len() int {
@@ -103,10 +109,25 @@ func (c *LRUCache) Type() string {
 }
 
 func (c *LRUCache) View() []byte {
-	// TODO
-	return nil
+	data := make([]byte, 0)
+	// table flag
+	data = append(data, uint8(TableFlag))
+	// keys num
+	data = append(data, util.IntToBytes(len(c.cache))...)
+	// kv pairs
+	for k, e := range c.cache {
+		kv := e.Value.(*entry)
+		data = append(data, kvPairView(k, kv.value)...)
+	}
+	return data
 }
 
 func (c *LRUCache) GetFlag() Flag {
 	return TableFlag
+}
+
+func (c *LRUCache) MemUsage() int64 {
+	c.rw.RLock()
+	defer c.rw.RUnlock()
+	return c.usedBytes
 }
