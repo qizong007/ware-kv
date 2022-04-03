@@ -32,6 +32,14 @@ WareEngine:
   MachineInfo:
     FreshFrequency: 1000 # default is 1000 millisecond (scale: 100 - 5000)
 
+  # Choose your cache eviction
+  Cache:
+    Open: false # default won't open the cache, just use the default ware_table
+    # You can choose one:
+    #   - "lru"
+    Strategy: "lru"
+    MaxBytes: 512 # unit is [byte]
+
 # It's a WAL.
 Tracker:
   Open: true # default is true, set 'false' to turn it down

@@ -69,14 +69,6 @@ func (s *Shard) SetInTime(key *Key, val Value) {
 }
 
 func (s *Shard) set(key string, val Value) {
-	if v, ok := s.table[key]; !ok {
-		// first time, we need to add the key bytes
-		s.usedBytes += int64(len(key))
-	} else {
-		// if already had, just sub the v.Size() before
-		s.usedBytes -= int64(v.Size())
-	}
-	s.usedBytes += int64(val.Size())
 	s.table[key] = val
 }
 
@@ -169,6 +161,16 @@ func (s *Shard) view() []byte {
 
 func (s *Shard) MemUsage() int64 {
 	s.rw.RLock()
-	defer s.rw.RUnlock()
+	sum := int64(0)
+	for _, v := range s.table {
+		sum += int64(v.Size())
+	}
+	s.rw.RUnlock()
+
+	s.rw.Lock()
+	// refresh mem usage
+	s.usedBytes = sum
+	s.rw.Unlock()
+
 	return s.usedBytes
 }

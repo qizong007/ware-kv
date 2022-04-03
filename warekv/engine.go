@@ -24,6 +24,17 @@ type WareEngineOption struct {
 	GC          *storage.WareGCOption          `yaml:"GC"`
 	Subscriber  *manager.SubscribeCenterOption `yaml:"Subscriber"`
 	MachineInfo *machine.WareInfoOption        `yaml:"MachineInfo"`
+	Cache       *CacheOption                   `yaml:"Cache"`
+}
+
+type CacheOption struct {
+	Open     bool   `yaml:"Open"`
+	Strategy string `yaml:"Strategy"`
+	MaxBytes uint64 `yaml:"MaxBytes"`
+}
+
+func DefaultCacheOption() *CacheOption {
+	return &CacheOption{Open: false}
 }
 
 func DefaultOption() *WareEngineOption {
@@ -32,6 +43,7 @@ func DefaultOption() *WareEngineOption {
 		GC:          storage.DefaultWareGCOption(),
 		Subscriber:  manager.DefaultSubscribeCenterOption(),
 		MachineInfo: machine.DefaultWareInfoOption(),
+		Cache:       DefaultCacheOption(),
 	}
 }
 
@@ -41,13 +53,27 @@ func New(option *WareEngineOption) *WareEngine {
 		engine.wTable = storage.NewWareTable(nil, nil)
 		engine.subscribeCenter = manager.NewSubscribeCenter(nil)
 		engine.info = machine.NewWareInfo(nil)
+		storage.GlobalTable = engine.wTable
 	} else {
-		engine.wTable = storage.NewWareTable(option.Shard, option.GC)
+		if option.Cache != nil && option.Cache.Open {
+			engine.wTable = newCache(option.Cache)
+		} else {
+			engine.wTable = storage.NewWareTable(option.Shard, option.GC)
+		}
+		storage.GlobalTable = engine.wTable
 		engine.subscribeCenter = manager.NewSubscribeCenter(option.Subscriber)
 		engine.info = machine.NewWareInfo(option.MachineInfo)
 	}
-	storage.GlobalTable = engine.wTable
 	return engine
+}
+
+func newCache(option *CacheOption) storage.KVTable {
+	switch option.Strategy {
+	case storage.LRUStrategy:
+		return storage.NewLRUCache(int64(option.MaxBytes))
+	default:
+		return storage.NewLRUCache(int64(option.MaxBytes))
+	}
 }
 
 func (e *WareEngine) Close() {

@@ -21,6 +21,7 @@ type Info struct {
 	cpuPercent float64
 	memPercent float32
 	memAlloc   uint64
+	memUsed    uint64
 	infoTicker *time.Ticker
 	closer     chan bool
 }
@@ -68,7 +69,7 @@ func GetWareInfo() *InfoView {
 		CpuPercent: wareInfo.cpuPercent,
 		MemPercent: wareInfo.memPercent,
 		MemAlloc:   wareInfo.memAlloc,
-		MemUsed:    uint64(storage.GlobalTable.MemUsage()),
+		MemUsed:    wareInfo.memUsed,
 		KeysTotal:  storage.GlobalTable.KeyNum(),
 		TableType:  storage.GlobalTable.Type(),
 	}
@@ -112,4 +113,5 @@ func (i *Info) updateInfo() {
 	var ms runtime.MemStats
 	runtime.ReadMemStats(&ms)
 	i.memAlloc = ms.Alloc
+	i.memUsed = uint64(storage.GlobalTable.MemUsage())
 }

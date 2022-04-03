@@ -6,6 +6,10 @@ import (
 	"sync"
 )
 
+const (
+	LRUStrategy = "lru"
+)
+
 type entry struct {
 	key   *Key
 	value Value
@@ -128,6 +132,21 @@ func (c *LRUCache) GetFlag() Flag {
 
 func (c *LRUCache) MemUsage() int64 {
 	c.rw.RLock()
-	defer c.rw.RUnlock()
+	sum := int64(0)
+	for _, e := range c.cache {
+		kv := e.Value.(*entry)
+		sum += int64(kv.value.Size())
+	}
+	c.rw.RUnlock()
+
+	c.rw.Lock()
+	// refresh mem usage
+	c.usedBytes = sum
+	// memory usage check
+	for c.maxBytes != 0 && c.maxBytes < c.usedBytes {
+		c.removeOldest()
+	}
+	c.rw.Unlock()
+
 	return c.usedBytes
 }
