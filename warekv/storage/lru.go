@@ -10,7 +10,7 @@ const (
 	LRUStrategy = "lru"
 )
 
-type entry struct {
+type lruEntry struct {
 	key   *Key
 	value Value
 }
@@ -36,7 +36,7 @@ func (c *LRUCache) Get(key *Key) Value {
 	defer c.rw.RUnlock()
 	if ele, ok := c.cache[key.GetKey()]; ok {
 		c.ll.MoveToFront(ele) // fresh
-		kv := ele.Value.(*entry)
+		kv := ele.Value.(*lruEntry)
 		return kv.value
 	}
 	return nil
@@ -48,12 +48,12 @@ func (c *LRUCache) Set(key *Key, value Value) {
 	if e, ok := c.cache[key.GetKey()]; ok {
 		// update
 		c.ll.MoveToFront(e)
-		kv := e.Value.(*entry)
+		kv := e.Value.(*lruEntry)
 		c.usedBytes += int64(value.Size() - kv.value.Size())
 		kv.value = value
 	} else {
 		// insert
-		newEle := c.ll.PushFront(&entry{
+		newEle := c.ll.PushFront(&lruEntry{
 			key:   key,
 			value: value,
 		})
@@ -68,7 +68,7 @@ func (c *LRUCache) Set(key *Key, value Value) {
 
 func (c *LRUCache) remove(e *list.Element) {
 	c.ll.Remove(e)
-	kv := e.Value.(*entry)
+	kv := e.Value.(*lruEntry)
 	delete(c.cache, kv.key.GetKey())
 	c.usedBytes -= int64(len(kv.key.GetKey()) + kv.value.Size())
 }
@@ -90,12 +90,6 @@ func (c *LRUCache) Delete(key *Key) {
 	if e, ok := c.cache[key.GetKey()]; ok {
 		c.remove(e)
 	}
-}
-
-func (c *LRUCache) Len() int {
-	c.rw.RLock()
-	defer c.rw.RUnlock()
-	return c.ll.Len()
 }
 
 func (c *LRUCache) Close() {
@@ -120,7 +114,7 @@ func (c *LRUCache) View() []byte {
 	data = append(data, util.IntToBytes(len(c.cache))...)
 	// kv pairs
 	for k, e := range c.cache {
-		kv := e.Value.(*entry)
+		kv := e.Value.(*lruEntry)
 		data = append(data, kvPairView(k, kv.value)...)
 	}
 	return data
@@ -134,7 +128,7 @@ func (c *LRUCache) MemUsage() int64 {
 	c.rw.RLock()
 	sum := int64(0)
 	for _, e := range c.cache {
-		kv := e.Value.(*entry)
+		kv := e.Value.(*lruEntry)
 		sum += int64(kv.value.Size())
 	}
 	c.rw.RUnlock()

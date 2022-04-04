@@ -4,6 +4,7 @@ import (
 	"github.com/qizong007/ware-kv/warekv/machine"
 	"github.com/qizong007/ware-kv/warekv/manager"
 	"github.com/qizong007/ware-kv/warekv/storage"
+	"log"
 )
 
 type WareEngine struct {
@@ -70,8 +71,13 @@ func New(option *WareEngineOption) *WareEngine {
 func newCache(option *CacheOption) storage.KVTable {
 	switch option.Strategy {
 	case storage.LRUStrategy:
+		log.Println("Cache Eviction Strategy ->", storage.LRUStrategy)
 		return storage.NewLRUCache(int64(option.MaxBytes))
+	case storage.LFUStrategy:
+		log.Println("Cache Eviction Strategy ->", storage.LFUStrategy)
+		return storage.NewLFUCache(int64(option.MaxBytes))
 	default:
+		log.Println("Cache Eviction Strategy ->", storage.LRUStrategy)
 		return storage.NewLRUCache(int64(option.MaxBytes))
 	}
 }

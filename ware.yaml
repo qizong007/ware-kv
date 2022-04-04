@@ -37,6 +37,7 @@ WareEngine:
     Open: false # default won't open the cache, just use the default ware_table
     # You can choose one:
     #   - "lru"
+    #   - "lfu"
     Strategy: "lru"
     MaxBytes: 512 # unit is [byte]
 
