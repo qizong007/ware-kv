@@ -37,7 +37,7 @@ Or you can just download it in [Release](https://github.com/qizong007/ware-kv/re
     - Message Queue (use *Sub/Pub* to simulate)
     - Bloom Filter
     - Distributed Lock
-  - Support web-based platform tools, including:
+  - Support monitoring API, including:
     - Operation usage
     - Performance monitoring
 - Thread-safe for sure!
