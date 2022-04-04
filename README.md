@@ -34,13 +34,12 @@ Or you can just download it in [Release](https://github.com/qizong007/ware-kv/re
     - list (except `set`)
     - map-dict (except `set`)
   - Contains some lightweight middlewares, like:
-    - Message Queue
+    - Message Queue (use *Sub/Pub* to simulate)
     - Bloom Filter
     - Distributed Lock
   - Support web-based platform tools, including:
     - Operation usage
     - Performance monitoring
-  - Provide double-write consistency plan for MySQL.
 - Thread-safe for sure!
 - Maybe there's no database like *ware-kv*?
 - By the way, complete the graduation project! :)
