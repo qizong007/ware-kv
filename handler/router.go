@@ -30,12 +30,10 @@ func Register(r *gin.Engine) {
 	r.DELETE("/:key", Delete)
 
 	// string
-	r.POST("/str", SetStr)
 	r.PUT("/str", SetStr)
 	r.GET("/str/:key/len", GetStrLen)
 
 	// counter
-	r.POST("/counter", SetCounter)
 	r.PUT("/counter", SetCounter)
 	r.POST("/counter/:key/incr", IncrCounter)
 	r.POST("/counter/:key/incrby/:delta", IncrByCounter)
@@ -43,13 +41,11 @@ func Register(r *gin.Engine) {
 	r.POST("/counter/:key/decrby/:delta", DecrByCounter)
 
 	// object
-	r.POST("/object", SetObject)
 	r.PUT("/object", SetObject)
 	r.GET("/object/:key/:field", GetObjectFieldByKey)
 	r.POST("/object/:key/:field", SetObjectFieldByKey)
 
 	// list
-	r.POST("/list", SetList)
 	r.PUT("/list", SetList)
 	r.POST("/list/:key/add", AddList)
 	r.GET("/list/:key/len", GetListLen)
@@ -59,12 +55,11 @@ func Register(r *gin.Engine) {
 	r.GET("/list/:key/between/:left/:right", GetListBetween)
 	r.DELETE("/list/:key", RemoveListElement)
 	r.POST("/list/:key/rpush", RPushList)
-	r.DELETE("/list/:key/rpop", RPopList)
+	r.POST("/list/:key/rpop", RPopList)
 	r.POST("/list/:key/lpush", LPushList)
-	r.DELETE("/list/:key/lpop", LPopList)
+	r.POST("/list/:key/lpop", LPopList)
 
 	// zlist
-	r.POST("/zlist", SetZList)
 	r.PUT("/zlist", SetZList)
 	r.POST("/zlist/:key/add", AddZList)
 	r.GET("/zlist/:key/len", GetZListLen)
@@ -76,7 +71,6 @@ func Register(r *gin.Engine) {
 	r.DELETE("/zlist/:key", RemoveZListByScore)
 
 	// set
-	r.POST("/set", SetSet)
 	r.PUT("/set", SetSet)
 	r.POST("/set/:key/add", AddSet)
 	r.GET("/set/:key/size", GetSetSize)
@@ -87,7 +81,6 @@ func Register(r *gin.Engine) {
 	r.GET("/set/diff/:set1/:set2", DiffSet)
 
 	// bitmap
-	r.POST("/bitmap/:key/:num", SetBitmap)
 	r.PUT("/bitmap/:key/:num", SetBitmap)
 	r.GET("/bitmap/:key/len", GetBitmapLen)
 	r.GET("/bitmap/:key/between/:left/:right", GetBitCount)
@@ -95,9 +88,7 @@ func Register(r *gin.Engine) {
 	r.DELETE("/bitmap/:key/:num", ClearBitmap)
 
 	// bloom filter
-	r.POST("/bloom", SetBloomSpecific)
 	r.PUT("/bloom", SetBloomSpecific)
-	r.POST("/bloom/fool", SetBloomFuzzy)
 	r.PUT("/bloom/fool", SetBloomFuzzy)
 	r.POST("/bloom/:key", AddBloom)
 	r.GET("/bloom/:key/size", GetBloomSize)
@@ -106,7 +97,6 @@ func Register(r *gin.Engine) {
 	r.DELETE("/bloom/:key", ClearBloom)
 
 	// lock
-	r.POST("/lock/:key", Lock)
 	r.PUT("/lock/:key", Lock)
 	r.POST("/unlock/:key", Unlock)
 
