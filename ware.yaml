@@ -53,3 +53,26 @@ Camera:
   IsZip: false # default won't zip the file
   FilePath: ./photo # default path is in cur dir
   SaveTickInterval: 15 # default is 15 minutes (scale: >= 5)
+
+# It's about authentication, you can use this auth management by HTTP authentication.
+Auth:
+  Open: false # default is false, set 'true' to open it up
+  # It's the root user, and it must be the Admin.
+  # You can register other users by this user (other Admin also OK!)
+  Root:
+    Username: warekv
+    Password: 991002
+  # If you want to add other users, just add like this.
+  # These users' parent will be the Root above.
+  # Role includes: Admin, Reader, Writer
+  # (default is Reader, if you set the wrong Role, or you never set though...)
+  Others:
+    - Username: user1
+      Password: pswd1
+      Role: Admin # Reader + Writer + register auth
+    - Username: user2
+      Password: pswd2
+      Role: Writer # You can only read the data from ware-kv
+    - Username: user3
+      Password: pswd3
+      Role: Reader # You can only write data into ware-kv

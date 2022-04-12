@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/qizong007/ware-kv/authentication"
 	"github.com/qizong007/ware-kv/util"
 	"log"
 	"time"
@@ -12,7 +13,7 @@ import (
 // POST:
 //  Create/Append a new element that belongs to the CURRENT resource to the resource group
 
-func Register(r *gin.Engine) {
+func Register(r *gin.Engine, needAuth bool) {
 	start := time.Now()
 
 	// add ticker
@@ -20,6 +21,11 @@ func Register(r *gin.Engine) {
 
 	// cross-origin
 	r.Use(util.Cors())
+
+	// authentication
+	if needAuth {
+		r.Use(authentication.Authentication())
+	}
 
 	// get machine info
 	r.GET("/", Info)

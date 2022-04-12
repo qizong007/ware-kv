@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gookit/color"
+	"github.com/qizong007/ware-kv/authentication"
 	"github.com/qizong007/ware-kv/camera"
 	"github.com/qizong007/ware-kv/handler"
 	"github.com/qizong007/ware-kv/tracker"
 	"github.com/qizong007/ware-kv/util"
 	"github.com/qizong007/ware-kv/warekv"
+	"log"
 	"time"
 )
 
@@ -45,7 +47,8 @@ func Boot(option *WareOption) {
 	tk.LoadTracker()
 	// Server.engine start in New()
 	defer Server.engine.Close()
-	handler.Register(Server.router)
+	needAuth := registerAuth(option.Auth)
+	handler.Register(Server.router, needAuth)
 	showFrame()
 	port := defaultPort
 	if option != nil {
@@ -82,4 +85,27 @@ func initOption(option *WareOption) {
 			option.WareEngine.MachineInfo = engineOption.WareEngine.MachineInfo
 		}
 	}
+}
+
+func registerAuth(option *authentication.WareAuthOption) bool {
+	if option == nil || option.Open == false {
+		return false
+	}
+	authCenter := authentication.NewAuthCenter(&authentication.AuthCenterOption{
+		Username: option.Root.Username,
+		Password: option.Root.Password,
+	})
+	if option.Others != nil && len(option.Others) > 0 {
+		for _, user := range option.Others {
+			if err := authCenter.Register(&authentication.AuthRegisterOption{
+				ParentUser: option.Root.Username,
+				Username:   user.Username,
+				Password:   user.Password,
+				Role:       authentication.GetAuthRoleIntFromStr(user.Role),
+			}); err != nil {
+				log.Println(user.Username, "Register Fail:", err)
+			}
+		}
+	}
+	return true
 }

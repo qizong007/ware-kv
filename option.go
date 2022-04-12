@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/qizong007/ware-kv/authentication"
 	"github.com/qizong007/ware-kv/camera"
 	"github.com/qizong007/ware-kv/tracker"
 	"github.com/qizong007/ware-kv/warekv"
@@ -10,10 +11,11 @@ import (
 )
 
 type WareOption struct {
-	Port       string                   `yaml:"Port"`
-	WareEngine *warekv.WareEngineOption `yaml:"WareEngine"`
-	Tracker    *tracker.TrackerOption   `yaml:"Tracker"`
-	Camera     *camera.CameraOption     `yaml:"Camera"`
+	Port       string                         `yaml:"Port"`
+	WareEngine *warekv.WareEngineOption       `yaml:"WareEngine"`
+	Tracker    *tracker.TrackerOption         `yaml:"Tracker"`
+	Camera     *camera.CameraOption           `yaml:"Camera"`
+	Auth       *authentication.WareAuthOption `yaml:"Auth"`
 }
 
 func LoadOption(file string) (*WareOption, error) {
