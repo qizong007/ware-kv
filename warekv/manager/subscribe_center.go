@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	defaultDefaultCallbackMethod     = http.MethodGet
+	defaultDefaultCallbackMethod     = http.MethodPost
 	defaultCallbackRetryQueueLen     = 128
 	callbackRetryQueueLenMin         = 1
 	callbackRetryQueueLenMax         = 64 * 1024 * 1024
