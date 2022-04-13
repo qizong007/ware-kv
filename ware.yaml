@@ -23,7 +23,7 @@ WareEngine:
   # There's a SubscribeCenter to handle the pub/sub stuff.
   # I mean, this is not just in time, the first time callback and retry.
   Subscriber:
-    DefaultCallbackMethod: "GET" # default is "GET", you can choose "POST"
+    DefaultCallbackMethod: "POST" # default is "POST", you can choose "PUT", "DELETE" or "GET" either
     RetryQueueLen: 128 # default is 128 (scale: 1 - 64M)
     RetryTickInterval: 1000 # default is 1000 millisecond (scale: 200 - 5000)
 

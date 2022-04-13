@@ -7,6 +7,7 @@ import (
 	"github.com/qizong007/ware-kv/warekv"
 	"github.com/qizong007/ware-kv/warekv/manager"
 	"log"
+	"net/http"
 	"strings"
 )
 
@@ -16,6 +17,14 @@ type SubscribeKeyParam struct {
 	Events       *[]string `json:"expect_events" binding:"-"`
 	RetryTimes   *int      `json:"retry_times" binding:"-"`
 	IsPersistent *bool     `json:"is_persistent" binding:"-"`
+	Method       string    `json:"method" binding:"-"`
+}
+
+var supportMethod = map[string]interface{}{
+	http.MethodPost:   struct{}{},
+	http.MethodPut:    struct{}{},
+	http.MethodDelete: struct{}{},
+	http.MethodGet:    struct{}{},
 }
 
 func SubscribeKey(c *gin.Context) {
@@ -36,6 +45,7 @@ func SubscribeKey(c *gin.Context) {
 		ExpectEvent:  nil,
 		RetryTimes:   0,
 		IsPersistent: false,
+		Method:       manager.GetSubscribeCenter().DefaultCallbackMethod(),
 	}
 	if param.Events != nil {
 		list := *param.Events
@@ -55,6 +65,12 @@ func SubscribeKey(c *gin.Context) {
 	}
 	if param.IsPersistent != nil {
 		manifest.IsPersistent = *param.IsPersistent
+	}
+	if param.Method != "" {
+		method := strings.ToUpper(param.Method)
+		if _, ok := supportMethod[method]; ok {
+			manifest.Method = method
+		}
 	}
 
 	wal(tracker.NewSubCommand(manifest))

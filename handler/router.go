@@ -114,7 +114,8 @@ func Register(r *gin.Engine, needAuth bool) {
 
 	// test
 	r.GET("/ping", Ping)
-	r.GET("/err", Err500)
+	r.GET("/test/err", Err500)
+	r.POST("/test/post", TestPost)
 
 	log.Printf("Router finished loading in %s...\n", time.Since(start))
 }

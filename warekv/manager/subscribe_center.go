@@ -89,6 +89,10 @@ func GetSubscribeCenter() *SubscribeCenter {
 	return center
 }
 
+func (s *SubscribeCenter) DefaultCallbackMethod() string {
+	return s.defaultCallbackMethod
+}
+
 func (s *SubscribeCenter) start() {
 	go center.scheduledRetry()
 	log.Println("Subscriber's Retry worker starts working...")
@@ -104,6 +108,7 @@ type SubscribeManifest struct {
 	ExpectEvent  []int  `json:"e"`
 	RetryTimes   int    `json:"rt"`
 	IsPersistent bool   `json:"ip"`
+	Method       string `json:"m"`
 }
 
 func (s *SubscribeCenter) Subscribe(option *SubscribeManifest) {
@@ -114,11 +119,12 @@ func (s *SubscribeCenter) Subscribe(option *SubscribeManifest) {
 		Events:       option.ExpectEvent,
 		RetryTimes:   option.RetryTimes,
 		IsPersistent: option.IsPersistent,
+		Method:       option.Method,
 	}
 	plan := s.generateCallbackPlan(cpOption)
 	key := option.Key
 	if plans, ok := s.record[key]; ok {
-		plans = append(plans, plan)
+		s.record[key] = append(s.record[key], plan)
 	} else {
 		plans = []*CallbackPlan{plan}
 		s.record[key] = plans
@@ -153,7 +159,7 @@ func (s *SubscribeCenter) Notify(key string, newVal interface{}, event int) {
 			if isEventInList(event, *plans[i].expectEvent) {
 				plans[i].notify(newVal)
 			} else {
-				deleteCallbackPlan(plans, i)
+				plans[i].status = callbackFail
 			}
 		}
 	}
@@ -175,7 +181,7 @@ func (s *SubscribeCenter) generateCallbackPlan(option *CallbackPlanOption) *Call
 	plan := &CallbackPlan{
 		center:         s,
 		callbackPath:   option.CallbackPath,
-		callbackMethod: s.defaultCallbackMethod,
+		callbackMethod: option.Method,
 		status:         callbackCreated,
 		expectEvent:    &[]int{CallbackSetEvent, CallbackDeleteEvent},
 		isPersistent:   option.IsPersistent,
@@ -248,7 +254,10 @@ func (p *CallbackPlan) distribute() {
 }
 
 func (p *CallbackPlan) generateRequest() (*http.Request, error) {
-	param, err := json.Marshal(p.param)
+	ctx := map[string]interface{}{
+		"new_val": p.param,
+	}
+	param, err := json.Marshal(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -265,8 +274,7 @@ func (p *CallbackPlan) generateGetPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// fixme: resolve newVal
-	return fmt.Sprintf("%s?newVal=%s", p.callbackPath, paramStr), nil
+	return fmt.Sprintf("%s?new_val=%s", p.callbackPath, paramStr), nil
 }
 
 func (p *CallbackPlan) notifyInGet() {
@@ -321,16 +329,12 @@ func (p *CallbackPlan) dealWithCallbackErr() {
 	}
 }
 
-func (p *CallbackPlan) view() []byte {
-	view := make([]byte, 0)
-	return view
-}
-
 type CallbackPlanOption struct {
 	CallbackPath string
 	Events       []int
 	RetryTimes   int
 	IsPersistent bool
+	Method       string
 }
 
 func (s *SubscribeCenter) View() []byte {
@@ -382,6 +386,7 @@ func callbackPlanListView(callbackPlans []*CallbackPlan) ([]byte, error) {
 			Events:       *callbackPlan.expectEvent,
 			RetryTimes:   callbackPlan.leftRetryTimes,
 			IsPersistent: callbackPlan.isPersistent,
+			Method:       callbackPlan.callbackMethod,
 		}
 		cpoBytes, err := json.Marshal(cpo)
 		if err != nil {
