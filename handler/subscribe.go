@@ -12,12 +12,13 @@ import (
 )
 
 type SubscribeKeyParam struct {
-	Key          string    `json:"key"`
-	Path         string    `json:"path"`
-	Events       *[]string `json:"expect_events" binding:"-"`
-	RetryTimes   *int      `json:"retry_times" binding:"-"`
-	IsPersistent *bool     `json:"is_persistent" binding:"-"`
-	Method       string    `json:"method" binding:"-"`
+	Key          string      `json:"key"`
+	Path         string      `json:"path"`
+	Events       *[]string   `json:"expect_events" binding:"-"`
+	RetryTimes   *int        `json:"retry_times" binding:"-"`
+	IsPersistent *bool       `json:"is_persistent" binding:"-"`
+	Method       string      `json:"method" binding:"-"`
+	ExpectValue  interface{} `json:"expect_value" binding:"-"`
 }
 
 var supportMethod = map[string]interface{}{
@@ -71,6 +72,9 @@ func SubscribeKey(c *gin.Context) {
 		if _, ok := supportMethod[method]; ok {
 			manifest.Method = method
 		}
+	}
+	if param.ExpectValue != nil {
+		manifest.ExpectValue = param.ExpectValue
 	}
 
 	wal(tracker.NewSubCommand(manifest))

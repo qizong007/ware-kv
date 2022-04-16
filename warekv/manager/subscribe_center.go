@@ -8,6 +8,7 @@ import (
 	"github.com/qizong007/ware-kv/warekv/util"
 	"log"
 	"net/http"
+	"reflect"
 	"sync"
 	"time"
 )
@@ -103,12 +104,13 @@ func (s *SubscribeCenter) Close() {
 }
 
 type SubscribeManifest struct {
-	Key          string `json:"k"`
-	CallbackPath string `json:"cp"`
-	ExpectEvent  []int  `json:"e"`
-	RetryTimes   int    `json:"rt"`
-	IsPersistent bool   `json:"ip"`
-	Method       string `json:"m"`
+	Key          string      `json:"k"`
+	CallbackPath string      `json:"cp"`
+	ExpectEvent  []int       `json:"ee"`
+	RetryTimes   int         `json:"rt"`
+	IsPersistent bool        `json:"ip"`
+	Method       string      `json:"m"`
+	ExpectValue  interface{} `json:"ev"`
 }
 
 func (s *SubscribeCenter) Subscribe(option *SubscribeManifest) {
@@ -120,6 +122,7 @@ func (s *SubscribeCenter) Subscribe(option *SubscribeManifest) {
 		RetryTimes:   option.RetryTimes,
 		IsPersistent: option.IsPersistent,
 		Method:       option.Method,
+		ExpectValue:  option.ExpectValue,
 	}
 	plan := s.generateCallbackPlan(cpOption)
 	key := option.Key
@@ -185,6 +188,7 @@ func (s *SubscribeCenter) generateCallbackPlan(option *CallbackPlanOption) *Call
 		status:         callbackCreated,
 		expectEvent:    &[]int{CallbackSetEvent, CallbackDeleteEvent},
 		isPersistent:   option.IsPersistent,
+		expectValue:    option.ExpectValue,
 	}
 	if option.RetryTimes != 0 {
 		plan.retryTimes = option.RetryTimes
@@ -230,10 +234,13 @@ type CallbackPlan struct {
 	retryTimes     int
 	leftRetryTimes int
 	isPersistent   bool
-	//expectValue
+	expectValue    interface{}
 }
 
 func (p *CallbackPlan) notify(newVal interface{}) {
+	if !reflect.DeepEqual(newVal, p.expectValue) {
+		return
+	}
 	p.param = newVal
 	p.status = callbackRequest
 	// distribute by callback method
@@ -335,6 +342,7 @@ type CallbackPlanOption struct {
 	RetryTimes   int
 	IsPersistent bool
 	Method       string
+	ExpectValue  interface{}
 }
 
 func (s *SubscribeCenter) View() []byte {
