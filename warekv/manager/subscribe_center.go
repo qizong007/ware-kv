@@ -38,6 +38,11 @@ const (
 	CallbackDeleteEvent
 )
 
+var callbackReason = map[int]string{
+	CallbackSetEvent:    "set",
+	CallbackDeleteEvent: "delete",
+}
+
 var (
 	center *SubscribeCenter
 )
@@ -142,6 +147,7 @@ func refreshCallbackPlan(plan *CallbackPlan) {
 	plan.param = nil
 	plan.status = callbackCreated
 	plan.leftRetryTimes = plan.retryTimes
+	plan.triggeredEvent = -1
 }
 
 // Notify just callback
@@ -160,6 +166,7 @@ func (s *SubscribeCenter) Notify(key string, newVal interface{}, event int) {
 		}
 		if plans[i].status == callbackCreated {
 			if isEventInList(event, *plans[i].expectEvent) {
+				plans[i].triggeredEvent = event
 				plans[i].notify(newVal)
 			} else {
 				plans[i].status = callbackFail
@@ -189,6 +196,7 @@ func (s *SubscribeCenter) generateCallbackPlan(option *CallbackPlanOption) *Call
 		expectEvent:    &[]int{CallbackSetEvent, CallbackDeleteEvent},
 		isPersistent:   option.IsPersistent,
 		expectValue:    option.ExpectValue,
+		triggeredEvent: -1, // null
 	}
 	if option.RetryTimes != 0 {
 		plan.retryTimes = option.RetryTimes
@@ -235,10 +243,11 @@ type CallbackPlan struct {
 	leftRetryTimes int
 	isPersistent   bool
 	expectValue    interface{}
+	triggeredEvent int
 }
 
 func (p *CallbackPlan) notify(newVal interface{}) {
-	if !reflect.DeepEqual(newVal, p.expectValue) {
+	if p.triggeredEvent == CallbackSetEvent && !reflect.DeepEqual(newVal, p.expectValue) {
 		return
 	}
 	p.param = newVal
@@ -262,7 +271,10 @@ func (p *CallbackPlan) distribute() {
 
 func (p *CallbackPlan) generateRequest() (*http.Request, error) {
 	ctx := map[string]interface{}{
-		"new_val": p.param,
+		"reason": callbackReason[p.triggeredEvent],
+	}
+	if p.triggeredEvent == CallbackSetEvent {
+		ctx["new_val"] = p.param
 	}
 	param, err := json.Marshal(ctx)
 	if err != nil {
@@ -281,7 +293,11 @@ func (p *CallbackPlan) generateGetPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%s?new_val=%s", p.callbackPath, paramStr), nil
+	callbackPath := fmt.Sprintf("%s?reason=%s", callbackReason[p.triggeredEvent], p.callbackPath)
+	if p.triggeredEvent == CallbackSetEvent {
+		callbackPath += fmt.Sprintf("&new_val=%s", paramStr)
+	}
+	return callbackPath, nil
 }
 
 func (p *CallbackPlan) notifyInGet() {
