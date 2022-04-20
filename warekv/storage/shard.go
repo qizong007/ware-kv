@@ -87,6 +87,16 @@ func (s *Shard) Delete(key *Key) {
 	}
 }
 
+func (s *Shard) DeleteInTime(key *Key) {
+	s.rw.Lock()
+	k := key.GetKey()
+	if val, ok := s.table[k]; ok {
+		s.usedBytes -= int64(len(k) + val.Size())
+		delete(s.table, k)
+	}
+	s.rw.Unlock()
+}
+
 func (s *Shard) scheduledBatchCommit() {
 	for {
 		select {

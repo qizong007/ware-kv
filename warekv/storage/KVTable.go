@@ -7,6 +7,7 @@ type KVTable interface {
 	Set(key *Key, val Value)
 	SetInTime(key *Key, val Value)
 	Delete(key *Key)
+	DeleteInTime(key *Key)
 	KeyNum() int
 	Type() string
 	MemUsage() int64

@@ -92,6 +92,10 @@ func (c *LRUCache) Delete(key *Key) {
 	}
 }
 
+func (c *LRUCache) DeleteInTime(key *Key) {
+	c.Delete(key)
+}
+
 func (c *LRUCache) Close() {
 	// compatible with the interface
 }

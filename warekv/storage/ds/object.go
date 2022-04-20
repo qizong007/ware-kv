@@ -56,3 +56,10 @@ func (o *Object) SetFieldByKey(key string, val interface{}) {
 	o.Update()
 	o.object[key] = val
 }
+
+func (o *Object) DeleteFieldByKey(key string) {
+	o.rw.Lock()
+	defer o.rw.Unlock()
+	o.Update()
+	delete(o.object, key)
+}

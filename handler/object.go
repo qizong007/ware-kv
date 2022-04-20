@@ -107,3 +107,37 @@ func SetObjectFieldByKey(c *gin.Context) {
 		Code: util.Success,
 	})
 }
+
+func DeleteObjectFieldByKey(c *gin.Context) {
+	key, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
+	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, dstype.ObjectDS) {
+		return
+	}
+
+	filed := c.Param("field")
+
+	if filed == "" {
+		log.Println("field is null")
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ParamError,
+			Msg:  "field is null",
+		})
+		return
+	}
+
+	object := storage.Value2Object(val)
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ObjectDeleteFieldByKey, time.Now().Unix(), filed))
+	object.DeleteFieldByKey(filed)
+	setNotify(key, object)
+
+	util.MakeResponse(c, &util.WareResponse{
+		Code: util.Success,
+	})
+}

@@ -140,6 +140,10 @@ func (c *LFUCache) Delete(key *Key) {
 	}
 }
 
+func (c *LFUCache) DeleteInTime(k *Key) {
+	c.Delete(k)
+}
+
 func (c *LFUCache) remove(entry *lfuEntry) {
 	c.removeKVFromCache(entry)
 	c.removeEntryFromFreqNode(entry.freqNode, entry)

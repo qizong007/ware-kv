@@ -108,6 +108,10 @@ func (e *WareEngine) Delete(key *storage.Key) {
 	e.wTable.Delete(key)
 }
 
+func (e *WareEngine) DeleteInTime(key *storage.Key) {
+	e.wTable.DeleteInTime(key)
+}
+
 func (e *WareEngine) Subscribe(option *manager.SubscribeManifest) {
 	e.subscribeCenter.Subscribe(option)
 }

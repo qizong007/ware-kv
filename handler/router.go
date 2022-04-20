@@ -50,6 +50,7 @@ func Register(r *gin.Engine, needAuth bool) {
 	r.PUT("/object", SetObject)
 	r.GET("/object/:key/:field", GetObjectFieldByKey)
 	r.POST("/object/:key/:field", SetObjectFieldByKey)
+	r.DELETE("/object/:key/:field", DeleteObjectFieldByKey)
 
 	// list
 	r.PUT("/list", SetList)

@@ -11,28 +11,29 @@ import (
 )
 
 const (
-	CounterIncr         = "cnt_i"
-	CounterDecr         = "cnt_d"
-	CounterIncrBy       = "cnt_ib"
-	CounterDecrBy       = "cnt_db"
-	ObjectSetFieldByKey = "obj_sf"
-	ListAdd             = "lst_a"
-	ListRemoveAt        = "lst_ra"
-	ListRemoveVal       = "lst_rv"
-	ListRPush           = "lst_rps"
-	ListLPush           = "lst_lps"
-	ListRPop            = "lst_rpp"
-	ListLPop            = "lst_lpp"
-	ZListAdd            = "zl_a"
-	ZListRemoveScore    = "zl_rs"
-	ZListRemoveScores   = "zl_rss"
-	ZListRemoveInScore  = "zl_ris"
-	SetAdd              = "set_a"
-	SetRemove           = "set_r"
-	BitmapSet           = "bm_s"
-	BitmapClear         = "bm_c"
-	BloomFilterAdd      = "bf_a"
-	BloomFilterClear    = "bf_c"
+	CounterIncr            = "cnt_i"
+	CounterDecr            = "cnt_d"
+	CounterIncrBy          = "cnt_ib"
+	CounterDecrBy          = "cnt_db"
+	ObjectSetFieldByKey    = "obj_sf"
+	ObjectDeleteFieldByKey = "obj_df"
+	ListAdd                = "lst_a"
+	ListRemoveAt           = "lst_ra"
+	ListRemoveVal          = "lst_rv"
+	ListRPush              = "lst_rps"
+	ListLPush              = "lst_lps"
+	ListRPop               = "lst_rpp"
+	ListLPop               = "lst_lpp"
+	ZListAdd               = "zl_a"
+	ZListRemoveScore       = "zl_rs"
+	ZListRemoveScores      = "zl_rss"
+	ZListRemoveInScore     = "zl_ris"
+	SetAdd                 = "set_a"
+	SetRemove              = "set_r"
+	BitmapSet              = "bm_s"
+	BitmapClear            = "bm_c"
+	BloomFilterAdd         = "bf_a"
+	BloomFilterClear       = "bf_c"
 )
 
 var str2ModifyFunc = map[string]func(storage.Value, []interface{}){
@@ -53,6 +54,10 @@ var str2ModifyFunc = map[string]func(storage.Value, []interface{}){
 	ObjectSetFieldByKey: func(val storage.Value, params []interface{}) {
 		filed := params[0].(string)
 		val.(*ds.Object).SetFieldByKey(filed, params[1])
+	},
+	ObjectDeleteFieldByKey: func(val storage.Value, params []interface{}) {
+		filed := params[0].(string)
+		val.(*ds.Object).DeleteFieldByKey(filed)
 	},
 	ListAdd: func(val storage.Value, params []interface{}) {
 		val.(*ds.List).Append(params[0].([]interface{}))

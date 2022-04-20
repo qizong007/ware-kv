@@ -25,7 +25,7 @@ func (c *DeleteCommand) String() string {
 }
 
 func (c *DeleteCommand) Execute() {
-	warekv.Engine().Delete(storage.MakeKey(c.Key))
+	warekv.Engine().DeleteInTime(storage.MakeKey(c.Key))
 }
 
 func (c *DeleteCommand) GetOpType() string {

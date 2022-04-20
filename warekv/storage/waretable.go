@@ -105,6 +105,11 @@ func (w *WareTable) Delete(key *Key) {
 	w.TableList[pos].Delete(key)
 }
 
+func (w *WareTable) DeleteInTime(key *Key) {
+	pos := w.wHash(key)
+	w.TableList[pos].DeleteInTime(key)
+}
+
 func (w *WareTable) KeyNum() int {
 	sum := 0
 	for i := 0; i < w.TableNum; i++ {
