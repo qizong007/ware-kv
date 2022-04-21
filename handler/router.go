@@ -55,6 +55,7 @@ func Register(r *gin.Engine, needAuth bool) {
 	// list
 	r.PUT("/list", SetList)
 	r.POST("/list/:key/add", AddList)
+	r.PUT("/list/:key/set", SetElementAt)
 	r.GET("/list/:key/len", GetListLen)
 	r.GET("/list/:key/pos/:pos", GetListByPos)
 	r.GET("/list/:key/start/:left", GetListStartAt)

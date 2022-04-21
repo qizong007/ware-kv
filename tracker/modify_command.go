@@ -18,6 +18,7 @@ const (
 	ObjectSetFieldByKey    = "obj_sf"
 	ObjectDeleteFieldByKey = "obj_df"
 	ListAdd                = "lst_a"
+	ListSetAt              = "lst_sa"
 	ListRemoveAt           = "lst_ra"
 	ListRemoveVal          = "lst_rv"
 	ListRPush              = "lst_rps"
@@ -62,12 +63,16 @@ var str2ModifyFunc = map[string]func(storage.Value, []interface{}){
 	ListAdd: func(val storage.Value, params []interface{}) {
 		val.(*ds.List).Append(params[0].([]interface{}))
 	},
+	ListSetAt: func(val storage.Value, params []interface{}) {
+		idx := int(params[0].(float64))
+		_ = val.(*ds.List).SetAt(idx, params[1])
+	},
 	ListRemoveVal: func(val storage.Value, params []interface{}) {
 		val.(*ds.List).RemoveVal(params[0])
 	},
 	ListRemoveAt: func(val storage.Value, params []interface{}) {
 		pos := int(params[0].(float64))
-		val.(*ds.List).RemoveAt(pos)
+		_ = val.(*ds.List).RemoveAt(pos)
 	},
 	ListRPush: func(val storage.Value, params []interface{}) {
 		val.(*ds.List).RPush(params[0])

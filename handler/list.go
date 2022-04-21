@@ -27,6 +27,11 @@ type RemoveListElementParam struct {
 	Pos *int
 }
 
+type SetAtParam struct {
+	Element interface{} `json:"e"`
+	Pos     int         `json:"pos"`
+}
+
 type PushListParam struct {
 	Element interface{} `json:"e"`
 }
@@ -377,7 +382,64 @@ func RemoveListElement(c *gin.Context) {
 
 	// param.Pos != nil
 	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListRemoveAt, time.Now().Unix(), *param.Pos))
-	list.RemoveAt(*param.Pos)
+	err = list.RemoveAt(*param.Pos)
+	if err != nil {
+		log.Println("RemoveListElement fail", err)
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ScopeError,
+		})
+		return
+	}
+	setNotify(key, list)
+	util.MakeResponse(c, &util.WareResponse{
+		Code: util.Success,
+	})
+}
+
+func SetElementAt(c *gin.Context) {
+	param := SetAtParam{}
+	err := c.BindJSON(&param)
+	if err != nil {
+		log.Println("BindJSON fail")
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ParamError,
+			Msg:  "Param bind json fail!",
+		})
+		return
+	}
+
+	if param.Element == nil {
+		log.Println("SetElementAt's element is <nil>!")
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ParamError,
+			Msg:  "Element is <nil>!",
+		})
+		return
+	}
+
+	key, val, err := findKeyAndValue(c)
+	if err != nil {
+		keyNull(c)
+		return
+	}
+	if !isKVEffective(c, val) {
+		return
+	}
+	if !isKVTypeCorrect(c, val, dstype.ListDS) {
+		return
+	}
+
+	list := storage.Value2List(val)
+
+	wal(tracker.NewModifyCommand(key.GetKey(), tracker.ListSetAt, time.Now().Unix(), param.Pos, param.Element))
+	err = list.SetAt(param.Pos, param.Element)
+	if err != nil {
+		log.Println("SetElementAt fail", err)
+		util.MakeResponse(c, &util.WareResponse{
+			Code: util.ScopeError,
+		})
+		return
+	}
 	setNotify(key, list)
 	util.MakeResponse(c, &util.WareResponse{
 		Code: util.Success,

@@ -127,7 +127,21 @@ func (l *List) Append(list []interface{}) {
 	*l.list = append(*l.list, list...)
 }
 
-func (l *List) RemoveAt(idx int) {
+func (l *List) SetAt(idx int, val interface{}) error {
+	if idx < 0 || idx >= l.GetLen() {
+		return fmt.Errorf("idx out of bounds")
+	}
+	l.rw.Lock()
+	defer l.rw.Unlock()
+	l.Update()
+	(*l.list)[idx] = val
+	return nil
+}
+
+func (l *List) RemoveAt(idx int) error {
+	if idx < 0 || idx >= l.GetLen() {
+		return fmt.Errorf("idx out of bounds")
+	}
 	l.rw.Lock()
 	defer l.rw.Unlock()
 	l.Update()
@@ -137,6 +151,7 @@ func (l *List) RemoveAt(idx int) {
 			break
 		}
 	}
+	return nil
 }
 
 func (l *List) RemoveVal(val interface{}) {
