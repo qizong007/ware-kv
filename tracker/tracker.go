@@ -167,7 +167,7 @@ func (t *Tracker) scheduledRefresh() {
 	}
 }
 
-// | OpType (1 byte) | Time (8 bytes) | CommandString (n bytes) |
+// | OpType | Time | CommandString |
 func (t *Tracker) Write(command Command) {
 	if !t.isOpen {
 		return
