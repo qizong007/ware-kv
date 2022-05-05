@@ -16,7 +16,7 @@ type SetBitmapParam struct {
 }
 
 func SetBitmap(c *gin.Context) {
-	param := SetListParam{}
+	param := SetBitmapParam{}
 	_ = c.ShouldBindJSON(&param)
 
 	numStr := c.Param("num")
