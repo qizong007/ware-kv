@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/qizong007/ware-kv/util"
 	"log"
 	"os"
 )
@@ -27,11 +28,11 @@ func init() {
 	flag.StringVar(&configPath, "c", defaultLoadOptionPath, "set configuration `file`")
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, `ware-kv version: ware-kv/0.0.1
+		fmt.Fprintf(os.Stderr, `ware-kv version: ware-kv/%s
 Usage: ware-kv [-hvt] [-c filename]
 
 Options:
-`)
+`, util.WareKVVersion)
 		flag.PrintDefaults()
 	}
 }
