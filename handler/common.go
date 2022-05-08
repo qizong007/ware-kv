@@ -38,7 +38,7 @@ func Delete(c *gin.Context) {
 		return
 	}
 
-	wal(tracker.NewDeleteCommand(key.GetKey()))
+	wal(tracker.NewDeleteCommand(key.GetKey(), time.Now().Unix()))
 	anticorrosive.Del(key)
 
 	util.MakeResponse(c, &util.WareResponse{

@@ -8,11 +8,12 @@ import (
 )
 
 type DeleteCommand struct {
-	Key string `json:"k"`
+	Key        string `json:"k"`
+	DeleteTime int64  `json:"t"`
 }
 
-func NewDeleteCommand(key string) *DeleteCommand {
-	return &DeleteCommand{key}
+func NewDeleteCommand(key string, delTime int64) *DeleteCommand {
+	return &DeleteCommand{key, delTime}
 }
 
 func (c *DeleteCommand) String() string {

@@ -13,7 +13,7 @@ func TestTrackerWrite(t *testing.T) {
 	tk := NewTracker(option)
 	c := NewCreateCommand("k1", StringStruct, "hello, ware-kv", time.Now().Unix(), 0)
 	tk.Write(c)
-	d := NewDeleteCommand("k1")
+	d := NewDeleteCommand("k1", time.Now().Unix())
 	tk.Write(d)
 	cl := NewCreateCommand("k2", ListStruct, []interface{}{1, 3.14, "wq"}, time.Now().Unix(), 0)
 	tk.Write(cl)
