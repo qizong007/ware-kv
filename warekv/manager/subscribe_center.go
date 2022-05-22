@@ -246,8 +246,12 @@ type CallbackPlan struct {
 	triggeredEvent int
 }
 
+func valueIsExpected(newVal interface{}, expectedVal interface{}) bool {
+	return expectedVal == nil || reflect.DeepEqual(newVal, expectedVal)
+}
+
 func (p *CallbackPlan) notify(newVal interface{}) {
-	if p.triggeredEvent == CallbackSetEvent && !reflect.DeepEqual(newVal, p.expectValue) {
+	if p.triggeredEvent == CallbackSetEvent && !valueIsExpected(newVal, p.expectValue) {
 		return
 	}
 	p.param = newVal
