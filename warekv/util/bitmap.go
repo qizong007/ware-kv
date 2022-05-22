@@ -101,19 +101,23 @@ func (bitmap *Bitmap) BitCount(start int, end int) int {
 	startSeg, startOffset := getSegAndOffsetByNum(start)
 	endSeg, endOffset := getSegAndOffsetByNum(end)
 	count := 0
-	for i := startSeg; i <= endSeg; i++ {
+	for i := startSeg; i < len(bitmap.val) && i <= endSeg; i++ {
 		count += hammingWeight(bitmap.val[i])
 	}
 	// the segment 'start' at
-	for i := uint(0); i < startOffset; i++ {
-		if bitmap.getBit(startSeg, i) != 0 {
-			count--
+	if startSeg < len(bitmap.val) {
+		for i := uint(0); i < startOffset; i++ {
+			if bitmap.getBit(startSeg, i) != 0 {
+				count--
+			}
 		}
 	}
 	// the segment 'end' at
-	for i := endOffset; i < 64; i++ {
-		if bitmap.getBit(endSeg, i) != 0 {
-			count--
+	if endSeg < len(bitmap.val) {
+		for i := endOffset; i < 64; i++ {
+			if bitmap.getBit(endSeg, i) != 0 {
+				count--
+			}
 		}
 	}
 	return count
